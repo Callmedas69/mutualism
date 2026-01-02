@@ -1,0 +1,1 @@
+farcaster color : #6A3CFF

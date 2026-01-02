@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 // Domain for miniapp metadata
-const domain = process.env.NEXT_PUBLIC_DOMAIN_URL || "http://localhost:3000";
+const domain = process.env.NEXT_PUBLIC_DOMAIN_URL || "https://mutualism.geoart.studio";
 
 // Farcaster miniapp embed configuration (Base App compatible)
 const miniAppEmbed = {

@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "WebSearch",
+      "WebFetch(domain:docs.farcaster.xyz)",
+      "Bash(npx shadcn@latest:*)",
+      "Bash(npx shadcn-ui@latest init --defaults)",
+      "Bash(npm uninstall:*)",
+      "Bash(npm i:*)",
+      "Bash(npm view:*)",
+      "Bash(findstr:*)",
+      "Bash(del \"D:\\\\Harry\\\\BasedNouns\\\\CodeProject\\\\quotientmutual\\\\types\\\\appkit.d.ts\")",
+      "Bash(npm run dev:*)",
+      "Bash(wc:*)",
+      "mcp__context7__query-docs",
+      "WebFetch(domain:docs.zora.co)",
+      "WebFetch(domain:nft.docs.zora.co)",
+      "WebFetch(domain:docs.base.org)",
+      "WebFetch(domain:github.com)",
+      "Bash(npm show:*)",
+      "Bash(dir /s \"D:\\\\Harry\\\\BasedNouns\\\\CodeProject\\\\quotientmutual\\\\app\\\\dashboard\")",
+      "WebFetch(domain:konvajs.org)",
+      "WebFetch(domain:miniapps.farcaster.xyz)",
+      "WebFetch(domain:www.base.org)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "context7"
+  ]
+}
