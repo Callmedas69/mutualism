@@ -21,7 +21,6 @@ export async function GET() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: "30px",
           }}
         >
           {/* Logo */}
@@ -46,7 +45,7 @@ export async function GET() {
               textAlign: "center",
             }}
           >
-            Visualize Your Farcaster Network
+            Visualize Your Farcaster Social Graphs
           </div>
           {/* Description */}
           <div
@@ -56,9 +55,11 @@ export async function GET() {
               color: "#71717a",
               letterSpacing: "0.05em",
               textAlign: "center",
+              fontStyle: "italic",
+              transform: "skewX(-12deg)",
             }}
           >
-            Explore connections • Tokenize on Zora
+            your mutual, your attention, your influence
           </div>
         </div>
       </div>

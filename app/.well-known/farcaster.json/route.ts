@@ -19,9 +19,9 @@ export async function GET() {
       splashImageUrl: `${domain}/splash-200.png`,
       splashBackgroundColor: "#18181b",
       webhookUrl: `${domain}/api/miniapp/webhook`,
-      subtitle: "Visualize Your Farcaster Network",
+      subtitle: "See Your Farcaster Mutuals",
       description:
-        "Explore your mutual connections, tokenize your social graph on Zora",
+        "Explore your mutual connections, whom you pay attention to, and whom pay attention to you",
       primaryCategory: "social",
       tags: ["farcaster", "social", "nft", "zora", "base"],
       // Base App enhanced fields
@@ -31,11 +31,12 @@ export async function GET() {
         `${domain}/screenshots/screenshot-3.png`,
       ],
       heroImageUrl: `${domain}/hero.png`,
-      tagline: "Visualize & Tokenize Your Network",
+      tagline: "Map and Tokenize Your Graph",
       ogTitle: "MUTUALISM",
       ogDescription:
-        "Visualize your Farcaster network and tokenize your social graph on Zora",
+        "Explore your mutual connections, whom you pay attention to, and whom pay attention to you",
       ogImageUrl: `${domain}/og-miniapp.png`,
+      noindex: true,
     },
   };
 

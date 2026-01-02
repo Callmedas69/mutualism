@@ -12,19 +12,30 @@ export async function GET() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#18181b",
+          backgroundColor: "#ffffff",
         }}
       >
-        {/* Logo M */}
+        {/* Rounded M Logo */}
         <div
           style={{
-            fontSize: "120px",
-            fontWeight: 900,
-            letterSpacing: "-0.05em",
-            color: "#f25b28",
+            width: "160px",
+            height: "160px",
+            borderRadius: "90px",
+            backgroundColor: "#18181b",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          M
+          <div
+            style={{
+              fontSize: "120px",
+              fontWeight: 900,
+              color: "#f25b28",
+            }}
+          >
+            M
+          </div>
         </div>
       </div>
     ),

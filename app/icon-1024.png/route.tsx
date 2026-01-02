@@ -20,28 +20,27 @@ export async function GET() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: "40px",
+            
           }}
         >
           {/* Logo M */}
           <div
             style={{
-              fontSize: "400px",
+              fontSize: "800px",
               fontWeight: 900,
-              letterSpacing: "-0.05em",
-              display: "flex",
+              lineHeight: 0.8,
+              color: "#f25b28",
             }}
           >
-            <span style={{ color: "#f25b28" }}>M</span>
+            M
           </div>
           {/* Tagline */}
           <div
             style={{
-              fontSize: "48px",
-              fontWeight: 500,
-              color: "#a1a1aa",
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
+              fontSize: "106px",
+              fontWeight: 700,
+              color: "#ffffff",
+              letterSpacing: "-0.03em",
             }}
           >
             MUTUALISM

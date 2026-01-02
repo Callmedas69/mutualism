@@ -22,7 +22,6 @@ export async function GET() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: "24px",
           }}
         >
           {/* Logo */}
@@ -46,7 +45,7 @@ export async function GET() {
               letterSpacing: "0.1em",
             }}
           >
-            Visualize & Tokenize Your Network
+            RELATIONSHIP ARE MUTUAL, YOURS ?
           </div>
         </div>
       </div>
