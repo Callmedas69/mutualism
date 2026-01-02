@@ -45,10 +45,10 @@ export default function Navbar() {
             Home
           </TransitionLink>
           <TransitionLink
-            href="/dashboard"
+            href="/graph"
             className="text-xs uppercase tracking-[0.15em] font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
           >
-            Dashboard
+            Graph
           </TransitionLink>
           <TransitionLink
             href="/gallery"
@@ -82,11 +82,11 @@ export default function Navbar() {
               {showDropdown && (
                 <div className="absolute right-0 top-full mt-2 min-w-[160px] border border-zinc-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-900 animate-in fade-in zoom-in-95 duration-150">
                   <TransitionLink
-                    href="/dashboard"
+                    href="/graph"
                     onClick={() => setShowDropdown(false)}
                     className="block px-4 py-3 text-xs uppercase tracking-[0.1em] font-medium text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white transition-colors"
                   >
-                    Dashboard
+                    Graph
                   </TransitionLink>
                   <button
                     onClick={() => {

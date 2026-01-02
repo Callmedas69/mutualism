@@ -37,20 +37,22 @@ export default function Home() {
   return (
     <section
       ref={heroRef}
-      className={`relative flex flex-col justify-end px-4 sm:px-8 lg:px-16 overflow-hidden ${
+      className={`relative flex flex-col px-4 sm:px-8 lg:px-16 overflow-hidden ${
         isMiniApp
-          ? "min-h-0 pb-4"
-          : "min-h-[calc(100vh-4rem)] pb-16 sm:pb-16 lg:pb-24"
+          ? "min-h-0 pb-4 justify-center items-center text-center"
+          : "min-h-[calc(100vh-4rem)] pb-16 sm:pb-16 lg:pb-24 justify-end"
       }`}
     >
       {/* Main Typography */}
-      <div className="relative">
-        {/* Overline Tag */}
-        <div className="hero-tag ">
-          <p className="text-xs sm:text-sm lg:text-base uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
-            FARCASTER SOCIAL GRAPH
-          </p>
-        </div>
+      <div className={`relative ${isMiniApp ? "flex flex-col items-center" : ""}`}>
+        {/* Overline Tag - hidden in miniapp */}
+        {!isMiniApp && (
+          <div className="hero-tag">
+            <p className="text-xs sm:text-sm lg:text-base uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
+              FARCASTER SOCIAL GRAPH
+            </p>
+          </div>
+        )}
 
         {/* Line 1 */}
         <div className="overflow-hidden">
@@ -92,21 +94,21 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Subtext and CTA */}
-      <div className={`mt-2 sm:mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between ${isMiniApp ? "gap-3" : "gap-6"}`}>
-        <p className="hero-subtext text-sm sm:text-base lg:text-2xl uppercase tracking-[0.15em] font-light text-zinc-500 dark:text-zinc-400 max-w-5xl leading-relaxed">
-          A FOLLOW IS NOT A RELATIONSHIP. SEE WHO ACTUALLY ENGAGES WITH YOU - AND WHO YOU ENGAGE WITH BACK.
-        </p>
+      {/* Subtext and CTA - hidden in miniapp */}
+      {!isMiniApp && (
+        <div className="mt-2 sm:mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+          <p className="hero-subtext text-sm sm:text-base lg:text-2xl uppercase tracking-[0.15em] font-light text-zinc-500 dark:text-zinc-400 max-w-5xl leading-relaxed">
+            A FOLLOW IS NOT A RELATIONSHIP. SEE WHO ACTUALLY ENGAGES WITH YOU - AND WHO YOU ENGAGE WITH BACK.
+          </p>
 
-        {!isMiniApp && (
           <TransitionLink
-            href="/dashboard"
+            href="/graph"
             className="hero-cta w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 text-sm sm:text-base font-medium uppercase tracking-[0.1em] text-zinc-900 dark:text-white border border-zinc-900 dark:border-white hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-zinc-900 transition-colors whitespace-nowrap"
           >
             SEE YOUR GRAPH
           </TransitionLink>
-        )}
-      </div>
+        </div>
+      )}
 
     </section>
   );

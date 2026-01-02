@@ -28,7 +28,8 @@
       "WebFetch(domain:konvajs.org)",
       "WebFetch(domain:miniapps.farcaster.xyz)",
       "WebFetch(domain:www.base.org)",
-      "WebFetch(domain:www.npmjs.com)"
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(dir:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

@@ -13,7 +13,7 @@ import { REGISTRY_ADDRESS } from "@/lib/registry";
 export default function GalleryPage() {
   const [localCoins, setLocalCoins] = useState<CreatedCoin[]>([]);
   const [mounted, setMounted] = useState(false);
-  const { signalReady } = useMiniApp();
+  const { signalReady, isMiniApp } = useMiniApp();
 
   // Query coins from on-chain registry
   const { coinAddresses, isLoading: isRegistryLoading, isConnected, error: registryError } = useCreatorCoins();
@@ -66,7 +66,7 @@ export default function GalleryPage() {
   // Loading state with shimmer
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-6 pb-safe sm:px-6 sm:py-8 lg:px-8">
+      <div className={`mx-auto max-w-7xl px-4 pb-safe sm:px-6 lg:px-8 ${isMiniApp ? "py-2" : "py-6 sm:py-8"}`}>
         <div className="mb-8 sm:mb-10">
           <div className="h-3 w-32 bg-zinc-100 dark:bg-zinc-800 skeleton-shimmer" />
           <div className="mt-2 h-8 w-48 bg-zinc-100 dark:bg-zinc-800 skeleton-shimmer" />
@@ -88,9 +88,9 @@ export default function GalleryPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 pb-safe sm:px-6 sm:py-8 lg:px-8">
+    <div className={`mx-auto max-w-7xl px-4 pb-safe sm:px-6 lg:px-8 ${isMiniApp ? "py-2" : "py-6 sm:py-8"}`}>
       {/* Header */}
-      <div className="mb-8 sm:mb-10">
+      <div className={isMiniApp ? "mb-4" : "mb-8 sm:mb-10"}>
         <p className="text-xs uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
           Tokenized Social Graphs
         </p>
@@ -122,13 +122,13 @@ export default function GalleryPage() {
             No tokens created
           </h3>
           <p className="mt-3 text-sm uppercase tracking-[0.05em] text-zinc-500 dark:text-zinc-400">
-            Tokenize your first social graph from the dashboard
+            Tokenize your first social graph from the graph page
           </p>
           <TransitionLink
-            href="/dashboard"
+            href="/graph"
             className="mt-6 inline-block px-6 py-3 text-xs uppercase tracking-[0.15em] font-medium border border-zinc-900 text-zinc-900 transition-all duration-200 hover:bg-zinc-900 hover:text-white dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-zinc-900"
           >
-            Go to Dashboard
+            Go to Graph
           </TransitionLink>
         </div>
       )}

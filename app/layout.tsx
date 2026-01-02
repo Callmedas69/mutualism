@@ -6,6 +6,7 @@ import FarcasterProvider from "@/context/FarcasterProvider";
 import MiniAppProvider from "@/context/MiniAppProvider";
 import Navbar from "@/components/Navbar";
 import MiniAppNavbar from "@/components/MiniAppNavbar";
+import MainContent from "@/components/MainContent";
 import MiniAppUserSync from "@/components/MiniAppUserSync";
 import { PageTransitionProvider } from "@/components/PageTransition";
 
@@ -33,7 +34,7 @@ const miniAppEmbed = {
       name: "MUTUALISM",
       url: domain,
       splashImageUrl: `${domain}/splash-200.png`,
-      splashBackgroundColor: "#18181b",
+      splashBackgroundColor: "#ffffff",
     },
   },
 };
@@ -68,7 +69,7 @@ export default function RootLayout({
               <MiniAppUserSync />
               <PageTransitionProvider>
                 <Navbar />
-                <main className="pb-20 pt-16">{children}</main>
+                <MainContent>{children}</MainContent>
                 <MiniAppNavbar />
               </PageTransitionProvider>
             </MiniAppProvider>
