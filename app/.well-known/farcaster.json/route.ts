@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const domain = process.env.NEXT_PUBLIC_DOMAIN_URL || "http://localhost:3000";
+  const domain = process.env.NEXT_PUBLIC_DOMAIN_URL || "https://mutualism.geoart.studio";
 
   const manifest = {
     accountAssociation: {
