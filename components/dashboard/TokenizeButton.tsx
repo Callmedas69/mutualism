@@ -26,9 +26,9 @@ export default function TokenizeButton({
         onClick={() => setIsModalOpen(true)}
         disabled={disabled || !isConnected}
         title={!isConnected ? "Connect wallet to tokenize" : "Tokenize your graph on Zora"}
-        className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-all hover:from-purple-500 hover:to-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex items-center gap-2 border border-purple-400 bg-purple-50 px-3 py-2 text-[10px] font-medium uppercase tracking-[0.1em] text-purple-700 transition-all duration-200 hover:border-purple-600 hover:bg-purple-100 hover:text-purple-900 disabled:cursor-not-allowed disabled:opacity-40 dark:border-purple-600 dark:bg-purple-950/50 dark:text-purple-300 dark:hover:border-purple-400 dark:hover:text-purple-100"
       >
-        <Sparkles size={14} />
+        <Sparkles size={12} />
         Tokenize
       </button>
 

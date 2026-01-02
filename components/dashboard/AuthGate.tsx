@@ -1,7 +1,8 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { useFarcasterUser } from "@/context/FarcasterProvider";
+import { useMiniApp } from "@/hooks/useMiniApp";
 import FarcasterSignInButton from "../FarcasterSignInButton";
 
 interface AuthGateProps {
@@ -10,6 +11,12 @@ interface AuthGateProps {
 
 export default function AuthGate({ children }: AuthGateProps) {
   const { user } = useFarcasterUser();
+  const { signalReady } = useMiniApp();
+
+  // Signal to Farcaster that the app is ready
+  useEffect(() => {
+    signalReady();
+  }, [signalReady]);
 
   if (!user) {
     return (

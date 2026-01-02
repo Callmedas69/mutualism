@@ -121,11 +121,12 @@ interface RenderToCanvasOptions {
   graphData: { nodes: GraphNode[]; links: GraphLink[] };
   loadedImages: Map<string, HTMLImageElement>;
   centerUsername: string;
+  totalConnections: number; // Total before limiting
 }
 
 // Shared high-resolution graph rendering function (DRY)
 function renderGraphToCanvas(options: RenderToCanvasOptions): void {
-  const { ctx, exportSize, type, graphData, loadedImages, centerUsername } = options;
+  const { ctx, exportSize, type, graphData, loadedImages, centerUsername, totalConnections } = options;
 
   // Layout constants
   const footerHeight = 200; // Increased for more padding
@@ -296,11 +297,15 @@ function renderGraphToCanvas(options: RenderToCanvasOptions): void {
   // Graph type + @username + count CONNECTIONS (combined on one line)
   leftY += 22 * uiScale;
   const tabLabel = type === "mutuals" ? "ALL MUTUALS" : type === "attention" ? "ATTENTION" : "INFLUENCE";
-  const nodeCount = graphData.nodes.length - 1;
+  const nodeCount = graphData.nodes.length - 1; // Displayed nodes (excluding center)
+  const isLimited = nodeCount < totalConnections;
+  const connectionText = isLimited
+    ? `showing ${nodeCount} of ${totalConnections}`
+    : `${nodeCount} connections`;
   ctx.font = `${Math.round(14 * uiScale)}px Inter, system-ui, sans-serif`;
   ctx.fillStyle = "#a1a1aa"; // zinc-400
   ctx.textAlign = "left";
-  ctx.fillText(`${tabLabel} • @${centerUsername} • ${nodeCount} connections`, leftX, leftY);
+  ctx.fillText(`${tabLabel} • @${centerUsername} • ${connectionText}`, leftX, leftY);
 
   // Date
   leftY += 22 * uiScale; // Reduced spacing
@@ -656,23 +661,9 @@ function ConnectionGraph({
     // Only auto-zoom on first stop (initial load) - preserve user zoom after that
     if (!hasInitialZoom.current) {
       hasInitialZoom.current = true;
-
-      // Smooth zoom to fit using GSAP
-      const currentZoom = graph.zoom() || 1;
-      const targetZoom = 0.9;
-      const camera = { zoom: currentZoom };
-
-      gsap.to(camera, {
-        duration: 0.5,
-        zoom: targetZoom,
-        ease: "power2.out",
-        onUpdate: () => {
-          graph.zoom(camera.zoom);
-        },
-        onComplete: () => {
-          graph.centerAt(0, 0);
-        },
-      });
+      // Use library's zoomToFit - automatically calculates correct zoom and center
+      // 400ms animation, 80px padding from edges
+      graph.zoomToFit(400, 80);
     }
   }, []);
 
@@ -696,6 +687,7 @@ function ConnectionGraph({
       graphData,
       loadedImages: loadedImagesRef.current,
       centerUsername: centerUser.username,
+      totalConnections: connections.length,
     });
 
     // Download as PNG
@@ -713,7 +705,7 @@ function ConnectionGraph({
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-  }, [centerUser.username, type, graphData]);
+  }, [centerUser.username, type, graphData, connections.length]);
 
   // Get graph as Blob for tokenization - uses shared high-res rendering
   const getGraphBlob = useCallback(async (): Promise<Blob | null> => {
@@ -734,13 +726,14 @@ function ConnectionGraph({
       graphData,
       loadedImages: loadedImagesRef.current,
       centerUsername: centerUser.username,
+      totalConnections: connections.length,
     });
 
     // Return blob
     return new Promise<Blob | null>((resolve) => {
       exportCanvas.toBlob(resolve, "image/png");
     });
-  }, [centerUser.username, type, graphData]);
+  }, [centerUser.username, type, graphData, connections.length]);
 
   // Tokenize graph data
   const tokenizeData: TokenizeGraphData = useMemo(() => ({
@@ -804,6 +797,18 @@ function ConnectionGraph({
     }
   }, [graphData]);
 
+  // Early zoom-to-fit for better initial UX (before simulation fully settles)
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      const graph = graphRef.current;
+      if (graph && !hasInitialZoom.current) {
+        graph.zoomToFit(200, 80);
+      }
+    }, 500); // 500ms allows initial node positioning
+
+    return () => clearTimeout(timeoutId);
+  }, [graphData]);
+
   if (connections.length === 0) {
     return (
       <div className="flex h-[600px] items-center justify-center border border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
@@ -841,20 +846,28 @@ function ConnectionGraph({
       {/* Top Bar: Legend + Export Button */}
       <div className="absolute left-2 right-2 top-2 flex flex-col gap-2 sm:left-4 sm:right-4 sm:top-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Legend - sharp style with uppercase */}
-        <div className="flex items-center gap-2 border border-zinc-200 bg-white/95 px-3 py-2 text-[10px] uppercase tracking-[0.05em] sm:gap-4 sm:px-4 sm:text-xs dark:border-zinc-700 dark:bg-zinc-900/95">
-          <span className="font-medium text-zinc-500">Score</span>
-          <div className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 bg-[#22c55e] sm:h-3 sm:w-3" />
-            <span className="hidden text-zinc-600 dark:text-zinc-400 sm:inline">High</span>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 border border-zinc-200 bg-white/95 px-3 py-2 text-[10px] uppercase tracking-[0.05em] sm:gap-4 sm:px-4 sm:text-xs dark:border-zinc-700 dark:bg-zinc-900/95">
+            <span className="font-medium text-zinc-500">Score</span>
+            <div className="flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 bg-[#22c55e] sm:h-3 sm:w-3" />
+              <span className="hidden text-zinc-600 dark:text-zinc-400 sm:inline">High</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 bg-[#eab308] sm:h-3 sm:w-3" />
+              <span className="hidden text-zinc-600 dark:text-zinc-400 sm:inline">Med</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 bg-[#71717a] sm:h-3 sm:w-3" />
+              <span className="hidden text-zinc-600 dark:text-zinc-400 sm:inline">Low</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 bg-[#eab308] sm:h-3 sm:w-3" />
-            <span className="hidden text-zinc-600 dark:text-zinc-400 sm:inline">Med</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 bg-[#71717a] sm:h-3 sm:w-3" />
-            <span className="hidden text-zinc-600 dark:text-zinc-400 sm:inline">Low</span>
-          </div>
+          {/* Show limit indicator when nodes are capped */}
+          {connections.length > maxNodes && (
+            <div className="border border-amber-300 bg-amber-50/95 px-3 py-2 text-[10px] uppercase tracking-[0.05em] text-amber-700 sm:text-xs dark:border-amber-700 dark:bg-amber-900/50 dark:text-amber-300">
+              Showing {maxNodes} of {connections.length}
+            </div>
+          )}
         </div>
 
         {/* Export Button */}
@@ -863,13 +876,11 @@ function ConnectionGraph({
             onExport={handleExportPNG}
             disabled={isEngineRunning}
           />
-          {/* TokenizeButton hidden for now
-          <TokenizeButton
+          {/* <TokenizeButton
             getGraphBlob={getGraphBlob}
             graphData={tokenizeData}
             disabled={isEngineRunning}
-          />
-          */}
+          /> */}
         </div>
       </div>
 

@@ -3,12 +3,17 @@
 import { useState, useRef, useEffect } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useFarcasterUser } from "@/context/FarcasterProvider";
+import { useMiniApp } from "@/hooks/useMiniApp";
 import { TransitionLink } from "./TransitionLink";
 
 export default function Navbar() {
+  const { isMiniApp } = useMiniApp();
   const { user, signOut } = useFarcasterUser();
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Hide navbar in miniapp mode (Farcaster client provides header)
+  if (isMiniApp) return null;
 
   // Close dropdown on click outside
   useEffect(() => {

@@ -19,62 +19,39 @@ export const PLATFORM_REFERRER = process.env
 // Tokenization fee in ETH
 export const TOKENIZE_FEE = "0.00001";
 
-// Suffix options for token symbol
-export const SYMBOL_SUFFIXES = [
-  { id: "fam", label: "FAM", description: "Community" },
-  { id: "crew", label: "CREW", description: "Squad" },
-  { id: "frens", label: "FRENS", description: "Web3" },
-  { id: "gang", label: "GANG", description: "Fun" },
-  { id: "dao", label: "DAO", description: "Governance" },
-  { id: "hq", label: "HQ", description: "Hub" },
-] as const;
-
-export type SymbolSuffix = (typeof SYMBOL_SUFFIXES)[number];
-
-// Name templates by graph type (playful/social style)
-const NAME_TEMPLATES: Record<string, string[]> = {
-  mutuals: [
-    "@{username}'s Inner Circle",
-    "The {username} Collective",
-    "{username} & Friends",
-    "{username} Mutuals Club",
-  ],
-  attention: [
-    "@{username}'s Fan Club",
-    "Team {username}",
-    "{username} Followers United",
-    "The {username} Fandom",
-  ],
-  influence: [
-    "@{username}'s Influence Network",
-    "{username} Impact Zone",
-    "Powered by {username}",
-    "The {username} Effect",
-  ],
+// Graph type to symbol suffix mapping
+const GRAPH_TYPE_SUFFIXES: Record<string, string> = {
+  mutuals: "MUT",
+  attention: "ATT",
+  influence: "INF",
 };
 
 /**
- * Generate a fun coin name based on username and graph type
- * Randomly selects from playful templates
+ * Generate coin name: username + graph type
+ * Example: "0xd Mutuals", "dwr Attention", "vitalik Influence"
  */
 export function generateCoinName(username: string, graphType: string): string {
-  // Map graphType display names to template keys
+  const suffix = graphType.toLowerCase().includes("attention")
+    ? "Attention"
+    : graphType.toLowerCase().includes("influence")
+    ? "Influence"
+    : "Mutuals";
+
+  return `${username} ${suffix}`;
+}
+
+/**
+ * Generate token symbol from username + graph type
+ * Example: "0xd" + "mutuals" = "0XDMUT"
+ */
+export function generateSymbol(username: string, graphType: string): string {
   const typeKey = graphType.toLowerCase().includes("attention")
     ? "attention"
     : graphType.toLowerCase().includes("influence")
     ? "influence"
     : "mutuals";
 
-  const templates = NAME_TEMPLATES[typeKey];
-  const template = templates[Math.floor(Math.random() * templates.length)];
-  return template.replace(/{username}/g, username);
-}
-
-/**
- * Generate a token symbol from username + suffix
- * Example: "dwr" + "FAM" = "DWRFAM"
- */
-export function generateSymbol(username: string, suffix: string): string {
+  const suffix = GRAPH_TYPE_SUFFIXES[typeKey];
   const base = username.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
   const maxBase = 10 - suffix.length; // Zora symbols max 10 chars
   return base.slice(0, Math.max(3, maxBase)) + suffix;

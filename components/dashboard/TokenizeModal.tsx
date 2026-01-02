@@ -5,6 +5,7 @@ import {
   useAccount,
   useWaitForTransactionReceipt,
   useSendTransaction,
+  useWriteContract,
 } from "wagmi";
 import { parseEther, type Address } from "viem";
 import Link from "next/link";
@@ -19,10 +20,9 @@ import {
   parseCoinAddressFromReceipt,
   TOKENIZE_FEE,
   PLATFORM_WALLET,
-  SYMBOL_SUFFIXES,
-  type SymbolSuffix,
 } from "@/lib/zora";
 import { saveCreatedCoin } from "@/lib/storage";
+import { REGISTRY_ADDRESS, REGISTRY_ABI } from "@/lib/registry";
 
 interface TokenizeModalProps {
   isOpen: boolean;
@@ -75,11 +75,13 @@ export default function TokenizeModal({
   const [coinAddress, setCoinAddress] = useState<Address | null>(null);
   const [coinUrl, setCoinUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [selectedSuffix, setSelectedSuffix] = useState<SymbolSuffix>(SYMBOL_SUFFIXES[0]);
 
-  // Generate coin name once (stable across re-renders)
+  // Generate coin name and symbol once (stable across re-renders)
   const [coinName] = useState(() =>
     generateCoinName(graphData.username, graphData.graphType)
+  );
+  const [coinSymbol] = useState(() =>
+    generateSymbol(graphData.username, graphData.graphType)
   );
 
   const { address } = useAccount();
@@ -117,8 +119,8 @@ export default function TokenizeModal({
     hash: coinHash,
   });
 
-  // Generated symbol from username + selected suffix
-  const coinSymbol = generateSymbol(graphData.username, selectedSuffix.label);
+  // Registry contract call (fire-and-forget after coin creation)
+  const { writeContract: registerCoin } = useWriteContract();
 
   // Handle fee payment
   const handlePayFee = useCallback(() => {
@@ -209,7 +211,7 @@ export default function TokenizeModal({
         setCoinAddress(coinAddr);
         setCoinUrl(getCoinUrl(coinAddr));
 
-        // Save to localStorage for gallery
+        // Save to localStorage for gallery (fallback/migration)
         saveCreatedCoin({
           coinAddress: coinAddr,
           name: coinName,
@@ -221,13 +223,23 @@ export default function TokenizeModal({
           createdAt: new Date().toISOString(),
           txHash: coinHash,
         });
+
+        // Register coin on-chain (fire-and-forget, don't block UI)
+        if (REGISTRY_ADDRESS) {
+          registerCoin({
+            address: REGISTRY_ADDRESS,
+            abi: REGISTRY_ABI,
+            functionName: "registerCoin",
+            args: [coinAddr],
+          });
+        }
       } else {
         // Fallback if parsing fails
         setCoinUrl(`https://zora.co/explore?search=${graphData.username}`);
       }
       setStep("success");
     }
-  }, [isCoinConfirmed, coinReceipt, coinHash, graphData, coinName, coinSymbol]);
+  }, [isCoinConfirmed, coinReceipt, coinHash, graphData, coinName, coinSymbol, registerCoin]);
 
   // Handle wallet errors
   useEffect(() => {
@@ -277,7 +289,7 @@ export default function TokenizeModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="relative w-full max-w-md rounded-xl bg-white p-6 shadow-2xl dark:bg-zinc-900">
+      <div className="relative w-full max-w-md border border-zinc-200 bg-white p-6 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900">
         {/* Close button (disabled during processing) */}
         {step !== "payment" && step !== "uploading" && step !== "creating" && (
           <button
@@ -293,22 +305,22 @@ export default function TokenizeModal({
           {STEPS.slice(0, -1).map((s, i) => (
             <div key={s.id} className="flex items-center">
               <div
-                className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-medium sm:h-8 sm:w-8 sm:text-xs ${
+                className={`flex h-6 w-6 items-center justify-center border text-[10px] font-medium sm:h-8 sm:w-8 sm:text-xs ${
                   i < currentStepIndex
-                    ? "bg-green-500 text-white"
+                    ? "border-green-500 bg-green-500 text-white"
                     : i === currentStepIndex
-                    ? "bg-purple-600 text-white"
-                    : "bg-zinc-200 text-zinc-500 dark:bg-zinc-700"
+                    ? "border-purple-600 bg-purple-600 text-white"
+                    : "border-zinc-300 bg-zinc-100 text-zinc-500 dark:border-zinc-600 dark:bg-zinc-800"
                 }`}
               >
                 {i < currentStepIndex ? <Check size={12} className="sm:h-3.5 sm:w-3.5" /> : i + 1}
               </div>
               {i < STEPS.length - 2 && (
                 <div
-                  className={`hidden h-0.5 w-4 sm:block sm:w-8 ${
+                  className={`hidden h-px w-4 sm:block sm:w-8 ${
                     i < currentStepIndex
                       ? "bg-green-500"
-                      : "bg-zinc-200 dark:bg-zinc-700"
+                      : "bg-zinc-300 dark:bg-zinc-600"
                   }`}
                 />
               )}
@@ -330,29 +342,10 @@ export default function TokenizeModal({
               <p className="font-medium text-zinc-900 dark:text-white">{coinName}</p>
             </div>
 
-            {/* Symbol Suffix Selector */}
-            <div className="space-y-2">
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                Choose your token symbol
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {SYMBOL_SUFFIXES.map((suffix) => {
-                  const previewSymbol = generateSymbol(graphData.username, suffix.label);
-                  return (
-                    <button
-                      key={suffix.id}
-                      onClick={() => setSelectedSuffix(suffix)}
-                      className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
-                        selectedSuffix.id === suffix.id
-                          ? "bg-purple-600 text-white"
-                          : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-                      }`}
-                    >
-                      ${previewSymbol}
-                    </button>
-                  );
-                })}
-              </div>
+            {/* Token Symbol */}
+            <div className="rounded-lg bg-zinc-50 p-3 dark:bg-zinc-800">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">Token Symbol</p>
+              <p className="font-mono font-medium text-zinc-900 dark:text-white">${coinSymbol}</p>
             </div>
 
             {/* Details */}
@@ -380,13 +373,13 @@ export default function TokenizeModal({
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:gap-3">
               <button
                 onClick={handleClose}
-                className="flex-1 rounded-lg border border-zinc-200 px-4 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                className="flex-1 border border-zinc-300 bg-white px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-zinc-700 transition-colors hover:border-zinc-500 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-400"
               >
                 Cancel
               </button>
               <button
                 onClick={handlePayFee}
-                className="flex-1 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:from-purple-500 hover:to-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+                className="flex-1 border border-purple-600 bg-purple-600 px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-white transition-colors hover:border-purple-700 hover:bg-purple-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
               >
                 Tokenize
               </button>
@@ -438,7 +431,7 @@ export default function TokenizeModal({
         {/* Success Step */}
         {step === "success" && (
           <div className="space-y-4 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center border-2 border-green-500 bg-green-50 dark:bg-green-900/30">
               <Check className="h-8 w-8 text-green-600" />
             </div>
             <h2 className="text-xl font-bold">Coin Created!</h2>
@@ -470,22 +463,22 @@ export default function TokenizeModal({
 
             {/* Shareable URL */}
             {coinUrl && (
-              <div className="flex items-center gap-2 rounded-lg border border-zinc-200 p-3 dark:border-zinc-700">
+              <div className="flex items-center gap-2 border border-zinc-300 bg-zinc-50 p-3 dark:border-zinc-600 dark:bg-zinc-800">
                 <input
                   type="text"
                   value={coinUrl}
                   readOnly
-                  className="flex-1 truncate bg-transparent text-sm"
+                  className="flex-1 truncate bg-transparent font-mono text-xs"
                 />
                 <button
                   onClick={handleCopy}
-                  className="rounded p-1 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                  className="border border-zinc-300 p-1.5 transition-colors hover:border-zinc-500 hover:bg-zinc-100 dark:border-zinc-600 dark:hover:border-zinc-400 dark:hover:bg-zinc-700"
                   title="Copy link"
                 >
                   {copied ? (
-                    <Check size={16} className="text-green-500" />
+                    <Check size={14} className="text-green-500" />
                   ) : (
-                    <Copy size={16} />
+                    <Copy size={14} />
                   )}
                 </button>
               </div>
@@ -495,7 +488,7 @@ export default function TokenizeModal({
               <Link
                 href="/gallery"
                 onClick={handleClose}
-                className="flex flex-1 items-center justify-center rounded-lg border border-zinc-200 px-4 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                className="flex flex-1 items-center justify-center border border-zinc-300 bg-white px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-zinc-700 transition-colors hover:border-zinc-500 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-400"
               >
                 View Gallery
               </Link>
@@ -504,10 +497,10 @@ export default function TokenizeModal({
                   href={coinUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:from-purple-500 hover:to-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+                  className="flex flex-1 items-center justify-center gap-2 border border-purple-600 bg-purple-600 px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-white transition-colors hover:border-purple-700 hover:bg-purple-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
                 >
                   View on Zora
-                  <ExternalLink size={14} />
+                  <ExternalLink size={12} />
                 </a>
               )}
             </div>
@@ -517,7 +510,7 @@ export default function TokenizeModal({
         {/* Error Step */}
         {step === "error" && (
           <div className="space-y-4 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center border-2 border-red-500 bg-red-50 dark:bg-red-900/30">
               <AlertCircle className="h-8 w-8 text-red-600" />
             </div>
             <h2 className="text-xl font-bold">Something Went Wrong</h2>
@@ -526,7 +519,7 @@ export default function TokenizeModal({
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:gap-3">
               <button
                 onClick={handleClose}
-                className="flex-1 rounded-lg border border-zinc-200 px-4 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                className="flex-1 border border-zinc-300 bg-white px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-zinc-700 transition-colors hover:border-zinc-500 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-400"
               >
                 Close
               </button>
@@ -535,7 +528,7 @@ export default function TokenizeModal({
                   setError(null);
                   setStep("preview");
                 }}
-                className="flex-1 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:from-purple-500 hover:to-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+                className="flex-1 border border-purple-600 bg-purple-600 px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-white transition-colors hover:border-purple-700 hover:bg-purple-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
               >
                 Try Again
               </button>
