@@ -27,7 +27,7 @@ const miniAppEmbed = {
   version: "next",
   imageUrl: `${domain}/og-miniapp.png`,
   button: {
-    title: "Open MUTUALISM",
+    title: "Your Graph",
     action: {
       type: "launch_miniapp",
       name: "MUTUALISM",

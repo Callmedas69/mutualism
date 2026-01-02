@@ -376,7 +376,7 @@ function ConnectionGraph({
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
 
   // Miniapp context for conditional export behavior
-  const { isMiniApp, openUrl } = useMiniAppContext();
+  const { isMiniApp, composeCast } = useMiniAppContext();
 
   // Use ref for image lookups in callbacks (stable reference)
   // State triggers re-render when images are loaded
@@ -868,9 +868,8 @@ function ConnectionGraph({
         <div className="flex items-center gap-2">
           {isMiniApp ? (
             <ShareGraphButton
-              getGraphBlob={getGraphBlob}
-              username={centerUser.username}
-              openUrl={openUrl}
+              graphType={type === "mutuals" ? "Mutuals" : type === "attention" ? "Attention" : "Influence"}
+              composeCast={composeCast}
               disabled={isEngineRunning}
             />
           ) : (
