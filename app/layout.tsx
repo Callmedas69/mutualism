@@ -21,14 +21,14 @@ const geistMono = Geist_Mono({
 // Domain for miniapp metadata
 const domain = process.env.NEXT_PUBLIC_DOMAIN_URL || "http://localhost:3000";
 
-// Farcaster miniapp embed configuration
+// Farcaster miniapp embed configuration (Base App compatible)
 const miniAppEmbed = {
-  version: "1",
+  version: "next",
   imageUrl: `${domain}/og-miniapp.png`,
   button: {
     title: "Open MUTUALISM",
     action: {
-      type: "launch_frame",
+      type: "launch_miniapp",
       name: "MUTUALISM",
       url: domain,
       splashImageUrl: `${domain}/splash-200.png`,
@@ -47,6 +47,7 @@ export const metadata: Metadata = {
   },
   other: {
     "fc:miniapp": JSON.stringify(miniAppEmbed),
+    'base:app_id': '6957415fc63ad876c9081d0c',
   },
 };
 
