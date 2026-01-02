@@ -27,7 +27,8 @@
       "Bash(dir /s \"D:\\\\Harry\\\\BasedNouns\\\\CodeProject\\\\quotientmutual\\\\app\\\\dashboard\")",
       "WebFetch(domain:konvajs.org)",
       "WebFetch(domain:miniapps.farcaster.xyz)",
-      "WebFetch(domain:www.base.org)"
+      "WebFetch(domain:www.base.org)",
+      "WebFetch(domain:www.npmjs.com)"
     ]
   },
   "enableAllProjectMcpServers": true,

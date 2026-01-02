@@ -10,7 +10,9 @@ import { URLS } from "@/lib/constants";
 import { LRUCache } from "@/lib/utils/lru-cache";
 import NodeInfoCard from "./NodeInfoCard";
 import ExportButton from "./ExportButton";
+import ShareGraphButton from "./ShareGraphButton";
 import TokenizeButton from "./TokenizeButton";
+import { useMiniAppContext } from "@/context/MiniAppProvider";
 
 const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
   ssr: false,
@@ -372,6 +374,9 @@ function ConnectionGraph({
   const containerRef = useRef<HTMLDivElement>(null);
   const hasInitialZoom = useRef(false);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
+
+  // Miniapp context for conditional export behavior
+  const { isMiniApp, openUrl } = useMiniAppContext();
 
   // Use ref for image lookups in callbacks (stable reference)
   // State triggers re-render when images are loaded
@@ -743,12 +748,17 @@ function ConnectionGraph({
     graphType: type === "mutuals" ? "All Mutuals" : type === "attention" ? "Attention" : "Influence",
   }), [centerUser, graphData.nodes.length, type]);
 
-  // Configure forces - called after graph renders
+  // Track if forces have been configured (prevents repeated calls)
+  const forcesConfiguredRef = useRef(false);
+
+  // Configure forces - called once after graph renders
   const configureForces = useCallback(() => {
     const fg = graphRef.current;
     if (!fg) return;
 
-    console.log("Configuring forces for", connections.length, "nodes");
+    // Skip if already configured
+    if (forcesConfiguredRef.current) return;
+    forcesConfiguredRef.current = true;
 
     // Charge (repulsion) - tighter spread
     const chargeStrength = connections.length > 50 ? -400 : -300;
@@ -773,20 +783,16 @@ function ConnectionGraph({
     fg.d3ReheatSimulation();
   }, [connections.length, getNodeSize]);
 
-  // Apply forces after a short delay to ensure graph is mounted
+  // Apply forces once after graph mounts (single delayed call)
   useEffect(() => {
-    // Immediate attempt
-    configureForces();
-
-    // Retry after delays to ensure graph is ready
-    const t1 = setTimeout(configureForces, 100);
-    const t2 = setTimeout(configureForces, 500);
-
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
+    const timeoutId = setTimeout(configureForces, 300);
+    return () => clearTimeout(timeoutId);
   }, [graphData, configureForces]);
+
+  // Reset forces config flag when graph data changes
+  useEffect(() => {
+    forcesConfiguredRef.current = false;
+  }, [graphData]);
 
   // Resume animation when graph data changes (e.g., switching tabs)
   useEffect(() => {
@@ -795,18 +801,6 @@ function ConnectionGraph({
       graphRef.current.resumeAnimation();
       setIsEngineRunning(true);
     }
-  }, [graphData]);
-
-  // Early zoom-to-fit for better initial UX (before simulation fully settles)
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      const graph = graphRef.current;
-      if (graph && !hasInitialZoom.current) {
-        graph.zoomToFit(200, 80);
-      }
-    }, 500); // 500ms allows initial node positioning
-
-    return () => clearTimeout(timeoutId);
   }, [graphData]);
 
   if (connections.length === 0) {
@@ -870,12 +864,21 @@ function ConnectionGraph({
           )}
         </div>
 
-        {/* Export Button */}
+        {/* Export Button - ShareGraphButton for miniapp, ExportButton for web */}
         <div className="flex items-center gap-2">
-          <ExportButton
-            onExport={handleExportPNG}
-            disabled={isEngineRunning}
-          />
+          {isMiniApp ? (
+            <ShareGraphButton
+              getGraphBlob={getGraphBlob}
+              username={centerUser.username}
+              openUrl={openUrl}
+              disabled={isEngineRunning}
+            />
+          ) : (
+            <ExportButton
+              onExport={handleExportPNG}
+              disabled={isEngineRunning}
+            />
+          )}
           {/* <TokenizeButton
             getGraphBlob={getGraphBlob}
             graphData={tokenizeData}

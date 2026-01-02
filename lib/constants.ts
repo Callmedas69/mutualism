@@ -10,7 +10,7 @@ export const BRAND = {
 // API Endpoints
 export const API = {
   quotient: "https://api.quotient.social",
-  optimismRpc: "https://mainnet.optimism.io",
+  optimismRpc: `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`,
 } as const;
 
 // RPC URLs
