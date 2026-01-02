@@ -155,7 +155,7 @@ export default function TokenizeModal({
       }
 
       // 2. Upload image to IPFS
-      const imageUri = await uploadImageToIPFS(
+      const { ipfsUri: imageUri } = await uploadImageToIPFS(
         blob,
         `${graphData.username}-graph.png`
       );

@@ -1,14 +1,22 @@
 import type { CoinMetadata, IPFSUploadResponse } from "@/types/tokenize";
 
 /**
+ * Upload result with both IPFS URI and gateway URL
+ */
+export interface UploadResult {
+  ipfsUri: string;
+  gatewayUrl: string;
+}
+
+/**
  * Upload an image blob to IPFS via server API
  * Retries once on failure (network issues are common)
  */
 export async function uploadImageToIPFS(
   blob: Blob,
   filename: string
-): Promise<string> {
-  const upload = async (): Promise<string> => {
+): Promise<UploadResult> {
+  const upload = async (): Promise<UploadResult> => {
     const formData = new FormData();
     formData.append("file", blob, filename);
 
@@ -23,7 +31,10 @@ export async function uploadImageToIPFS(
     }
 
     const data: IPFSUploadResponse = await response.json();
-    return data.ipfsUri;
+    return {
+      ipfsUri: data.ipfsUri,
+      gatewayUrl: data.gatewayUrl || "",
+    };
   };
 
   // Simple retry: try once, wait 1s, try again

@@ -869,6 +869,8 @@ function ConnectionGraph({
           {isMiniApp ? (
             <ShareGraphButton
               graphType={type === "mutuals" ? "Mutuals" : type === "attention" ? "Attention" : "Influence"}
+              username={centerUser.username}
+              getGraphBlob={getGraphBlob}
               composeCast={composeCast}
               disabled={isEngineRunning}
             />
