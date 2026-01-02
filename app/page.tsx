@@ -5,9 +5,11 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { TransitionLink } from "@/components/TransitionLink";
 import { sdk } from "@farcaster/miniapp-sdk";
+import { useMiniAppContext } from "@/context/MiniAppProvider";
 
 export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
+  const { isMiniApp } = useMiniAppContext();
 
   useGSAP(
     () => {
@@ -35,7 +37,11 @@ export default function Home() {
   return (
     <section
       ref={heroRef}
-      className="relative min-h-[calc(100vh-4rem)] flex flex-col justify-end px-4 sm:px-8 lg:px-16 pb-16 sm:pb-16 lg:pb-24 overflow-hidden"
+      className={`relative flex flex-col justify-end px-4 sm:px-8 lg:px-16 overflow-hidden ${
+        isMiniApp
+          ? "min-h-0 pb-4"
+          : "min-h-[calc(100vh-4rem)] pb-16 sm:pb-16 lg:pb-24"
+      }`}
     >
       {/* Main Typography */}
       <div className="relative">
@@ -87,17 +93,19 @@ export default function Home() {
       </div>
 
       {/* Subtext and CTA */}
-      <div className="mt-2 sm:mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+      <div className={`mt-2 sm:mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between ${isMiniApp ? "gap-3" : "gap-6"}`}>
         <p className="hero-subtext text-sm sm:text-base lg:text-2xl uppercase tracking-[0.15em] font-light text-zinc-500 dark:text-zinc-400 max-w-5xl leading-relaxed">
           A FOLLOW IS NOT A RELATIONSHIP. SEE WHO ACTUALLY ENGAGES WITH YOU - AND WHO YOU ENGAGE WITH BACK.
         </p>
 
-        <TransitionLink
-          href="/dashboard"
-          className="hero-cta w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 text-sm sm:text-base font-medium uppercase tracking-[0.1em] text-zinc-900 dark:text-white border border-zinc-900 dark:border-white hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-zinc-900 transition-colors whitespace-nowrap"
-        >
-          SEE YOUR GRAPH
-        </TransitionLink>
+        {!isMiniApp && (
+          <TransitionLink
+            href="/dashboard"
+            className="hero-cta w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 text-sm sm:text-base font-medium uppercase tracking-[0.1em] text-zinc-900 dark:text-white border border-zinc-900 dark:border-white hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-zinc-900 transition-colors whitespace-nowrap"
+          >
+            SEE YOUR GRAPH
+          </TransitionLink>
+        )}
       </div>
 
     </section>

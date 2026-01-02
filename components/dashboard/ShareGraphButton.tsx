@@ -4,6 +4,9 @@ import { useState } from "react";
 import { Share2 } from "lucide-react";
 import { uploadImageToIPFS } from "@/lib/pinata";
 
+// App URL for embed (allows users to click through to the app)
+const APP_URL = process.env.NEXT_PUBLIC_DOMAIN_URL || "https://mutualism.geoart.studio";
+
 type ShareState = "idle" | "uploading" | "sharing" | "success" | "error";
 
 interface ShareGraphButtonProps {
@@ -61,12 +64,12 @@ export default function ShareGraphButton({
       return;
     }
 
-    // Step 3: Open composeCast with image embed
+    // Step 3: Open composeCast with image + app URL embeds
     setState("sharing");
     try {
       await composeCast(
         `My ${graphType} graph on MUTUALISM`,
-        [gatewayUrl]
+        [gatewayUrl, APP_URL]
       );
       // Show success feedback before returning to idle
       setState("success");

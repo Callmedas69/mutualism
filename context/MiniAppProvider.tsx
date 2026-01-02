@@ -9,11 +9,16 @@ import {
   type ReactNode,
 } from "react";
 import { sdk } from "@farcaster/miniapp-sdk";
+import { useComposeCast } from "@coinbase/onchainkit/minikit";
 import type { MiniAppUser } from "@/lib/miniapp";
+
+// Platform detection: farcaster (Warpcast), base (Coinbase Wallet), or web
+type MiniAppPlatform = "farcaster" | "base" | "web";
 
 interface MiniAppContextType {
   isMiniApp: boolean;
   isReady: boolean;
+  platform: MiniAppPlatform;
   user: MiniAppUser | null;
   signalReady: () => Promise<void>;
   composeCast: (text?: string, embeds?: string[]) => Promise<void>;
@@ -39,18 +44,23 @@ interface MiniAppProviderProps {
 export default function MiniAppProvider({ children }: MiniAppProviderProps) {
   const [isMiniApp, setIsMiniApp] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  const [platform, setPlatform] = useState<MiniAppPlatform>("web");
   const [user, setUser] = useState<MiniAppUser | null>(null);
+
+  // OnchainKit's composeCast hook for Base miniapp
+  const { composeCast: onchainComposeCast } = useComposeCast();
 
   // Initialize SDK and detect miniapp environment
   useEffect(() => {
     const init = async () => {
       try {
-        // Check if we're in miniapp environment
+        // Check if we're in Farcaster miniapp environment
         // The SDK context is a Promise that resolves with the context
         const context = await sdk.context;
 
         if (context) {
           setIsMiniApp(true);
+          setPlatform("farcaster");
 
           // Extract user from context
           if (context.user) {
@@ -61,12 +71,30 @@ export default function MiniAppProvider({ children }: MiniAppProviderProps) {
               pfpUrl: context.user.pfpUrl,
             });
           }
+        } else {
+          // Not Farcaster - check if we're in an iframe (could be Base miniapp)
+          const inIframe = typeof window !== "undefined" && window.self !== window.top;
+          if (inIframe) {
+            setIsMiniApp(true);
+            setPlatform("base");
+          }
         }
         // Mark provider as ready (does NOT call sdk.actions.ready() here)
         // Pages should call signalReady() when their content is visible
         setIsReady(true);
       } catch {
-        // Not in miniapp environment, just continue
+        // SDK context failed - check if we're in an iframe (could be Base miniapp)
+        try {
+          const inIframe = typeof window !== "undefined" && window.self !== window.top;
+          if (inIframe) {
+            setIsMiniApp(true);
+            setPlatform("base");
+          }
+        } catch {
+          // Cross-origin iframe - likely Base miniapp
+          setIsMiniApp(true);
+          setPlatform("base");
+        }
         setIsReady(true);
       }
     };
@@ -87,20 +115,36 @@ export default function MiniAppProvider({ children }: MiniAppProviderProps) {
     }
   }, [isMiniApp, hasSignaledReady]);
 
-  // Action handlers
+  // Action handlers - dual platform support
   const composeCast = useCallback(async (text?: string, embeds?: string[]) => {
     if (!isMiniApp) return;
+
+    // Try Farcaster SDK first if we detected Farcaster platform
+    if (platform === "farcaster") {
+      try {
+        const embedsTuple = embeds?.slice(0, 2) as [] | [string] | [string, string] | undefined;
+        await sdk.actions.composeCast({
+          text,
+          embeds: embedsTuple,
+        });
+        return;
+      } catch (error) {
+        console.error("Farcaster composeCast failed, trying OnchainKit:", error);
+        // Fall through to OnchainKit
+      }
+    }
+
+    // Use OnchainKit's composeCast for Base miniapp or as fallback
     try {
-      // SDK expects embeds as a tuple of up to 2 strings
       const embedsTuple = embeds?.slice(0, 2) as [] | [string] | [string, string] | undefined;
-      await sdk.actions.composeCast({
+      onchainComposeCast({
         text,
         embeds: embedsTuple,
       });
     } catch (error) {
       console.error("Failed to compose cast:", error);
     }
-  }, [isMiniApp]);
+  }, [isMiniApp, platform, onchainComposeCast]);
 
   const closeMiniApp = useCallback(async () => {
     if (!isMiniApp) return;
@@ -138,6 +182,7 @@ export default function MiniAppProvider({ children }: MiniAppProviderProps) {
   const value: MiniAppContextType = {
     isMiniApp,
     isReady,
+    platform,
     user,
     signalReady,
     composeCast,

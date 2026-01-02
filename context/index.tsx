@@ -1,10 +1,13 @@
 "use client";
 
 import "@rainbow-me/rainbowkit/styles.css";
+import "@coinbase/onchainkit/styles.css";
 
 import { config, miniAppConfig } from "@/config";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RainbowKitProvider, lightTheme } from "@rainbow-me/rainbowkit";
+import { OnchainKitProvider } from "@coinbase/onchainkit";
+import { base } from "wagmi/chains";
 import React, { type ReactNode, useState, useEffect } from "react";
 import { WagmiProvider } from "wagmi";
 
@@ -55,12 +58,21 @@ export default function ContextProvider({
     return null;
   }
 
-  // MiniApp mode: use miniAppConfig without RainbowKit
+  // MiniApp mode: use miniAppConfig with OnchainKit (no RainbowKit)
+  // Note: OnchainKit API key is optional for basic MiniKit features like composeCast
   if (isMiniApp) {
     return (
       <WagmiProvider config={miniAppConfig}>
         <QueryClientProvider client={queryClient}>
-          {children}
+          <OnchainKitProvider
+            chain={base}
+            config={{
+              appearance: { mode: "auto" },
+            }}
+            miniKit={{ enabled: true }}
+          >
+            {children}
+          </OnchainKitProvider>
         </QueryClientProvider>
       </WagmiProvider>
     );
