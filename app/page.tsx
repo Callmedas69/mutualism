@@ -4,11 +4,10 @@ import { useRef, useEffect } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { TransitionLink } from "@/components/TransitionLink";
-import { useMiniApp } from "@/hooks/useMiniApp";
+import { sdk } from "@farcaster/miniapp-sdk";
 
 export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
-  const { signalReady } = useMiniApp();
 
   useGSAP(
     () => {
@@ -30,8 +29,8 @@ export default function Home() {
 
   // Signal to Farcaster that the app is ready (hides splash screen)
   useEffect(() => {
-    signalReady();
-  }, [signalReady]);
+    sdk.actions.ready();
+  }, []);
 
   return (
     <section
