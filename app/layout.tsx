@@ -6,6 +6,7 @@ import FarcasterProvider from "@/context/FarcasterProvider";
 import MiniAppProvider from "@/context/MiniAppProvider";
 import Navbar from "@/components/Navbar";
 import MiniAppNavbar from "@/components/MiniAppNavbar";
+import MiniAppUserSync from "@/components/MiniAppUserSync";
 import { PageTransitionProvider } from "@/components/PageTransition";
 
 const geistSans = Geist({
@@ -64,6 +65,7 @@ export default function RootLayout({
         <ContextProvider>
           <FarcasterProvider>
             <MiniAppProvider>
+              <MiniAppUserSync />
               <PageTransitionProvider>
                 <Navbar />
                 <main className="pb-20 pt-16">{children}</main>

@@ -152,11 +152,13 @@ export default function ConnectionTabs() {
     };
   }, [user?.fid, retryCount]); // retryCount triggers re-fetch on retry button click
 
-  const tabs: { key: TabType; label: string; count: number }[] = [
-    { key: "mutuals", label: "All Mutuals", count: mutuals.length },
-    { key: "attention", label: "Attention", count: attention.length },
-    { key: "influence", label: "Influence", count: influence.length },
+  const tabs: { key: TabType; label: string; count: number; description: string }[] = [
+    { key: "mutuals", label: "Mutuals", count: mutuals.length, description: "People who engage with you and you engage back" },
+    { key: "attention", label: "Attention", count: attention.length, description: "People you engage with the most" },
+    { key: "influence", label: "Influence", count: influence.length, description: "People who engage with you the most" },
   ];
+
+  const activeTabData = tabs.find((t) => t.key === activeTab);
 
   const getConnections = (tab: TabType) => {
     switch (tab) {
@@ -236,11 +238,11 @@ export default function ConnectionTabs() {
           ))}
         </TabsList>
 
-        {/* View Toggle - Sharp border style */}
+        {/* View Toggle - Sharp border style, 44px min touch target */}
         <div className="flex">
           <button
             onClick={() => setViewType("list")}
-            className={`px-4 py-2 text-xs uppercase tracking-[0.1em] font-medium border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 ${
+            className={`min-h-[44px] px-5 py-3 text-xs uppercase tracking-[0.1em] font-medium border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 ${
               viewType === "list"
                 ? "bg-zinc-900 text-white border-zinc-900 dark:bg-white dark:text-zinc-900 dark:border-white"
                 : "bg-transparent text-zinc-600 border-zinc-300 hover:border-zinc-900 hover:text-zinc-900 dark:text-zinc-400 dark:border-zinc-700 dark:hover:border-white dark:hover:text-white"
@@ -250,7 +252,7 @@ export default function ConnectionTabs() {
           </button>
           <button
             onClick={() => setViewType("graph")}
-            className={`px-4 py-2 text-xs uppercase tracking-[0.1em] font-medium border border-l-0 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 ${
+            className={`min-h-[44px] px-5 py-3 text-xs uppercase tracking-[0.1em] font-medium border border-l-0 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 ${
               viewType === "graph"
                 ? "bg-zinc-900 text-white border-zinc-900 dark:bg-white dark:text-zinc-900 dark:border-white"
                 : "bg-transparent text-zinc-600 border-zinc-300 hover:border-zinc-900 hover:text-zinc-900 dark:text-zinc-400 dark:border-zinc-700 dark:hover:border-white dark:hover:text-white"
@@ -260,6 +262,13 @@ export default function ConnectionTabs() {
           </button>
         </div>
       </div>
+
+      {/* Tab description */}
+      {activeTabData && (
+        <p className="text-xs text-zinc-500 dark:text-zinc-400 -mt-2">
+          {activeTabData.description}
+        </p>
+      )}
 
       {/* Content with fade transition */}
       {tabs.map((tab) => (

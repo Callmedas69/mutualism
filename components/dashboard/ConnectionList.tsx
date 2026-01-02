@@ -30,9 +30,48 @@ export default function ConnectionList({ connections, type }: ConnectionListProp
   const paginatedConnections = connections.slice(startIndex, endIndex);
 
   if (connections.length === 0) {
+    const emptyMessages = {
+      mutual: {
+        title: "No Mutuals Yet",
+        description: "Mutuals are people who engage with you and you engage back. Start interacting on Farcaster to build mutual connections.",
+      },
+      attention: {
+        title: "No Attention Data",
+        description: "People you engage with the most will appear here. Like, reply, and recast to see your attention patterns.",
+      },
+      influence: {
+        title: "No Influence Data",
+        description: "People who engage with you the most will appear here. Keep casting to attract more engagement.",
+      },
+    };
+
+    const message = emptyMessages[type];
+
     return (
-      <div className="py-12 text-center text-zinc-500 dark:text-zinc-400">
-        No connections found
+      <div className="flex min-h-[30vh] flex-col items-center justify-center gap-4 py-12">
+        <div className="h-16 w-16 rounded-full border-2 border-dashed border-zinc-300 dark:border-zinc-700 flex items-center justify-center">
+          <svg
+            className="h-8 w-8 text-zinc-400 dark:text-zinc-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+            />
+          </svg>
+        </div>
+        <div className="text-center max-w-sm">
+          <h3 className="text-sm font-medium uppercase tracking-wide text-zinc-900 dark:text-white">
+            {message.title}
+          </h3>
+          <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+            {message.description}
+          </p>
+        </div>
       </div>
     );
   }

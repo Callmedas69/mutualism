@@ -14,11 +14,19 @@ export interface FarcasterUser {
   pfp_url?: string | null;
 }
 
+// MiniApp user type (from SDK context)
+interface MiniAppUserData {
+  fid: number;
+  username?: string;
+  pfpUrl?: string;
+}
+
 // Context for sharing signed-in user across components
 interface FarcasterUserContextType {
   user: FarcasterUser | null;
   setUser: (user: FarcasterUser | null) => void;
   signOut: () => void;
+  setUserFromMiniApp: (miniAppUser: MiniAppUserData) => void;
 }
 
 const FarcasterUserContext = createContext<FarcasterUserContextType | null>(null);
@@ -73,9 +81,20 @@ export default function FarcasterProvider({ children }: { children: ReactNode })
     setUser(null);
   }, [setUser]);
 
+  // Set user from MiniApp SDK context (no localStorage - ephemeral session)
+  const setUserFromMiniApp = useCallback((miniAppUser: MiniAppUserData) => {
+    const farcasterUser: FarcasterUser = {
+      fid: miniAppUser.fid,
+      username: miniAppUser.username || `user-${miniAppUser.fid}`,
+      pfp_url: miniAppUser.pfpUrl || null,
+    };
+    // Use setUserState directly to skip localStorage persistence
+    setUserState(farcasterUser);
+  }, []);
+
   return (
     <AuthKitProvider config={config}>
-      <FarcasterUserContext.Provider value={{ user, setUser, signOut }}>
+      <FarcasterUserContext.Provider value={{ user, setUser, signOut, setUserFromMiniApp }}>
         {children}
       </FarcasterUserContext.Provider>
     </AuthKitProvider>

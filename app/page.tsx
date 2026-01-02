@@ -35,36 +35,36 @@ export default function Home() {
   return (
     <section
       ref={heroRef}
-      className="relative min-h-[calc(100vh-4rem)] flex flex-col justify-end px-4 sm:px-8 lg:px-16 pb-12 sm:pb-16 lg:pb-24 overflow-hidden"
+      className="relative min-h-[calc(100vh-4rem)] flex flex-col justify-end px-4 sm:px-8 lg:px-16 pb-16 sm:pb-16 lg:pb-24 overflow-hidden"
     >
       {/* Main Typography */}
       <div className="relative">
         {/* Overline Tag */}
         <div className="hero-tag ">
-          <p className="text-[12px] sm:text-2xl uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
+          <p className="text-xs sm:text-sm lg:text-base uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
             FARCASTER SOCIAL GRAPH
           </p>
         </div>
 
         {/* Line 1 */}
         <div className="overflow-hidden">
-          <h1 className="hero-line text-[12vw] sm:text-[10vw] lg:text-[9vw] font-black uppercase leading-[0.85] tracking-tighter text-zinc-900 dark:text-white">
+          <h1 className="hero-line text-[11vw] sm:text-[10vw] lg:text-[9vw] font-black uppercase leading-[0.85] tracking-tighter text-zinc-900 dark:text-white">
             RELATIONSHIPS
           </h1>
         </div>
 
         {/* Line 2 */}
         <div className="overflow-hidden">
-          <h1 className="hero-line text-[12vw] sm:text-[10vw] lg:text-[9vw] font-black uppercase leading-[0.85] tracking-tighter text-zinc-900 dark:text-white">
+          <h1 className="hero-line text-[11vw] sm:text-[10vw] lg:text-[9vw] font-black uppercase leading-[0.85] tracking-tighter text-zinc-900 dark:text-white">
             ARE MUTUAL.
           </h1>
         </div>
 
         {/* Line 3 - The Question */}
         <div className="overflow-hidden flex items-end justify-between">
-          <h1 className="hero-line text-[12vw] sm:text-[10vw] lg:text-[9vw] font-black uppercase leading-[0.85] tracking-tighter text-zinc-900 dark:text-white flex items-baseline">
+          <h1 className="hero-line text-[11vw] sm:text-[10vw] lg:text-[9vw] font-black uppercase leading-[0.85] tracking-tighter text-zinc-900 dark:text-white flex items-baseline">
             <span>YOURS ? Y/N</span>
-            <span className="inline-block w-[0.03em] h-[0.75em] bg-zinc-900 dark:bg-white ml-5 animate-blink" />
+            <span className="inline-block w-[0.03em] h-[0.75em] bg-zinc-900 dark:bg-white ml-2 sm:ml-5 animate-blink" />
           </h1>
 
           {/* Scroll Indicator */}
@@ -94,7 +94,7 @@ export default function Home() {
 
         <TransitionLink
           href="/dashboard"
-          className="hero-cta inline-flex items-center justify-center px-6 py-3 text-sm sm:text-base font-medium uppercase tracking-[0.1em] text-zinc-900 dark:text-white border border-zinc-900 dark:border-white hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-zinc-900 transition-colors whitespace-nowrap"
+          className="hero-cta w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 text-sm sm:text-base font-medium uppercase tracking-[0.1em] text-zinc-900 dark:text-white border border-zinc-900 dark:border-white hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-zinc-900 transition-colors whitespace-nowrap"
         >
           SEE YOUR GRAPH
         </TransitionLink>

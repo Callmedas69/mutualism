@@ -17,7 +17,7 @@ export async function GET() {
       homeUrl: domain,
       iconUrl: `${domain}/icon-1024.png`,
       splashImageUrl: `${domain}/splash-200.png`,
-      splashBackgroundColor: "#18181b",
+      splashBackgroundColor: "#ffffff",
       webhookUrl: `${domain}/api/miniapp/webhook`,
       subtitle: "See Your Farcaster Mutuals",
       description:
