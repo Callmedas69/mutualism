@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   useAccount,
   useWaitForTransactionReceipt,
@@ -271,16 +271,23 @@ export default function TokenizeModal({
     onClose();
   }, [onClose]);
 
-  // Close on escape key
+  // Stable refs for escape handler to avoid re-adding listener
+  const handleCloseRef = useRef(handleClose);
+  const stepRef = useRef(step);
+  handleCloseRef.current = handleClose;
+  stepRef.current = step;
+
+  // Close on escape key - listener added once
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && step !== "payment" && step !== "uploading" && step !== "creating") {
-        handleClose();
+      const currentStep = stepRef.current;
+      if (e.key === "Escape" && currentStep !== "payment" && currentStep !== "uploading" && currentStep !== "creating") {
+        handleCloseRef.current();
       }
     };
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
-  }, [handleClose, step]);
+  }, []);
 
   if (!isOpen) return null;
 

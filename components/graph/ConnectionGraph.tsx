@@ -7,11 +7,11 @@ import gsap from "gsap";
 import type { MutualUser, ConnectionUser } from "@/types/quotient";
 import type { TokenizeGraphData } from "@/types/tokenize";
 import { URLS } from "@/lib/constants";
-import { LRUCache } from "@/lib/utils/lru-cache";
+import { useGraphData, type GraphNode, type GraphLink } from "@/hooks/useGraphData";
+import { useImagePreloader, getAvatarCanvas } from "@/hooks/useImagePreloader";
 import NodeInfoCard from "./NodeInfoCard";
 import ExportButton from "./ExportButton";
 import ShareGraphButton from "./ShareGraphButton";
-import TokenizeButton from "./TokenizeButton";
 import { useMiniAppContext } from "@/context/MiniAppProvider";
 
 const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
@@ -26,86 +26,6 @@ interface ConnectionGraphProps {
     pfp_url: string | null;
   };
   type: "mutuals" | "attention" | "influence";
-}
-
-interface GraphNode {
-  id: string;
-  fid: number;
-  username: string;
-  pfp_url: string | null;
-  score: number;
-  isCenter: boolean;
-  color: string;
-  x?: number;
-  y?: number;
-}
-
-interface GraphLink {
-  source: string;
-  target: string;
-}
-
-// LRU cache for loaded images (max 200 entries to prevent memory bloat)
-const imageCache = new LRUCache<string, HTMLImageElement>(200);
-
-// LRU cache for pre-rendered circular avatar canvases (max 400 entries)
-// Higher limit because same image may have multiple size variants
-const avatarCanvasCache = new LRUCache<string, HTMLCanvasElement>(400);
-
-function loadImage(url: string): Promise<HTMLImageElement> {
-  const cached = imageCache.get(url);
-  if (cached) {
-    return Promise.resolve(cached);
-  }
-
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      imageCache.set(url, img);
-      resolve(img);
-    };
-    img.onerror = reject;
-    img.src = url;
-  });
-}
-
-// Pre-render clipped circular avatar to offscreen canvas (called once per avatar)
-// Uses 4x resolution for crisp export quality
-function getAvatarCanvas(img: HTMLImageElement, size: number): HTMLCanvasElement {
-  const key = `${img.src}-${size}`;
-  const cached = avatarCanvasCache.get(key);
-  if (cached) {
-    return cached;
-  }
-
-  const canvas = document.createElement("canvas");
-  const scale = 4; // High-res for export quality
-  const diameter = size * 2 * scale;
-  canvas.width = diameter;
-  canvas.height = diameter;
-  const ctx = canvas.getContext("2d")!;
-
-  // Draw circular clip and image at high resolution
-  ctx.beginPath();
-  ctx.arc(diameter / 2, diameter / 2, diameter / 2, 0, Math.PI * 2);
-  ctx.closePath();
-  ctx.clip();
-  ctx.drawImage(img, 0, 0, diameter, diameter);
-
-  avatarCanvasCache.set(key, canvas);
-  return canvas;
-}
-
-function getScoreColor(score: number, maxScore: number): string {
-  const ratio = score / maxScore;
-  if (ratio > 0.7) return "#22c55e"; // green
-  if (ratio > 0.4) return "#eab308"; // yellow
-  return "#71717a"; // gray
-}
-
-function isMutualUser(user: MutualUser | ConnectionUser): user is MutualUser {
-  return "combined_score" in user;
 }
 
 // Stable link color function (avoid inline recreations)
@@ -123,24 +43,21 @@ interface RenderToCanvasOptions {
   graphData: { nodes: GraphNode[]; links: GraphLink[] };
   loadedImages: Map<string, HTMLImageElement>;
   centerUsername: string;
-  totalConnections: number; // Total before limiting
+  totalConnections: number;
 }
 
-// Shared high-resolution graph rendering function (DRY)
+// Shared high-resolution graph rendering function
 function renderGraphToCanvas(options: RenderToCanvasOptions): void {
   const { ctx, exportSize, type, graphData, loadedImages, centerUsername, totalConnections } = options;
 
-  // Layout constants
-  const footerHeight = 200; // Increased for more padding
-  const graphAreaTop = 0;
+  const footerHeight = 200;
   const graphAreaBottom = exportSize - footerHeight;
   const uiScale = exportSize / 1200;
 
-  // Enable high-quality rendering
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
 
-  // Pastel gradient background for graph area
+  // Pastel gradient background
   const gradient = ctx.createLinearGradient(0, 0, exportSize, graphAreaBottom);
   gradient.addColorStop(0, "#E8F4F8");
   gradient.addColorStop(1, "#F5E6FF");
@@ -172,17 +89,15 @@ function renderGraphToCanvas(options: RenderToCanvasOptions): void {
   const graphCenterX = (minX + maxX) / 2;
   const graphCenterY = (minY + maxY) / 2;
 
-  // Calculate transform to fit graph into export area
-  const graphAreaSize = graphAreaBottom - 40; // 40px padding
+  const graphAreaSize = graphAreaBottom - 40;
   const scale = graphAreaSize / Math.max(graphWidth, graphHeight);
   const offsetX = exportSize / 2 - graphCenterX * scale;
   const offsetY = graphAreaBottom / 2 - graphCenterY * scale;
 
-  // Helper to transform coordinates
   const tx = (x: number) => x * scale + offsetX;
   const ty = (y: number) => y * scale + offsetY;
 
-  // Draw all links first (behind nodes)
+  // Draw links
   ctx.strokeStyle = "rgba(156, 163, 175, 0.4)";
   ctx.lineWidth = 1.5 * uiScale;
   for (const link of graphData.links) {
@@ -196,7 +111,7 @@ function renderGraphToCanvas(options: RenderToCanvasOptions): void {
     }
   }
 
-  // Draw all nodes with high-res avatars (NO username labels)
+  // Draw nodes
   for (const node of graphData.nodes) {
     if (node.x === undefined || node.y === undefined) continue;
 
@@ -208,7 +123,6 @@ function renderGraphToCanvas(options: RenderToCanvasOptions): void {
     const img = node.pfp_url ? loadedImages.get(node.pfp_url) : null;
 
     if (img) {
-      // Draw circular avatar directly from source image (high quality)
       ctx.save();
       ctx.beginPath();
       ctx.arc(x, y, nodeSize, 0, Math.PI * 2);
@@ -217,14 +131,12 @@ function renderGraphToCanvas(options: RenderToCanvasOptions): void {
       ctx.drawImage(img, x - nodeSize, y - nodeSize, nodeSize * 2, nodeSize * 2);
       ctx.restore();
 
-      // Draw border
       ctx.beginPath();
       ctx.arc(x, y, nodeSize, 0, Math.PI * 2);
       ctx.strokeStyle = node.isCenter ? "#3b82f6" : (node.color || "#71717a");
       ctx.lineWidth = (node.isCenter ? 4 : 2.5) * uiScale;
       ctx.stroke();
     } else {
-      // Fallback: colored circle with initial
       ctx.beginPath();
       ctx.arc(x, y, nodeSize, 0, Math.PI * 2);
       ctx.fillStyle = node.color || "#71717a";
@@ -244,18 +156,14 @@ function renderGraphToCanvas(options: RenderToCanvasOptions): void {
         ctx.stroke();
       }
     }
-    // No username labels - cleaner graph
   }
 
-  // ========== FOOTER PANEL ==========
+  // Footer panel
   const footerY = graphAreaBottom;
-
-  // Dark footer background
-  ctx.fillStyle = "#18181b"; // zinc-900
+  ctx.fillStyle = "#18181b";
   ctx.fillRect(0, footerY, exportSize, footerHeight);
 
-  // Divider line
-  ctx.strokeStyle = "#3f3f46"; // zinc-700
+  ctx.strokeStyle = "#3f3f46";
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(0, footerY);
@@ -263,9 +171,8 @@ function renderGraphToCanvas(options: RenderToCanvasOptions): void {
   ctx.stroke();
 
   const margin = 32 * uiScale;
-  const columnDivider = exportSize * 0.28; // Narrower branding column
+  const columnDivider = exportSize * 0.28;
 
-  // Helper for letter-spaced text
   const drawSpacedText = (text: string, x: number, y: number, spacing: number) => {
     ctx.textAlign = "left";
     let currentX = x;
@@ -275,20 +182,16 @@ function renderGraphToCanvas(options: RenderToCanvasOptions): void {
     }
   };
 
-  // ===== LEFT COLUMN: Branding =====
+  // Branding
   const leftX = margin;
   let leftY = footerY + 45 * uiScale;
 
-  // MUTUALISM brand with orange M (larger font)
   ctx.font = `bold ${Math.round(42 * uiScale)}px Inter, system-ui, sans-serif`;
   ctx.textAlign = "left";
-
-  // Draw "M" in orange
   ctx.fillStyle = "#f25b28";
   ctx.fillText("M", leftX, leftY);
   const mWidth = ctx.measureText("M").width + 0.1 * uiScale;
 
-  // Draw "UTUALISM" in white with tighter letter spacing
   ctx.fillStyle = "#ffffff";
   let currentX = leftX + mWidth;
   for (const char of "UTUALISM") {
@@ -296,59 +199,51 @@ function renderGraphToCanvas(options: RenderToCanvasOptions): void {
     currentX += ctx.measureText(char).width + 0.1 * uiScale;
   }
 
-  // Graph type + @username + count CONNECTIONS (combined on one line)
   leftY += 22 * uiScale;
   const tabLabel = type === "mutuals" ? "ALL MUTUALS" : type === "attention" ? "ATTENTION" : "INFLUENCE";
-  const nodeCount = graphData.nodes.length - 1; // Displayed nodes (excluding center)
+  const nodeCount = graphData.nodes.length - 1;
   const isLimited = nodeCount < totalConnections;
-  const connectionText = isLimited
-    ? `showing ${nodeCount} of ${totalConnections}`
-    : `${nodeCount} connections`;
+  const connectionText = isLimited ? `showing ${nodeCount} of ${totalConnections}` : `${nodeCount} connections`;
   ctx.font = `${Math.round(14 * uiScale)}px Inter, system-ui, sans-serif`;
-  ctx.fillStyle = "#a1a1aa"; // zinc-400
+  ctx.fillStyle = "#a1a1aa";
   ctx.textAlign = "left";
   ctx.fillText(`${tabLabel} • @${centerUsername} • ${connectionText}`, leftX, leftY);
 
-  // Date
-  leftY += 22 * uiScale; // Reduced spacing
+  leftY += 22 * uiScale;
   const now = new Date();
   const dateStr = now.toLocaleDateString("en-US", { month: "short", year: "numeric" }).toUpperCase();
   ctx.font = `${Math.round(12 * uiScale)}px Inter, system-ui, sans-serif`;
-  ctx.fillStyle = "#52525b"; // zinc-600
+  ctx.fillStyle = "#52525b";
   ctx.fillText(dateStr, leftX, leftY);
 
-  // ===== RIGHT COLUMN: Top Connections =====
+  // Top connections
   const rightX = columnDivider + 20 * uiScale;
-  let rightY = footerY + 24 * uiScale; // Match left column
+  let rightY = footerY + 24 * uiScale;
 
-  // TOP CONNECTIONS header
   ctx.font = `500 ${Math.round(11 * uiScale)}px Inter, system-ui, sans-serif`;
   ctx.fillStyle = "#a1a1aa";
   drawSpacedText("TOP CONNECTIONS", rightX, rightY, 1.5 * uiScale);
 
-  // Get top 28 connections (sorted by score, excluding center)
   const topConnections = graphData.nodes
     .filter(n => !n.isCenter)
     .sort((a, b) => b.score - a.score)
     .slice(0, 28);
 
-  // Draw usernames in 7 columns × 4 rows = 28 users
   ctx.font = `${Math.round(9 * uiScale)}px "SF Mono", Monaco, monospace`;
-  ctx.fillStyle = "#d4d4d8"; // zinc-300
+  ctx.fillStyle = "#d4d4d8";
   ctx.textAlign = "left";
 
-  const availableWidth = exportSize - rightX - 20 * uiScale; // Full width minus margins
-  const colWidth = availableWidth / 7; // Even distribution across 7 columns
+  const availableWidth = exportSize - rightX - 20 * uiScale;
+  const colWidth = availableWidth / 7;
   const lineHeight = 20 * uiScale;
-  const rowsPerCol = 4; // 4 users per column
-  const maxUsernameLength = 13; // Truncate long usernames
+  const rowsPerCol = 4;
+  const maxUsernameLength = 13;
 
   topConnections.forEach((node, i) => {
     const colIndex = Math.floor(i / rowsPerCol);
     const rowIndex = i % rowsPerCol;
     const x = rightX + colIndex * colWidth;
     const y = rightY + 18 * uiScale + rowIndex * lineHeight;
-    // Truncate long usernames with ellipsis
     let username = node.username;
     if (username.length > maxUsernameLength) {
       username = username.slice(0, maxUsernameLength - 1) + "…";
@@ -356,7 +251,6 @@ function renderGraphToCanvas(options: RenderToCanvasOptions): void {
     ctx.fillText(`@${username}`, x, y);
   });
 
-  // Vertical divider between columns
   ctx.strokeStyle = "#3f3f46";
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -365,31 +259,36 @@ function renderGraphToCanvas(options: RenderToCanvasOptions): void {
   ctx.stroke();
 }
 
-function ConnectionGraph({
-  connections,
-  centerUser,
-  type,
-}: ConnectionGraphProps) {
+function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps) {
   const graphRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hasInitialZoom = useRef(false);
+  const forcesConfiguredRef = useRef(false);
+
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
-
-  // Miniapp context for conditional export behavior
-  const { isMiniApp, composeCast } = useMiniAppContext();
-
-  // Use ref for image lookups in callbacks (stable reference)
-  // State triggers re-render when images are loaded
-  const loadedImagesRef = useRef<Map<string, HTMLImageElement>>(new Map());
-  const [imagesLoaded, setImagesLoaded] = useState(false);
-
   const [isEngineRunning, setIsEngineRunning] = useState(true);
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [cardPosition, setCardPosition] = useState({ x: 0, y: 0 });
 
-  // Limit nodes based on count to prevent overcrowding
+  const { isMiniApp, composeCast } = useMiniAppContext();
+
+  // Limit nodes based on count
   const maxNodes = connections.length > 100 ? 50 : connections.length > 50 ? 75 : 100;
 
+  // Use extracted hooks
+  const { graphData, maxScore, getNodeSize } = useGraphData({
+    connections,
+    centerUser,
+    maxNodes,
+  });
+
+  const { loadedImagesRef, imagesLoaded } = useImagePreloader({
+    centerUserPfp: centerUser.pfp_url,
+    connectionPfps: connections.map(c => c.pfp_url),
+    maxNodes,
+  });
+
+  // Dimension tracking
   useEffect(() => {
     const updateDimensions = () => {
       const container = document.getElementById("graph-container");
@@ -406,90 +305,11 @@ function ConnectionGraph({
     return () => window.removeEventListener("resize", updateDimensions);
   }, []);
 
-  // Preload images - uses ref for stable callback access
-  useEffect(() => {
-    const urlsToLoad: string[] = [];
-
-    if (centerUser.pfp_url) {
-      urlsToLoad.push(centerUser.pfp_url);
-    }
-
-    connections.slice(0, maxNodes).forEach((c) => {
-      if (c.pfp_url) {
-        urlsToLoad.push(c.pfp_url);
-      }
-    });
-
-    const loadAllImages = async () => {
-      const newImages = new Map<string, HTMLImageElement>();
-
-      await Promise.all(
-        urlsToLoad.map(async (url) => {
-          try {
-            const img = await loadImage(url);
-            newImages.set(url, img);
-          } catch {
-            // Failed to load image, will show fallback
-          }
-        })
-      );
-
-      // Update ref (stable for callbacks) and trigger re-render
-      loadedImagesRef.current = newImages;
-      setImagesLoaded(true);
-    };
-
-    // Reset state for new data
-    setImagesLoaded(false);
-    loadAllImages();
-  }, [connections, centerUser, maxNodes]);
-
-  const graphData = useMemo(() => {
-    const maxScore = Math.max(
-      ...connections.map((c) =>
-        isMutualUser(c) ? c.combined_score : c.score
-      ),
-      1
-    );
-
-    const nodes: GraphNode[] = [
-      {
-        id: `user-${centerUser.fid}`,
-        fid: centerUser.fid,
-        username: centerUser.username,
-        pfp_url: centerUser.pfp_url,
-        score: maxScore,
-        isCenter: true,
-        color: "#3b82f6",
-      },
-      ...connections.slice(0, maxNodes).map((c) => {
-        const score = isMutualUser(c) ? c.combined_score : c.score;
-        return {
-          id: `user-${c.fid}`,
-          fid: c.fid,
-          username: c.username,
-          pfp_url: c.pfp_url,
-          score,
-          isCenter: false,
-          color: getScoreColor(score, maxScore),
-        };
-      }),
-    ];
-
-    const links: GraphLink[] = connections.slice(0, maxNodes).map((c) => ({
-      source: `user-${centerUser.fid}`,
-      target: `user-${c.fid}`,
-    }));
-
-    return { nodes, links };
-  }, [connections, centerUser, maxNodes]);
-
-  // GSAP smooth camera focus on node click + show info card
+  // GSAP smooth camera focus on node click
   const handleNodeClick = useCallback((node: any, event: MouseEvent) => {
     const graph = graphRef.current;
     const container = containerRef.current;
 
-    // Calculate card position from mouse event
     if (container) {
       const rect = container.getBoundingClientRect();
       setCardPosition({
@@ -503,34 +323,24 @@ function ConnectionGraph({
       return;
     }
 
-    // Get current camera state
     const currentZoom = graph.zoom() || 1;
     const targetZoom = 2.5;
-
-    // Animate camera to node
     const camera = { zoom: currentZoom };
 
     gsap.to(camera, {
       duration: 0.5,
       zoom: targetZoom,
       ease: "power2.out",
-      onUpdate: () => {
-        graph.zoom(camera.zoom);
-      },
+      onUpdate: () => graph.zoom(camera.zoom),
       onComplete: () => {
         graph.centerAt(node.x, node.y);
-        // Show info card after zoom animation
         setSelectedNode(node);
       },
     });
   }, []);
 
-  // Close info card
-  const handleCloseCard = useCallback(() => {
-    setSelectedNode(null);
-  }, []);
+  const handleCloseCard = useCallback(() => setSelectedNode(null), []);
 
-  // Open Warpcast profile
   const handleViewProfile = useCallback(() => {
     if (selectedNode) {
       window.open(`${URLS.warpcast}/${selectedNode.username}`, "_blank");
@@ -538,73 +348,39 @@ function ConnectionGraph({
     }
   }, [selectedNode]);
 
-  // Calculate max score for size scaling
-  const maxScore = useMemo(() => {
-    return Math.max(
-      ...connections.map((c) =>
-        isMutualUser(c) ? c.combined_score : c.score
-      ),
-      1
-    );
-  }, [connections]);
-
-  // Calculate node size based on score (higher score = bigger node)
-  const getNodeSize = useCallback((node: GraphNode) => {
-    if (node.isCenter) return 28;
-
-    // Score-based sizing: 12px (low) to 22px (high)
-    const minSize = connections.length > 50 ? 10 : 12;
-    const maxSize = connections.length > 50 ? 18 : 22;
-    const ratio = node.score / maxScore;
-
-    return minSize + (maxSize - minSize) * ratio;
-  }, [connections.length, maxScore]);
-
-  // Optimized node rendering with offscreen canvas cache and LOD
-  // Uses ref for image lookup to prevent callback recreation on every image load
+  // Optimized node rendering with LOD
   const nodeCanvasObject = useCallback(
     (node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
       const size = getNodeSize(node);
-      // Use ref for stable lookup (doesn't cause callback recreation)
       const img = node.pfp_url ? loadedImagesRef.current.get(node.pfp_url) : null;
 
-      // Draw avatar (using cached offscreen canvas for performance)
       if (img) {
         const cachedCanvas = getAvatarCanvas(img, size);
         const displaySize = size * 2;
-        // Draw high-res cached avatar scaled down for crisp display
         ctx.drawImage(
           cachedCanvas,
           0, 0, cachedCanvas.width, cachedCanvas.height,
           node.x! - size, node.y! - size, displaySize, displaySize
         );
 
-        // Draw border
         ctx.beginPath();
         ctx.arc(node.x!, node.y!, size, 0, 2 * Math.PI);
         ctx.strokeStyle = node.isCenter ? "#3b82f6" : node.color;
         ctx.lineWidth = node.isCenter ? 3 : 2;
         ctx.stroke();
       } else {
-        // Fallback: colored circle with initial
         ctx.beginPath();
         ctx.arc(node.x!, node.y!, size, 0, 2 * Math.PI);
         ctx.fillStyle = node.color;
         ctx.fill();
 
-        // Draw initial letter
         const fontSize = size * 0.8;
         ctx.font = `bold ${fontSize}px Inter, system-ui, sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillStyle = "#ffffff";
-        ctx.fillText(
-          node.username.charAt(0).toUpperCase(),
-          node.x!,
-          node.y!
-        );
+        ctx.fillText(node.username.charAt(0).toUpperCase(), node.x!, node.y!);
 
-        // Border for center
         if (node.isCenter) {
           ctx.beginPath();
           ctx.arc(node.x!, node.y!, size, 0, 2 * Math.PI);
@@ -614,7 +390,7 @@ function ConnectionGraph({
         }
       }
 
-      // LOD: Only draw labels when zoomed in enough
+      // LOD: Only draw labels when zoomed in
       if (globalScale > LOD_LABEL_THRESHOLD) {
         const fontSize = Math.max(6, 8 / globalScale);
         ctx.font = `${fontSize}px Inter, system-ui, sans-serif`;
@@ -624,24 +400,16 @@ function ConnectionGraph({
         const label = `@${node.username}`;
         const textWidth = ctx.measureText(label).width;
 
-        // Background for better readability
         ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
-        ctx.fillRect(
-          node.x! - textWidth / 2 - 2,
-          node.y! + size + 3,
-          textWidth + 4,
-          fontSize + 2
-        );
+        ctx.fillRect(node.x! - textWidth / 2 - 2, node.y! + size + 3, textWidth + 4, fontSize + 2);
 
-        // Label text
         ctx.fillStyle = node.isCenter ? "#3b82f6" : "#52525b";
         ctx.fillText(label, node.x!, node.y! + size + 4);
       }
     },
-    [getNodeSize, imagesLoaded] // imagesLoaded triggers re-render when images ready
+    [getNodeSize, imagesLoaded]
   );
 
-  // Stable pointer area paint function
   const nodePointerAreaPaint = useCallback(
     (node: any, color: string, ctx: CanvasRenderingContext2D) => {
       const size = getNodeSize(node);
@@ -653,38 +421,28 @@ function ConnectionGraph({
     [getNodeSize]
   );
 
-  // Handle engine stop - pause animation and auto-zoom only on first stop
   const handleEngineStop = useCallback(() => {
     const graph = graphRef.current;
     if (!graph) return;
 
     setIsEngineRunning(false);
-
-    // Pause animation loop (critical for performance)
     graph.pauseAnimation();
 
-    // Only auto-zoom on first stop (initial load) - preserve user zoom after that
     if (!hasInitialZoom.current) {
       hasInitialZoom.current = true;
-      // Use library's zoomToFit - automatically calculates correct zoom and center
-      // 400ms animation, 80px padding from edges
       graph.zoomToFit(400, 80);
     }
   }, []);
 
-  // Export graph as PNG - re-renders at fixed 2K resolution for consistency
+  // Export as PNG
   const handleExportPNG = useCallback(async (): Promise<void> => {
-    // Fixed 2K resolution for consistent exports across all devices
     const exportSize = 2000;
-
-    // Create high-resolution export canvas
     const exportCanvas = document.createElement("canvas");
     exportCanvas.width = exportSize;
     exportCanvas.height = exportSize;
     const ctx = exportCanvas.getContext("2d");
     if (!ctx) return;
 
-    // Render graph at high resolution using shared helper
     renderGraphToCanvas({
       ctx,
       exportSize,
@@ -695,7 +453,6 @@ function ConnectionGraph({
       totalConnections: connections.length,
     });
 
-    // Download as PNG
     const blob = await new Promise<Blob | null>((resolve) => {
       exportCanvas.toBlob(resolve, "image/png");
     });
@@ -712,18 +469,15 @@ function ConnectionGraph({
     URL.revokeObjectURL(url);
   }, [centerUser.username, type, graphData, connections.length]);
 
-  // Get graph as Blob for tokenization - uses shared high-res rendering
+  // Get graph as Blob for tokenization
   const getGraphBlob = useCallback(async (): Promise<Blob | null> => {
-    // Fixed size for tokenization (2K for consistent NFT quality)
     const exportSize = 2000;
-
     const exportCanvas = document.createElement("canvas");
     exportCanvas.width = exportSize;
     exportCanvas.height = exportSize;
     const ctx = exportCanvas.getContext("2d");
     if (!ctx) return null;
 
-    // Render graph using shared helper
     renderGraphToCanvas({
       ctx,
       exportSize,
@@ -734,7 +488,6 @@ function ConnectionGraph({
       totalConnections: connections.length,
     });
 
-    // Return blob
     return new Promise<Blob | null>((resolve) => {
       exportCanvas.toBlob(resolve, "image/png");
     });
@@ -744,34 +497,24 @@ function ConnectionGraph({
   const tokenizeData: TokenizeGraphData = useMemo(() => ({
     username: centerUser.username,
     fid: centerUser.fid,
-    nodeCount: graphData.nodes.length - 1, // Exclude center user
+    nodeCount: graphData.nodes.length - 1,
     graphType: type === "mutuals" ? "All Mutuals" : type === "attention" ? "Attention" : "Influence",
   }), [centerUser, graphData.nodes.length, type]);
 
-  // Track if forces have been configured (prevents repeated calls)
-  const forcesConfiguredRef = useRef(false);
-
-  // Configure forces - called once after graph renders
+  // Configure forces
   const configureForces = useCallback(() => {
     const fg = graphRef.current;
-    if (!fg) return;
-
-    // Skip if already configured
-    if (forcesConfiguredRef.current) return;
+    if (!fg || forcesConfiguredRef.current) return;
     forcesConfiguredRef.current = true;
 
-    // Charge (repulsion) - tighter spread
     const chargeStrength = connections.length > 50 ? -400 : -300;
     fg.d3Force("charge")?.strength(chargeStrength);
 
-    // Link distance - tighter spread
     const linkDistance = connections.length > 50 ? 120 : 100;
     fg.d3Force("link")?.distance(linkDistance);
 
-    // Disable center force completely to allow spreading
     fg.d3Force("center", null);
 
-    // Collision force to prevent overlap
     fg.d3Force("collision",
       forceCollide()
         .radius((node: any) => getNodeSize(node) + 15)
@@ -779,25 +522,21 @@ function ConnectionGraph({
         .iterations(3)
     );
 
-    // Reheat simulation to apply new forces
     fg.d3ReheatSimulation();
   }, [connections.length, getNodeSize]);
 
-  // Apply forces once after graph mounts (single delayed call)
   useEffect(() => {
     const timeoutId = setTimeout(configureForces, 300);
     return () => clearTimeout(timeoutId);
   }, [graphData, configureForces]);
 
-  // Reset forces config flag when graph data changes
   useEffect(() => {
     forcesConfiguredRef.current = false;
   }, [graphData]);
 
-  // Resume animation when graph data changes (e.g., switching tabs)
   useEffect(() => {
     if (graphRef.current && !isEngineRunning) {
-      hasInitialZoom.current = false; // Reset so new data gets initial zoom
+      hasInitialZoom.current = false;
       graphRef.current.resumeAnimation();
       setIsEngineRunning(true);
     }
@@ -837,9 +576,8 @@ function ConnectionGraph({
         maxZoom={4}
       />
 
-      {/* Top Bar: Legend + Export Button */}
+      {/* Top Bar */}
       <div className="absolute left-2 right-2 top-2 flex flex-col gap-2 sm:left-4 sm:right-4 sm:top-4 sm:flex-row sm:items-center sm:justify-between">
-        {/* Legend - sharp style with uppercase */}
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-2 border border-zinc-200 bg-white/95 px-3 py-2 text-[10px] uppercase tracking-[0.05em] sm:gap-4 sm:px-4 sm:text-xs dark:border-zinc-700 dark:bg-zinc-900/95">
             <span className="font-medium text-zinc-500">Score</span>
@@ -856,7 +594,6 @@ function ConnectionGraph({
               <span className="hidden text-zinc-600 dark:text-zinc-400 sm:inline">Low</span>
             </div>
           </div>
-          {/* Show limit indicator when nodes are capped */}
           {connections.length > maxNodes && (
             <div className="border border-amber-300 bg-amber-50/95 px-3 py-2 text-[10px] uppercase tracking-[0.05em] text-amber-700 sm:text-xs dark:border-amber-700 dark:bg-amber-900/50 dark:text-amber-300">
               Showing {maxNodes} of {connections.length}
@@ -864,7 +601,6 @@ function ConnectionGraph({
           )}
         </div>
 
-        {/* Export Button - ShareGraphButton for miniapp, ExportButton for web */}
         <div className="flex items-center gap-2">
           {isMiniApp ? (
             <ShareGraphButton
@@ -880,11 +616,6 @@ function ConnectionGraph({
               disabled={isEngineRunning}
             />
           )}
-          {/* <TokenizeButton
-            getGraphBlob={getGraphBlob}
-            graphData={tokenizeData}
-            disabled={isEngineRunning}
-          /> */}
         </div>
       </div>
 
@@ -906,5 +637,4 @@ function ConnectionGraph({
   );
 }
 
-// Phase 2.1: Wrap with React.memo to prevent unnecessary re-renders
 export default React.memo(ConnectionGraph);

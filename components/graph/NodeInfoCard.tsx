@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { X } from "lucide-react";
 
@@ -26,13 +26,11 @@ export default function NodeInfoCard({
   const cardRef = useRef<HTMLDivElement>(null);
   // Track if the card just mounted to ignore the opening click
   const justMountedRef = useRef(true);
+  // Stable ref for onClose to avoid re-adding listeners
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
-  // Stable close handler
-  const handleClose = useCallback(() => {
-    onClose();
-  }, [onClose]);
-
-  // Click outside to close - uses ref instead of setTimeout
+  // Click outside to close - listener added once
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       // Ignore the first click (the one that opened the card)
@@ -42,7 +40,7 @@ export default function NodeInfoCard({
       }
 
       if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
-        handleClose();
+        onCloseRef.current();
       }
     };
 
@@ -52,16 +50,16 @@ export default function NodeInfoCard({
     return () => {
       document.removeEventListener("mouseup", handleClickOutside);
     };
-  }, [handleClose]);
+  }, []);
 
-  // Escape key to close
+  // Escape key to close - listener added once
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") handleClose();
+      if (event.key === "Escape") onCloseRef.current();
     };
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
-  }, [handleClose]);
+  }, []);
 
   return (
     <div
