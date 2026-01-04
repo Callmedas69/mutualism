@@ -639,11 +639,11 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
                 onExport={handleExportPNG}
                 disabled={isEngineRunning}
               />
-              <TokenizeButton
+{/* <TokenizeButton
                 getGraphBlob={getGraphBlob}
                 graphData={tokenizeData}
                 disabled={isEngineRunning}
-              />
+              /> */}
             </>
           )}
         </div>
