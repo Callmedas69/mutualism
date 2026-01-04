@@ -9,6 +9,7 @@ interface CoinStats {
   address: string;
   name: string;
   symbol: string;
+  image: string;
   marketCap: string;
   volume24h: string;
   uniqueHolders: number;
@@ -24,6 +25,11 @@ interface ZoraToken {
   address?: string;
   name?: string;
   symbol?: string;
+  mediaContent?: {
+    previewImage?: {
+      medium?: string;
+    };
+  };
   marketCap?: string;
   volume24h?: string;
   uniqueHolders?: number;
@@ -109,6 +115,7 @@ export async function POST(request: NextRequest) {
       address: token.address || "",
       name: token.name || "",
       symbol: token.symbol || "",
+      image: token.mediaContent?.previewImage?.medium || "",
       marketCap: token.marketCap || "0",
       volume24h: token.volume24h || "0",
       uniqueHolders: token.uniqueHolders || 0,

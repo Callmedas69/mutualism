@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Loader2 } from "lucide-react";
 import { useFarcasterUser } from "@/context/FarcasterProvider";
 import { useConnectionData, type ErrorType } from "@/hooks/useConnectionData";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -39,6 +40,20 @@ export default function ConnectionTabs() {
   };
 
   if (loading) {
+    // Graph view: spinner style (consistent with image loading overlay)
+    if (viewType === "graph") {
+      return (
+        <div className="relative h-[600px] border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="flex flex-col items-center gap-2 bg-white/80 dark:bg-zinc-900/80 px-6 py-4 rounded-lg">
+              <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
+              <span className="text-xs uppercase tracking-wider text-zinc-500">Loading...</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    // List view: shimmer skeleton
     return <ConnectionSkeleton />;
   }
 

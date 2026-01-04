@@ -9,6 +9,7 @@ export interface CoinStats {
   address: string;
   name: string;
   symbol: string;
+  image: string;
   marketCap: string;
   volume24h: string;
   uniqueHolders: number;

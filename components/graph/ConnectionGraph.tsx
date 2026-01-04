@@ -9,6 +9,7 @@ import type { TokenizeGraphData } from "@/types/tokenize";
 import { URLS } from "@/lib/constants";
 import { useGraphData, type GraphNode, type GraphLink } from "@/hooks/useGraphData";
 import { useImagePreloader, getAvatarCanvas } from "@/hooks/useImagePreloader";
+import { Loader2 } from "lucide-react";
 import NodeInfoCard from "./NodeInfoCard";
 import ExportButton from "./ExportButton";
 import ShareGraphButton from "./ShareGraphButton";
@@ -44,12 +45,11 @@ interface RenderToCanvasOptions {
   graphData: { nodes: GraphNode[]; links: GraphLink[] };
   loadedImages: Map<string, HTMLImageElement>;
   centerUsername: string;
-  totalConnections: number;
 }
 
 // Shared high-resolution graph rendering function
 function renderGraphToCanvas(options: RenderToCanvasOptions): void {
-  const { ctx, exportSize, type, graphData, loadedImages, centerUsername, totalConnections } = options;
+  const { ctx, exportSize, type, graphData, loadedImages, centerUsername } = options;
 
   const footerHeight = 200;
   const graphAreaBottom = exportSize - footerHeight;
@@ -202,13 +202,10 @@ function renderGraphToCanvas(options: RenderToCanvasOptions): void {
 
   leftY += 22 * uiScale;
   const tabLabel = type === "mutuals" ? "ALL MUTUALS" : type === "attention" ? "ATTENTION" : "INFLUENCE";
-  const nodeCount = graphData.nodes.length - 1;
-  const isLimited = nodeCount < totalConnections;
-  const connectionText = isLimited ? `showing ${nodeCount} of ${totalConnections}` : `${nodeCount} connections`;
   ctx.font = `${Math.round(14 * uiScale)}px Inter, system-ui, sans-serif`;
   ctx.fillStyle = "#a1a1aa";
   ctx.textAlign = "left";
-  ctx.fillText(`${tabLabel} • @${centerUsername} • ${connectionText}`, leftX, leftY);
+  ctx.fillText(`${tabLabel} • @${centerUsername}`, leftX, leftY);
 
   leftY += 22 * uiScale;
   const now = new Date();
@@ -289,21 +286,38 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
     maxNodes,
   });
 
-  // Dimension tracking
+  // Graph is ready when images are loaded AND physics simulation has settled
+  const isGraphReady = imagesLoaded && !isEngineRunning;
+
+  // Dimension tracking - uses ResizeObserver to detect visibility changes
   useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
     const updateDimensions = () => {
-      const container = document.getElementById("graph-container");
-      if (container) {
-        setDimensions({
-          width: container.clientWidth,
-          height: Math.max(600, window.innerHeight - 250),
-        });
+      const width = container.clientWidth;
+      const height = Math.max(600, window.innerHeight - 250);
+      // Only update if we have valid dimensions (not hidden)
+      if (width > 0) {
+        setDimensions({ width, height });
       }
     };
 
-    updateDimensions();
+    // ResizeObserver fires when element becomes visible (goes from 0 to non-zero size)
+    const resizeObserver = new ResizeObserver(() => {
+      updateDimensions();
+    });
+
+    resizeObserver.observe(container);
     window.addEventListener("resize", updateDimensions);
-    return () => window.removeEventListener("resize", updateDimensions);
+
+    // Initial dimension check
+    updateDimensions();
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updateDimensions);
+    };
   }, []);
 
   // GSAP smooth camera focus on node click
@@ -451,7 +465,6 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
       graphData,
       loadedImages: loadedImagesRef.current,
       centerUsername: centerUser.username,
-      totalConnections: connections.length,
     });
 
     const blob = await new Promise<Blob | null>((resolve) => {
@@ -468,7 +481,7 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-  }, [centerUser.username, type, graphData, connections.length]);
+  }, [centerUser.username, type, graphData]);
 
   // Get graph as Blob for tokenization
   const getGraphBlob = useCallback(async (): Promise<Blob | null> => {
@@ -486,13 +499,12 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
       graphData,
       loadedImages: loadedImagesRef.current,
       centerUsername: centerUser.username,
-      totalConnections: connections.length,
     });
 
     return new Promise<Blob | null>((resolve) => {
       exportCanvas.toBlob(resolve, "image/png");
     });
-  }, [centerUser.username, type, graphData, connections.length]);
+  }, [centerUser.username, type, graphData]);
 
   // Tokenize graph data
   const tokenizeData: TokenizeGraphData = useMemo(() => ({
@@ -557,25 +569,40 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
       id="graph-container"
       className="relative overflow-hidden border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
     >
-      <ForceGraph2D
-        ref={graphRef}
-        graphData={graphData}
-        width={dimensions.width}
-        height={dimensions.height}
-        nodeCanvasObject={nodeCanvasObject}
-        nodePointerAreaPaint={nodePointerAreaPaint}
-        onNodeClick={handleNodeClick}
-        linkColor={getLinkColor}
-        linkWidth={1}
-        cooldownTicks={200}
-        warmupTicks={100}
-        d3AlphaDecay={0.01}
-        d3VelocityDecay={0.3}
-        onEngineStop={handleEngineStop}
-        enableNodeDrag={true}
-        minZoom={0.5}
-        maxZoom={4}
-      />
+      {/* Graph Canvas with blur during loading */}
+      <div className={`transition-all duration-500 ${!isGraphReady ? "blur-sm" : ""}`}>
+        <ForceGraph2D
+          ref={graphRef}
+          graphData={graphData}
+          width={dimensions.width}
+          height={dimensions.height}
+          nodeCanvasObject={nodeCanvasObject}
+          nodePointerAreaPaint={nodePointerAreaPaint}
+          onNodeClick={handleNodeClick}
+          linkColor={getLinkColor}
+          linkWidth={1}
+          cooldownTicks={200}
+          warmupTicks={100}
+          d3AlphaDecay={0.01}
+          d3VelocityDecay={0.3}
+          onEngineStop={handleEngineStop}
+          enableNodeDrag={true}
+          minZoom={0.5}
+          maxZoom={4}
+        />
+      </div>
+
+      {/* Loading Overlay */}
+      {!isGraphReady && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+          <div className="flex flex-col items-center gap-2 bg-white/80 dark:bg-zinc-900/80 px-6 py-4 rounded-lg">
+            <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
+            <span className="text-xs uppercase tracking-wider text-zinc-500">
+              Loading...
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Top Bar */}
       <div className="absolute left-2 right-2 top-2 flex flex-col gap-2 sm:left-4 sm:right-4 sm:top-4 sm:flex-row sm:items-center sm:justify-between">
@@ -595,11 +622,6 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
               <span className="hidden text-zinc-600 dark:text-zinc-400 sm:inline">Low</span>
             </div>
           </div>
-          {connections.length > maxNodes && (
-            <div className="border border-amber-300 bg-amber-50/95 px-3 py-2 text-[10px] uppercase tracking-[0.05em] text-amber-700 sm:text-xs dark:border-amber-700 dark:bg-amber-900/50 dark:text-amber-300">
-              Showing {maxNodes} of {connections.length}
-            </div>
-          )}
         </div>
 
         <div className="flex items-center gap-2">

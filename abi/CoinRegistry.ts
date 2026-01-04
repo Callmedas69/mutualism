@@ -1,4 +1,4 @@
-export const COIN_REGISTRY_ADDRESS = "0x2a1b0e3Df8B751308d7831a8e61D66100d3D9dE1" as const;
+export const COIN_REGISTRY_ADDRESS = "0x056263E7bfa86BdaDB79295ed2B5164834cd2Fb4" as const;
 
 export const COIN_REGISTRY_ABI = [
   {

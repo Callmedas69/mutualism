@@ -81,6 +81,22 @@ const nextConfig: NextConfig = {
         hostname: "pbs.twimg.com",
         pathname: "/**",
       },
+      // Zora CDN
+      {
+        protocol: "https",
+        hostname: "*.zora.co",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "zora.co",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "*.choicecdn.com",
+        pathname: "/**",
+      },
     ],
   },
 };

@@ -83,8 +83,22 @@ export default function TokenizeModal({
   const [coinSymbol] = useState(() =>
     generateSymbol(graphData.username, graphData.graphType)
   );
+  const [ethPrice, setEthPrice] = useState<number | null>(null);
 
   const { address } = useAccount();
+
+  // Fetch ETH price when modal opens
+  useEffect(() => {
+    if (!isOpen) return;
+
+    fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd")
+      .then((res) => res.json())
+      .then((data) => setEthPrice(data.ethereum?.usd ?? null))
+      .catch(() => setEthPrice(null));
+  }, [isOpen]);
+
+  // Calculate USD value
+  const feeInUsd = ethPrice ? (parseFloat(TOKENIZE_FEE) * ethPrice).toFixed(2) : null;
 
   // Fee payment transaction
   const {
@@ -338,14 +352,14 @@ export default function TokenizeModal({
         {step !== "payment" && step !== "uploading" && step !== "creating" && step !== "registering" && (
           <button
             onClick={handleClose}
-            className="absolute right-4 top-4 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+            className="absolute right-3 top-3 z-10 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
           >
             <X size={20} />
           </button>
         )}
 
         {/* Progress Steps */}
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex items-center justify-between pr-8">
           {STEPS.slice(0, -1).map((s, i) => (
             <div key={s.id} className="flex items-center">
               <div
@@ -353,7 +367,7 @@ export default function TokenizeModal({
                   i < currentStepIndex
                     ? "border-green-500 bg-green-500 text-white"
                     : i === currentStepIndex
-                    ? "border-purple-600 bg-purple-600 text-white"
+                    ? "border-[#f25b28] bg-[#f25b28] text-white"
                     : "border-zinc-300 bg-zinc-100 text-zinc-500 dark:border-zinc-600 dark:bg-zinc-800"
                 }`}
               >
@@ -375,9 +389,8 @@ export default function TokenizeModal({
         {/* Preview Step */}
         {step === "preview" && (
           <div className="space-y-4">
-            <h2 className="text-xl font-bold">Tokenize Your Graph</h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Create a tradeable social token from your Farcaster graph snapshot.
+            <p className="text-lg font-bold py-3">
+              Turn your social graph into a tradeable coin.
             </p>
 
             {/* Token Name */}
@@ -399,31 +412,25 @@ export default function TokenizeModal({
                   <span className="text-zinc-500">Graph Type</span>
                   <span className="font-medium">{graphData.graphType}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-zinc-500">Connections</span>
-                  <span className="font-medium">{graphData.nodeCount}</span>
-                </div>
                 <div className="flex justify-between border-t border-zinc-200 pt-2 dark:border-zinc-700">
-                  <span className="text-zinc-500">Tokenization Fee</span>
-                  <span className="font-medium">{TOKENIZE_FEE} ETH</span>
+                  <span className="text-zinc-500">Deployment Fee</span>
+                  <span className="font-medium">
+                    {TOKENIZE_FEE} ETH{feeInUsd && ` (~$${feeInUsd})`}
+                  </span>
                 </div>
               </div>
             </div>
 
-            <p className="text-xs text-zinc-400">
-              You&apos;ll receive trading fees as the creator. The platform earns a small referral percentage.
-            </p>
-
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:gap-3">
               <button
                 onClick={handleClose}
-                className="flex-1 border border-zinc-300 bg-white px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-zinc-700 transition-colors hover:border-zinc-500 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-400"
+                className="flex-1 border border-zinc-300 bg-white px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-zinc-700 transition-colors hover:border-zinc-500 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f25b28] dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-400"
               >
                 Cancel
               </button>
               <button
                 onClick={handlePayFee}
-                className="flex-1 border border-purple-600 bg-purple-600 px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-white transition-colors hover:border-purple-700 hover:bg-purple-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+                className="flex-1 border border-[#f25b28] bg-[#f25b28] px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-white transition-colors hover:border-[#d94f22] hover:bg-[#d94f22] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f25b28] focus-visible:ring-offset-2"
               >
                 Tokenize
               </button>
@@ -434,28 +441,23 @@ export default function TokenizeModal({
         {/* Payment Step */}
         {step === "payment" && (
           <div className="space-y-4 text-center">
-            <Loader2 className="mx-auto h-12 w-12 animate-spin text-purple-600" />
+            <Loader2 className="mx-auto h-12 w-12 animate-spin text-[#f25b28]" />
             <h2 className="text-xl font-bold">
-              {isFeePending ? "Confirm in Wallet" : "Processing Payment"}
+              {isFeePending ? "Check your wallet" : "Sending fee..."}
             </h2>
             <p className="text-sm text-zinc-500">
               {isFeePending
-                ? `Approve the ${TOKENIZE_FEE} ETH tokenization fee`
-                : "Waiting for transaction confirmation..."}
+                ? `Approve ${TOKENIZE_FEE} ETH${feeInUsd ? ` (~$${feeInUsd})` : ""} to continue`
+                : "Hang tight, confirming..."}
             </p>
-            {isFeePending && (
-              <p className="text-xs text-zinc-400">
-                This fee supports platform maintenance and development.
-              </p>
-            )}
           </div>
         )}
 
         {/* Uploading Step */}
         {step === "uploading" && (
           <div className="space-y-4 text-center">
-            <Loader2 className="mx-auto h-12 w-12 animate-spin text-purple-600" />
-            <h2 className="text-xl font-bold">Chunking your graph</h2>
+            <Loader2 className="mx-auto h-12 w-12 animate-spin text-[#f25b28]" />
+            <h2 className="text-xl font-bold">Preparing your coin</h2>
             <p className="text-sm text-zinc-500">
               Capturing your graph...
             </p>
@@ -465,40 +467,30 @@ export default function TokenizeModal({
         {/* Creating Step */}
         {step === "creating" && (
           <div className="space-y-4 text-center">
-            <Loader2 className="mx-auto h-12 w-12 animate-spin text-purple-600" />
+            <Loader2 className="mx-auto h-12 w-12 animate-spin text-[#f25b28]" />
             <h2 className="text-xl font-bold">
-              {isCoinPending ? "Confirm in Wallet" : "Creating Your Coin"}
+              {isCoinPending ? "Check your wallet" : "Minting your coin..."}
             </h2>
             <p className="text-sm text-zinc-500">
               {isCoinPending
-                ? "Approve the transaction to create your coin on Zora"
-                : "Waiting for transaction confirmation..."}
+                ? "Approve to deploy on Zora"
+                : "Almost there..."}
             </p>
-            {isCoinPending && (
-              <p className="text-xs text-zinc-400">
-                This deploys your social graph as a tradeable coin on Base.
-              </p>
-            )}
           </div>
         )}
 
         {/* Registering Step */}
         {step === "registering" && (
           <div className="space-y-4 text-center">
-            <Loader2 className="mx-auto h-12 w-12 animate-spin text-purple-600" />
+            <Loader2 className="mx-auto h-12 w-12 animate-spin text-[#f25b28]" />
             <h2 className="text-xl font-bold">
-              {isRegistryPending ? "Confirm in Wallet" : "Registering Your Coin"}
+              {isRegistryPending ? "One more signature" : "Adding to gallery..."}
             </h2>
             <p className="text-sm text-zinc-500">
               {isRegistryPending
-                ? "Approve the transaction to register your coin"
-                : "Waiting for registration confirmation..."}
+                ? "Approve to save your coin"
+                : "Wrapping up..."}
             </p>
-            {isRegistryPending && (
-              <p className="text-xs text-zinc-400">
-                This adds your coin to your gallery for easy access.
-              </p>
-            )}
           </div>
         )}
 
@@ -508,9 +500,9 @@ export default function TokenizeModal({
             <div className="mx-auto flex h-16 w-16 items-center justify-center border-2 border-green-500 bg-green-50 dark:bg-green-900/30">
               <Check className="h-8 w-8 text-green-600" />
             </div>
-            <h2 className="text-xl font-bold">Coin Created!</h2>
+            <h2 className="text-xl font-bold">You're live!</h2>
             <p className="text-sm text-zinc-500">
-              Your social graph is now tokenized on Zora.
+              Your coin is ready to trade on Zora.
             </p>
 
             {/* Warning if registry failed */}
@@ -570,7 +562,7 @@ export default function TokenizeModal({
               <Link
                 href="/gallery"
                 onClick={handleClose}
-                className="flex flex-1 items-center justify-center border border-zinc-300 bg-white px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-zinc-700 transition-colors hover:border-zinc-500 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-400"
+                className="flex flex-1 items-center justify-center border border-zinc-300 bg-white px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-zinc-700 transition-colors hover:border-zinc-500 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f25b28] dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-400"
               >
                 View Gallery
               </Link>
@@ -579,7 +571,7 @@ export default function TokenizeModal({
                   href={coinUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-1 items-center justify-center gap-2 border border-purple-600 bg-purple-600 px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-white transition-colors hover:border-purple-700 hover:bg-purple-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+                  className="flex flex-1 items-center justify-center gap-2 border border-[#f25b28] bg-[#f25b28] px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-white transition-colors hover:border-[#d94f22] hover:bg-[#d94f22] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f25b28] focus-visible:ring-offset-2"
                 >
                   View on Zora
                   <ExternalLink size={12} />
@@ -601,7 +593,7 @@ export default function TokenizeModal({
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:gap-3">
               <button
                 onClick={handleClose}
-                className="flex-1 border border-zinc-300 bg-white px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-zinc-700 transition-colors hover:border-zinc-500 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-400"
+                className="flex-1 border border-zinc-300 bg-white px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-zinc-700 transition-colors hover:border-zinc-500 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f25b28] dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-400"
               >
                 Close
               </button>
@@ -610,7 +602,7 @@ export default function TokenizeModal({
                   setError(null);
                   setStep("preview");
                 }}
-                className="flex-1 border border-purple-600 bg-purple-600 px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-white transition-colors hover:border-purple-700 hover:bg-purple-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+                className="flex-1 border border-[#f25b28] bg-[#f25b28] px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-white transition-colors hover:border-[#d94f22] hover:bg-[#d94f22] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f25b28] focus-visible:ring-offset-2"
               >
                 Try Again
               </button>

@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { ExternalLink, Coins, Loader2, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { useAccount } from "wagmi";
 import { getCoinUrl } from "@/lib/zora";
@@ -184,6 +185,7 @@ const CoinCard = memo(function CoinCard({ coinData, stats, isStatsLoading, isOwn
 
   const name = stats?.name || "Unknown Coin";
   const symbol = stats?.symbol || "???";
+  const image = stats?.image || "";
   const holders = stats?.uniqueHolders || 0;
 
   const formatMarketCap = (value: string | undefined) => {
@@ -205,9 +207,21 @@ const CoinCard = memo(function CoinCard({ coinData, stats, isStatsLoading, isOwn
       rel="noopener noreferrer"
       className="group flex items-center gap-4 p-4 border border-zinc-100 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/50 transition-all duration-300 ease-out hover:border-zinc-200 dark:hover:border-zinc-700 hover:-translate-y-0.5"
     >
-      {/* Icon */}
-      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-        <Coins className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+      {/* Image */}
+      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+        {image ? (
+          <Image
+            src={image}
+            alt={name}
+            fill
+            className="object-cover"
+            sizes="40px"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <Coins className="h-5 w-5 text-zinc-400" />
+          </div>
+        )}
       </div>
 
       {/* Name, Symbol & Creator */}

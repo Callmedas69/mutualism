@@ -17,7 +17,7 @@ export const PLATFORM_REFERRER = process.env
   .NEXT_PUBLIC_PLATFORM_REFERRER as Address;
 
 // Tokenization fee in ETH
-export const TOKENIZE_FEE = "0.00001";
+export const TOKENIZE_FEE = "0.00015";
 
 // Graph type to symbol suffix mapping
 const GRAPH_TYPE_SUFFIXES: Record<string, string> = {
