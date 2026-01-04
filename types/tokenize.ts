@@ -55,6 +55,7 @@ export type TokenizeStep =
   | "payment"
   | "uploading"
   | "creating"
+  | "registering"
   | "success"
   | "error";
 

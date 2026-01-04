@@ -42,6 +42,9 @@ const miniAppEmbed = {
 export const metadata: Metadata = {
   title: "MUTUALISM",
   description: "Visualize your Farcaster network and tokenize your social graph on Zora",
+  appleWebApp: {
+    title: "Mutualism",
+  },
   openGraph: {
     title: "MUTUALISM",
     description: "Visualize your Farcaster network and tokenize your social graph on Zora",

@@ -33,6 +33,12 @@ contract CoinRegistry is Ownable {
     /// @dev Mapping to track if a coin is already registered
     mapping(address => bool) private _isRegistered;
 
+    /// @dev Array of all registered coins (for pagination)
+    address[] private _allCoins;
+
+    /// @dev Mapping from coin to creator
+    mapping(address => address) private _coinCreator;
+
     constructor(address _signer) Ownable(msg.sender) {
         require(_signer != address(0), "Invalid signer address");
         signer = _signer;
@@ -61,6 +67,8 @@ contract CoinRegistry is Ownable {
         // Register the coin
         _isRegistered[coin] = true;
         _creatorCoins[msg.sender].push(coin);
+        _allCoins.push(coin);
+        _coinCreator[coin] = msg.sender;
 
         emit CoinRegistered(msg.sender, coin, block.timestamp);
     }
@@ -101,5 +109,53 @@ contract CoinRegistry is Ownable {
      */
     function isRegistered(address coin) external view returns (bool) {
         return _isRegistered[coin];
+    }
+
+    /**
+     * @notice Get coins with pagination
+     * @param offset Starting index
+     * @param limit Max coins to return
+     * @return coins Array of coin addresses
+     * @return creators Array of creator addresses
+     * @return total Total number of coins
+     */
+    function getCoins(uint256 offset, uint256 limit) external view returns (
+        address[] memory coins,
+        address[] memory creators,
+        uint256 total
+    ) {
+        total = _allCoins.length;
+        if (offset >= total) {
+            return (new address[](0), new address[](0), total);
+        }
+
+        uint256 end = offset + limit;
+        if (end > total) end = total;
+        uint256 length = end - offset;
+
+        coins = new address[](length);
+        creators = new address[](length);
+
+        for (uint256 i = 0; i < length; i++) {
+            coins[i] = _allCoins[offset + i];
+            creators[i] = _coinCreator[coins[i]];
+        }
+    }
+
+    /**
+     * @notice Get total registered coin count
+     * @return Number of registered coins
+     */
+    function getTotalCoins() external view returns (uint256) {
+        return _allCoins.length;
+    }
+
+    /**
+     * @notice Get creator of a coin
+     * @param coin The coin contract address
+     * @return Creator address
+     */
+    function coinCreator(address coin) external view returns (address) {
+        return _coinCreator[coin];
     }
 }

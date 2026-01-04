@@ -29,6 +29,34 @@ export const COIN_REGISTRY_ABI = [
   },
   {
     type: "function",
+    name: "getCoins",
+    inputs: [
+      { name: "offset", type: "uint256", internalType: "uint256" },
+      { name: "limit", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [
+      { name: "coins", type: "address[]", internalType: "address[]" },
+      { name: "creators", type: "address[]", internalType: "address[]" },
+      { name: "total", type: "uint256", internalType: "uint256" },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getTotalCoins",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "coinCreator",
+    inputs: [{ name: "coin", type: "address", internalType: "address" }],
+    outputs: [{ name: "", type: "address", internalType: "address" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "owner",
     inputs: [],
     outputs: [{ name: "", type: "address", internalType: "address" }],

@@ -100,7 +100,7 @@ export function generateMetadata(
 ): CoinMetadata {
   return {
     name: `Mutual Graph of @${username}`,
-    description: `Farcaster social graph snapshot via Quotient. A visual representation of @${username}'s social connections on Farcaster.`,
+    description: `A snapshot of Farcaster social graph via Quotient, showing how people are connected across the network.`,
     image: imageUri,
     properties: {
       category: "social",

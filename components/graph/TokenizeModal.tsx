@@ -21,7 +21,6 @@ import {
   TOKENIZE_FEE,
   PLATFORM_WALLET,
 } from "@/lib/zora";
-import { saveCreatedCoin } from "@/lib/storage";
 import { REGISTRY_ADDRESS, REGISTRY_ABI } from "@/lib/registry";
 
 interface TokenizeModalProps {
@@ -61,6 +60,7 @@ const STEPS: { id: TokenizeStep; label: string }[] = [
   { id: "payment", label: "Pay Fee" },
   { id: "uploading", label: "Upload" },
   { id: "creating", label: "Create" },
+  { id: "registering", label: "Register" },
   { id: "success", label: "Done" },
 ];
 
@@ -119,8 +119,19 @@ export default function TokenizeModal({
     hash: coinHash,
   });
 
-  // Registry contract call (fire-and-forget after coin creation)
-  const { writeContract: registerCoin } = useWriteContract();
+  // Registry contract call
+  const {
+    writeContract: registerCoin,
+    data: registryHash,
+    isPending: isRegistryPending,
+    error: registryError,
+  } = useWriteContract();
+
+  // Wait for registry transaction
+  const { isLoading: isRegistryConfirming, isSuccess: isRegistryConfirmed } =
+    useWaitForTransactionReceipt({
+      hash: registryHash,
+    });
 
   // Handle fee payment
   const handlePayFee = useCallback(() => {
@@ -201,9 +212,9 @@ export default function TokenizeModal({
     }
   }, [isFeeConfirmed, step, handleUploadAndCreate]);
 
-  // Handle coin creation success - parse coin address from receipt
+  // Handle coin creation success - parse coin address and trigger registry
   useEffect(() => {
-    if (isCoinConfirmed && coinReceipt && coinHash) {
+    if (isCoinConfirmed && coinReceipt && coinHash && step === "creating") {
       // Parse coin address from transaction logs
       const coinAddr = parseCoinAddressFromReceipt(coinReceipt);
 
@@ -211,35 +222,54 @@ export default function TokenizeModal({
         setCoinAddress(coinAddr);
         setCoinUrl(getCoinUrl(coinAddr));
 
-        // Save to localStorage for gallery (fallback/migration)
-        saveCreatedCoin({
-          coinAddress: coinAddr,
-          name: coinName,
-          symbol: coinSymbol,
-          username: graphData.username,
-          fid: graphData.fid,
-          graphType: graphData.graphType,
-          nodeCount: graphData.nodeCount,
-          createdAt: new Date().toISOString(),
-          txHash: coinHash,
-        });
+        // Register coin on-chain
+        if (REGISTRY_ADDRESS && address) {
+          setStep("registering");
+          (async () => {
+            try {
+              const signRes = await fetch("/api/registry/sign", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ creator: address, coin: coinAddr }),
+              });
 
-        // Register coin on-chain (fire-and-forget, don't block UI)
-        if (REGISTRY_ADDRESS) {
-          registerCoin({
-            address: REGISTRY_ADDRESS,
-            abi: REGISTRY_ABI,
-            functionName: "registerCoin",
-            args: [coinAddr],
-          });
+              if (signRes.ok) {
+                const { signature } = await signRes.json();
+                registerCoin({
+                  address: REGISTRY_ADDRESS,
+                  abi: REGISTRY_ABI,
+                  functionName: "registerCoin",
+                  args: [coinAddr, signature as `0x${string}`],
+                });
+              } else {
+                console.error("Failed to get registry signature:", await signRes.text());
+                setError("Failed to register coin. You can still view it on Zora.");
+                setStep("success"); // Continue to success, just won't show in gallery
+              }
+            } catch (err) {
+              console.error("Registry signature fetch failed:", err);
+              setError("Failed to register coin. You can still view it on Zora.");
+              setStep("success");
+            }
+          })();
+        } else {
+          // No registry configured, go straight to success
+          setStep("success");
         }
       } else {
         // Fallback if parsing fails
         setCoinUrl(`https://zora.co/explore?search=${graphData.username}`);
+        setStep("success");
       }
+    }
+  }, [isCoinConfirmed, coinReceipt, coinHash, step, graphData, registerCoin, address]);
+
+  // Handle registry success
+  useEffect(() => {
+    if (isRegistryConfirmed && step === "registering") {
       setStep("success");
     }
-  }, [isCoinConfirmed, coinReceipt, coinHash, graphData, coinName, coinSymbol, registerCoin]);
+  }, [isRegistryConfirmed, step]);
 
   // Handle wallet errors
   useEffect(() => {
@@ -251,7 +281,13 @@ export default function TokenizeModal({
       setError(formatError(coinError));
       setStep("error");
     }
-  }, [feeError, coinError]);
+    if (registryError) {
+      // Registry failed but coin was created - show warning but continue
+      console.error("Registry error:", registryError);
+      setError("Coin created but failed to register. It may not appear in your gallery.");
+      setStep("success");
+    }
+  }, [feeError, coinError, registryError]);
 
   // Copy URL to clipboard
   const handleCopy = useCallback(() => {
@@ -281,7 +317,8 @@ export default function TokenizeModal({
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       const currentStep = stepRef.current;
-      if (e.key === "Escape" && currentStep !== "payment" && currentStep !== "uploading" && currentStep !== "creating") {
+      const blockedSteps = ["payment", "uploading", "creating", "registering"];
+      if (e.key === "Escape" && !blockedSteps.includes(currentStep)) {
         handleCloseRef.current();
       }
     };
@@ -298,7 +335,7 @@ export default function TokenizeModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="relative w-full max-w-md border border-zinc-200 bg-white p-6 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900">
         {/* Close button (disabled during processing) */}
-        {step !== "payment" && step !== "uploading" && step !== "creating" && (
+        {step !== "payment" && step !== "uploading" && step !== "creating" && step !== "registering" && (
           <button
             onClick={handleClose}
             className="absolute right-4 top-4 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
@@ -406,6 +443,11 @@ export default function TokenizeModal({
                 ? `Approve the ${TOKENIZE_FEE} ETH tokenization fee`
                 : "Waiting for transaction confirmation..."}
             </p>
+            {isFeePending && (
+              <p className="text-xs text-zinc-400">
+                This fee supports platform maintenance and development.
+              </p>
+            )}
           </div>
         )}
 
@@ -413,9 +455,9 @@ export default function TokenizeModal({
         {step === "uploading" && (
           <div className="space-y-4 text-center">
             <Loader2 className="mx-auto h-12 w-12 animate-spin text-purple-600" />
-            <h2 className="text-xl font-bold">Uploading to IPFS</h2>
+            <h2 className="text-xl font-bold">Chunking your graph</h2>
             <p className="text-sm text-zinc-500">
-              Capturing your graph and uploading to IPFS...
+              Capturing your graph...
             </p>
           </div>
         )}
@@ -432,6 +474,31 @@ export default function TokenizeModal({
                 ? "Approve the transaction to create your coin on Zora"
                 : "Waiting for transaction confirmation..."}
             </p>
+            {isCoinPending && (
+              <p className="text-xs text-zinc-400">
+                This deploys your social graph as a tradeable coin on Base.
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Registering Step */}
+        {step === "registering" && (
+          <div className="space-y-4 text-center">
+            <Loader2 className="mx-auto h-12 w-12 animate-spin text-purple-600" />
+            <h2 className="text-xl font-bold">
+              {isRegistryPending ? "Confirm in Wallet" : "Registering Your Coin"}
+            </h2>
+            <p className="text-sm text-zinc-500">
+              {isRegistryPending
+                ? "Approve the transaction to register your coin"
+                : "Waiting for registration confirmation..."}
+            </p>
+            {isRegistryPending && (
+              <p className="text-xs text-zinc-400">
+                This adds your coin to your gallery for easy access.
+              </p>
+            )}
           </div>
         )}
 
@@ -445,6 +512,14 @@ export default function TokenizeModal({
             <p className="text-sm text-zinc-500">
               Your social graph is now tokenized on Zora.
             </p>
+
+            {/* Warning if registry failed */}
+            {error && (
+              <div className="flex items-center gap-2 rounded-lg bg-amber-50 p-3 text-left dark:bg-amber-900/20">
+                <AlertCircle size={16} className="shrink-0 text-amber-600" />
+                <p className="text-xs text-amber-700 dark:text-amber-400">{error}</p>
+              </div>
+            )}
 
             {/* Coin Details */}
             <div className="rounded-lg bg-zinc-50 p-4 text-left dark:bg-zinc-800">

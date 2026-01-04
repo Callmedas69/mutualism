@@ -12,6 +12,7 @@ import { useImagePreloader, getAvatarCanvas } from "@/hooks/useImagePreloader";
 import NodeInfoCard from "./NodeInfoCard";
 import ExportButton from "./ExportButton";
 import ShareGraphButton from "./ShareGraphButton";
+import TokenizeButton from "./TokenizeButton";
 import { useMiniAppContext } from "@/context/MiniAppProvider";
 
 const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
@@ -611,10 +612,17 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
               disabled={isEngineRunning}
             />
           ) : (
-            <ExportButton
-              onExport={handleExportPNG}
-              disabled={isEngineRunning}
-            />
+            <>
+              <ExportButton
+                onExport={handleExportPNG}
+                disabled={isEngineRunning}
+              />
+              <TokenizeButton
+                getGraphBlob={getGraphBlob}
+                graphData={tokenizeData}
+                disabled={isEngineRunning}
+              />
+            </>
           )}
         </div>
       </div>

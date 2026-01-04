@@ -33,12 +33,33 @@ interface ZoraToken {
 }
 
 /**
- * Simple in-memory cache with TTL
+ * Simple in-memory cache with TTL and proper LRU eviction
  * Key: comma-separated sorted addresses
  * Value: { data, timestamp }
  */
 const cache = new Map<string, { data: CoinStats[]; timestamp: number }>();
 const CACHE_TTL = 60_000; // 60 seconds
+const MAX_CACHE_SIZE = 100;
+
+/**
+ * Evict oldest entries when cache exceeds max size
+ */
+function evictOldestEntries(): void {
+  if (cache.size <= MAX_CACHE_SIZE) return;
+
+  // Convert to array and sort by timestamp (oldest first)
+  const entries = Array.from(cache.entries()).sort(
+    (a, b) => a[1].timestamp - b[1].timestamp
+  );
+
+  // Remove oldest entries until we're at 80% capacity
+  const targetSize = Math.floor(MAX_CACHE_SIZE * 0.8);
+  const entriesToRemove = cache.size - targetSize;
+
+  for (let i = 0; i < entriesToRemove && i < entries.length; i++) {
+    cache.delete(entries[i][0]);
+  }
+}
 
 /**
  * POST /api/coins/stats
@@ -99,11 +120,8 @@ export async function POST(request: NextRequest) {
     // Update cache
     cache.set(cacheKey, { data: stats, timestamp: Date.now() });
 
-    // Cleanup old cache entries (simple LRU-ish)
-    if (cache.size > 100) {
-      const oldestKey = cache.keys().next().value;
-      if (oldestKey) cache.delete(oldestKey);
-    }
+    // Cleanup old cache entries with proper LRU eviction
+    evictOldestEntries();
 
     return NextResponse.json({ stats, cached: false });
   } catch (error) {

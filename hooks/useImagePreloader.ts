@@ -90,10 +90,21 @@ export function useImagePreloader({
     });
 
     const loadAllImages = async () => {
-      const newImages = new Map<string, HTMLImageElement>();
+      // Preserve existing loaded images from ref
+      const currentImages = loadedImagesRef.current;
+      const newImages = new Map<string, HTMLImageElement>(currentImages);
+
+      // Only load images that aren't already in the ref
+      const urlsToFetch = urlsToLoad.filter((url) => !currentImages.has(url));
+
+      if (urlsToFetch.length === 0) {
+        // All images already loaded
+        setImagesLoaded(true);
+        return;
+      }
 
       await Promise.all(
-        urlsToLoad.map(async (url) => {
+        urlsToFetch.map(async (url) => {
           try {
             const img = await loadImage(url);
             newImages.set(url, img);

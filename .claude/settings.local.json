@@ -29,7 +29,11 @@
       "WebFetch(domain:miniapps.farcaster.xyz)",
       "WebFetch(domain:www.base.org)",
       "WebFetch(domain:www.npmjs.com)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(curl:*)",
+      "Bash(del \"D:\\\\Harry\\\\BasedNouns\\\\CodeProject\\\\quotientmutual\\\\public\\\\farcaster_logo.png\")",
+      "Bash(npm ls:*)",
+      "Bash(npm prune:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

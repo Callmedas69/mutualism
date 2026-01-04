@@ -7,6 +7,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import ConnectionList from "./ConnectionList";
 import ConnectionGraph from "./ConnectionGraph";
 import ConnectionSkeleton from "./ConnectionSkeleton";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 type TabType = "mutuals" | "attention" | "influence";
 type ViewType = "list" | "graph";
@@ -136,20 +137,23 @@ export default function ConnectionTabs() {
         </p>
       )}
 
-      {/* Content with fade transition */}
+      {/* Content with fade transition - both views rendered, one hidden */}
       {tabs.map((tab) => (
         <TabsContent
           key={tab.key}
           value={tab.key}
           className="mt-0 animate-in fade-in duration-300"
         >
-          <div key={viewType} className="animate-in fade-in duration-200">
-            {viewType === "list" ? (
-              <ConnectionList
-                connections={getConnections(tab.key)}
-                type={tab.key === "mutuals" ? "mutual" : tab.key}
-              />
-            ) : (
+          {/* List View */}
+          <div className={viewType === "list" ? "block" : "hidden"}>
+            <ConnectionList
+              connections={getConnections(tab.key)}
+              type={tab.key === "mutuals" ? "mutual" : tab.key}
+            />
+          </div>
+          {/* Graph View - stays mounted to preserve state */}
+          <div className={viewType === "graph" ? "block" : "hidden"}>
+            <ErrorBoundary name="ConnectionGraph">
               <ConnectionGraph
                 connections={getConnections(tab.key)}
                 centerUser={{
@@ -159,7 +163,7 @@ export default function ConnectionTabs() {
                 }}
                 type={tab.key}
               />
-            )}
+            </ErrorBoundary>
           </div>
         </TabsContent>
       ))}

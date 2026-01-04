@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    // Prefer WebP format for better compression
+    formats: ["image/webp"],
     remotePatterns: [
       // Cloudflare Images (main Farcaster CDN)
       {

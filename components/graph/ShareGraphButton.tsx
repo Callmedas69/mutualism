@@ -101,7 +101,7 @@ export default function ShareGraphButton({
 
   const buttonText = {
     idle: "Share",
-    uploading: "Uploading...",
+    uploading: "Nodeing...",
     sharing: "Opening...",
     success: "Shared!",
     error: "Error",

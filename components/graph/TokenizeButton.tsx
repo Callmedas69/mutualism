@@ -1,10 +1,23 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
+import dynamic from "next/dynamic";
+import { Sparkles, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import type { TokenizeGraphData } from "@/types/tokenize";
-import TokenizeModal from "./TokenizeModal";
+
+// Lazy load TokenizeModal - only loads when user clicks Tokenize button
+const TokenizeModal = dynamic(() => import("./TokenizeModal"), {
+  ssr: false,
+  loading: () => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div className="flex items-center gap-2 rounded bg-white px-4 py-3 dark:bg-zinc-800">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        <span className="text-sm">Loading...</span>
+      </div>
+    </div>
+  ),
+});
 
 interface TokenizeButtonProps {
   getGraphBlob: () => Promise<Blob | null>;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import type { MutualUser, ConnectionUser } from "@/types/quotient";
 import Image from "next/image";
 import { URLS } from "@/lib/constants";
@@ -15,6 +15,56 @@ interface ConnectionListProps {
 function isMutualUser(user: MutualUser | ConnectionUser): user is MutualUser {
   return "combined_score" in user;
 }
+
+interface ConnectionItemProps {
+  user: MutualUser | ConnectionUser;
+  type: "mutual" | "attention" | "influence";
+}
+
+const ConnectionItem = memo(function ConnectionItem({ user, type }: ConnectionItemProps) {
+  return (
+    <a
+      href={`${URLS.warpcast}/${user.username}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group flex items-center gap-4 p-4 border border-zinc-100 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/50 transition-all duration-300 ease-out hover:border-zinc-200 dark:hover:border-zinc-700 hover:-translate-y-0.5"
+    >
+      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+        {user.pfp_url && (
+          <Image
+            src={user.pfp_url}
+            alt={user.username}
+            fill
+            className="object-cover"
+            unoptimized // Required for user-generated URLs from arbitrary domains
+          />
+        )}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium uppercase tracking-wide text-zinc-900 dark:text-white">
+          @{user.username}
+        </p>
+        <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-500">
+          <span className="font-mono">#{user.rank}</span>
+          <span className="text-zinc-300 dark:text-zinc-700">|</span>
+          {isMutualUser(user) ? (
+            <span>{user.combined_score.toFixed(1)}</span>
+          ) : (
+            <span>{user.score}</span>
+          )}
+        </div>
+      </div>
+      {type === "mutual" && isMutualUser(user) && (
+        <div className="flex flex-col items-end text-[10px] uppercase tracking-wider text-zinc-400">
+          <span>A: {user.attention_score.toFixed(1)}</span>
+          <span>I: {user.influence_score.toFixed(1)}</span>
+        </div>
+      )}
+    </a>
+  );
+});
+
+ConnectionItem.displayName = "ConnectionItem";
 
 export default function ConnectionList({ connections, type }: ConnectionListProps) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -81,45 +131,7 @@ export default function ConnectionList({ connections, type }: ConnectionListProp
       {/* Grid */}
       <div className="grid gap-3 sm:grid-cols-2">
         {paginatedConnections.map((user) => (
-          <a
-            key={user.fid}
-            href={`${URLS.warpcast}/${user.username}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group flex items-center gap-4 p-4 border border-zinc-100 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/50 transition-all duration-300 ease-out hover:border-zinc-200 dark:hover:border-zinc-700 hover:-translate-y-0.5"
-          >
-            <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
-              {user.pfp_url && (
-                <Image
-                  src={user.pfp_url}
-                  alt={user.username}
-                  fill
-                  className="object-cover"
-                  unoptimized // Required for user-generated URLs from arbitrary domains
-                />
-              )}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium uppercase tracking-wide text-zinc-900 dark:text-white">
-                @{user.username}
-              </p>
-              <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-500">
-                <span className="font-mono">#{user.rank}</span>
-                <span className="text-zinc-300 dark:text-zinc-700">|</span>
-                {isMutualUser(user) ? (
-                  <span>{user.combined_score.toFixed(1)}</span>
-                ) : (
-                  <span>{user.score}</span>
-                )}
-              </div>
-            </div>
-            {type === "mutual" && isMutualUser(user) && (
-              <div className="flex flex-col items-end text-[10px] uppercase tracking-wider text-zinc-400">
-                <span>A: {user.attention_score.toFixed(1)}</span>
-                <span>I: {user.influence_score.toFixed(1)}</span>
-              </div>
-            )}
-          </a>
+          <ConnectionItem key={user.fid} user={user} type={type} />
         ))}
       </div>
 

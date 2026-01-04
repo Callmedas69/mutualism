@@ -39,6 +39,7 @@
 ## Engineering Philosophy
 
 - Follow the **KISS Principle** (Keep It Simple, Stupid)
+- KISS is simple solutions, not fewer fixes and not fewer files
 - **Never compromise on security**
 - Do **NOT**:
   - Over-engineer

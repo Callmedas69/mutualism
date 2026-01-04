@@ -22,8 +22,11 @@ export interface CoinStats {
  * @param addresses Array of coin contract addresses
  */
 export function useCoinStats(addresses: string[] | undefined) {
+  // Stabilize query key by sorting addresses to prevent cache misses
+  const sortedKey = addresses ? [...addresses].sort().join(",") : "";
+
   return useQuery({
-    queryKey: ["coinStats", addresses],
+    queryKey: ["coinStats", sortedKey],
     queryFn: async (): Promise<CoinStats[]> => {
       if (!addresses || addresses.length === 0) {
         return [];
@@ -43,7 +46,10 @@ export function useCoinStats(addresses: string[] | undefined) {
       return data.stats || [];
     },
     enabled: !!addresses && addresses.length > 0,
-    staleTime: 30_000, // 30 seconds
+    staleTime: 60_000, // 60 sec fresh window
+    gcTime: 5 * 60 * 1000, // 5 min cache retention
     refetchInterval: 60_000, // Refresh every minute
+    refetchOnWindowFocus: false, // Don't refetch on tab focus
+    refetchOnReconnect: true, // Refetch on network reconnect
   });
 }

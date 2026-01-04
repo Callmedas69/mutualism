@@ -24,6 +24,8 @@ export function useCreatorCoins() {
     chainId: base.id,
     query: {
       enabled: isConnected && !!address && !!REGISTRY_ADDRESS,
+      gcTime: 5 * 60 * 1000, // 5 min cache retention
+      staleTime: 30_000, // 30 sec fresh window
     },
   });
 
