@@ -76,6 +76,9 @@ export function useImagePreloader({
   const loadedImagesRef = useRef<Map<string, HTMLImageElement>>(new Map());
   const [imagesLoaded, setImagesLoaded] = useState(false);
 
+  // Stable key to detect actual URL changes (prevents infinite re-renders)
+  const urlsKey = [centerUserPfp, ...connectionPfps.slice(0, maxNodes)].filter(Boolean).join(",");
+
   useEffect(() => {
     const urlsToLoad: string[] = [];
 
@@ -122,7 +125,7 @@ export function useImagePreloader({
     // Reset state for new data
     setImagesLoaded(false);
     loadAllImages();
-  }, [centerUserPfp, connectionPfps, maxNodes]);
+  }, [urlsKey]); // Use stable string key instead of array references
 
   return {
     loadedImagesRef,

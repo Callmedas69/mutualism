@@ -280,9 +280,15 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
     maxNodes,
   });
 
+  // Memoize to prevent infinite re-renders in useImagePreloader
+  const connectionPfps = useMemo(
+    () => connections.map(c => c.pfp_url),
+    [connections]
+  );
+
   const { loadedImagesRef, imagesLoaded } = useImagePreloader({
     centerUserPfp: centerUser.pfp_url,
-    connectionPfps: connections.map(c => c.pfp_url),
+    connectionPfps,
     maxNodes,
   });
 
