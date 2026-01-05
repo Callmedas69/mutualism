@@ -91,7 +91,7 @@ export default function ShareGraphButton({
     return (
       <button
         onClick={handleRetry}
-        className="flex items-center gap-2 border border-red-400 bg-red-50 px-3 py-2 text-[10px] uppercase tracking-[0.1em] font-medium text-red-600 transition-all duration-200 hover:border-red-600 hover:bg-red-100 dark:border-red-700 dark:bg-red-950 dark:text-red-400 dark:hover:border-red-500"
+        className="flex items-center gap-1.5 border border-red-400 bg-red-50 px-2 py-1.5 text-[9px] uppercase tracking-[0.1em] font-medium text-red-600 transition-all duration-200 hover:border-red-600 hover:bg-red-100 sm:gap-2 sm:px-3 sm:py-2 sm:text-[10px] dark:border-red-700 dark:bg-red-950 dark:text-red-400 dark:hover:border-red-500"
       >
         <Share2 size={12} />
         {error || "Error"} - Retry
@@ -113,7 +113,7 @@ export default function ShareGraphButton({
     <button
       onClick={handleShare}
       disabled={disabled || state !== "idle"}
-      className={`flex items-center gap-2 border px-3 py-2 text-[10px] uppercase tracking-[0.1em] font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40 ${
+      className={`flex items-center gap-1.5 border px-2 py-1.5 text-[9px] uppercase tracking-[0.1em] font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40 sm:gap-2 sm:px-3 sm:py-2 sm:text-[10px] ${
         isSuccess
           ? "border-green-500 bg-green-50 text-green-600 dark:border-green-600 dark:bg-green-950 dark:text-green-400"
           : "border-zinc-300 bg-white text-zinc-600 hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-white dark:hover:text-white"

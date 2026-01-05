@@ -21,38 +21,15 @@ import {
   TOKENIZE_FEE,
   PLATFORM_WALLET,
 } from "@/lib/zora";
-import { REGISTRY_ADDRESS, REGISTRY_ABI } from "@/lib/registry";
+import { REGISTRY_ADDRESS, REGISTRY_ABI, requestRegistrySignature } from "@/lib/registry";
+import { useEthPrice, calculateUsdValue } from "@/hooks/useEthPrice";
+import { formatTransactionError } from "@/lib/errors";
 
 interface TokenizeModalProps {
   isOpen: boolean;
   onClose: () => void;
   getGraphBlob: () => Promise<Blob | null>;
   graphData: TokenizeGraphData;
-}
-
-// User-friendly error messages
-function formatError(err: Error | string): string {
-  const msg = typeof err === "string" ? err : err.message;
-
-  // Common wallet errors
-  if (msg.includes("rejected") || msg.includes("denied")) {
-    return "Transaction was cancelled";
-  }
-  if (msg.includes("insufficient funds")) {
-    return "Insufficient ETH balance";
-  }
-
-  // Network errors
-  if (msg.includes("network") || msg.includes("fetch")) {
-    return "Network error. Please check your connection.";
-  }
-
-  // Keep it short
-  if (msg.length > 100) {
-    return msg.slice(0, 100) + "...";
-  }
-
-  return msg;
 }
 
 const STEPS: { id: TokenizeStep; label: string }[] = [
@@ -83,22 +60,10 @@ export default function TokenizeModal({
   const [coinSymbol] = useState(() =>
     generateSymbol(graphData.username, graphData.graphType)
   );
-  const [ethPrice, setEthPrice] = useState<number | null>(null);
 
   const { address } = useAccount();
-
-  // Fetch ETH price when modal opens
-  useEffect(() => {
-    if (!isOpen) return;
-
-    fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd")
-      .then((res) => res.json())
-      .then((data) => setEthPrice(data.ethereum?.usd ?? null))
-      .catch(() => setEthPrice(null));
-  }, [isOpen]);
-
-  // Calculate USD value
-  const feeInUsd = ethPrice ? (parseFloat(TOKENIZE_FEE) * ethPrice).toFixed(2) : null;
+  const ethPrice = useEthPrice();
+  const feeInUsd = calculateUsdValue(TOKENIZE_FEE, ethPrice);
 
   // Fee payment transaction
   const {
@@ -214,7 +179,7 @@ export default function TokenizeModal({
       });
     } catch (err) {
       console.error("Tokenization error:", err);
-      setError(formatError(err instanceof Error ? err : String(err)));
+      setError(formatTransactionError(err instanceof Error ? err : String(err)));
       setStep("error");
     }
   }, [address, getGraphBlob, graphData, coinName, coinSymbol, sendCoinTx]);
@@ -240,28 +205,16 @@ export default function TokenizeModal({
         if (REGISTRY_ADDRESS && address) {
           setStep("registering");
           (async () => {
-            try {
-              const signRes = await fetch("/api/registry/sign", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ creator: address, coin: coinAddr }),
-              });
+            const signature = await requestRegistrySignature(address, coinAddr);
 
-              if (signRes.ok) {
-                const { signature } = await signRes.json();
-                registerCoin({
-                  address: REGISTRY_ADDRESS,
-                  abi: REGISTRY_ABI,
-                  functionName: "registerCoin",
-                  args: [coinAddr, signature as `0x${string}`],
-                });
-              } else {
-                console.error("Failed to get registry signature:", await signRes.text());
-                setError("Failed to register coin. You can still view it on Zora.");
-                setStep("success"); // Continue to success, just won't show in gallery
-              }
-            } catch (err) {
-              console.error("Registry signature fetch failed:", err);
+            if (signature) {
+              registerCoin({
+                address: REGISTRY_ADDRESS,
+                abi: REGISTRY_ABI,
+                functionName: "registerCoin",
+                args: [coinAddr, signature],
+              });
+            } else {
               setError("Failed to register coin. You can still view it on Zora.");
               setStep("success");
             }
@@ -288,11 +241,11 @@ export default function TokenizeModal({
   // Handle wallet errors
   useEffect(() => {
     if (feeError) {
-      setError(formatError(feeError));
+      setError(formatTransactionError(feeError));
       setStep("error");
     }
     if (coinError) {
-      setError(formatError(coinError));
+      setError(formatTransactionError(coinError));
       setStep("error");
     }
     if (registryError) {

@@ -3,11 +3,10 @@
 import dynamic from "next/dynamic";
 import { Sparkles, Loader2 } from "lucide-react";
 import { useState } from "react";
-import { useAccount } from "wagmi";
 import type { TokenizeGraphData } from "@/types/tokenize";
 
-// Lazy load TokenizeModal - only loads when user clicks Tokenize button
-const TokenizeModal = dynamic(() => import("./TokenizeModal"), {
+// Lazy load MiniAppTokenizeModal
+const MiniAppTokenizeModal = dynamic(() => import("./MiniAppTokenizeModal"), {
   ssr: false,
   loading: () => (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -19,26 +18,26 @@ const TokenizeModal = dynamic(() => import("./TokenizeModal"), {
   ),
 });
 
-interface TokenizeButtonProps {
+interface MiniAppTokenizeButtonProps {
   getGraphBlob: () => Promise<Blob | null>;
   graphData: TokenizeGraphData;
   disabled?: boolean;
 }
 
-export default function TokenizeButton({
+export default function MiniAppTokenizeButton({
   getGraphBlob,
   graphData,
   disabled = false,
-}: TokenizeButtonProps) {
+}: MiniAppTokenizeButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { isConnected } = useAccount();
 
+  // In miniapp mode, Farcaster auto-connects wallet - no need to check isConnected
   return (
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        disabled={disabled || !isConnected}
-        title={!isConnected ? "Connect wallet to tokenize" : "Tokenize your graph on Zora"}
+        disabled={disabled}
+        title="Tokenize your graph on Zora"
         className="flex items-center gap-1.5 border border-purple-400 bg-purple-50 px-2 py-1.5 text-[9px] font-medium uppercase tracking-[0.1em] text-purple-700 transition-all duration-200 hover:border-purple-600 hover:bg-purple-100 hover:text-purple-900 disabled:cursor-not-allowed disabled:opacity-40 sm:gap-2 sm:px-3 sm:py-2 sm:text-[10px] dark:border-purple-600 dark:bg-purple-950/50 dark:text-purple-300 dark:hover:border-purple-400 dark:hover:text-purple-100"
       >
         <Sparkles size={12} />
@@ -46,7 +45,7 @@ export default function TokenizeButton({
       </button>
 
       {isModalOpen && (
-        <TokenizeModal
+        <MiniAppTokenizeModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           getGraphBlob={getGraphBlob}

@@ -42,5 +42,5 @@ next-env.d.ts
 
 
 .docs/*
-.claude/*
+# .claude/*
 CLAUDE.md

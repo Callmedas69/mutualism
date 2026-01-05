@@ -124,6 +124,147 @@ Always:
 
 ---
 
+
+## APPLICATION ARCHITECTURE RULES (NON-NEGOTIABLE)
+
+### Core Architecture Flow
+
+All application code **MUST** follow this unidirectional flow:
+
+```
+
+UI
+↓
+API / Controller
+↓
+Business Logic / Use Case
+↓
+Repository
+↓
+DB / Chain / External API
+
+```
+
+**Dependencies flow downward only.  
+Upward or sideways dependencies are forbidden.**
+
+---
+
+### Layer Responsibilities (Hard Constraints)
+
+#### UI (Presentation Layer)
+
+- Displays data and handles user interaction only
+- MUST NOT contain business rules
+- MUST NOT perform data fetching directly from DB, chain, or external APIs
+- MUST NOT call repositories
+
+> UI is display-only. Always.
+
+---
+
+#### API / Controller (Transport Layer)
+
+- Handles routing, authentication, authorization, and input validation
+- Translates requests into use-case calls
+- Returns responses and status codes
+
+MUST NOT:
+- Contain business logic
+- Persist data directly
+- Access DB / chain / indexers directly
+
+> Controllers manage traffic, not rules.
+
+---
+
+#### Business Logic / Use Case (Domain Core)
+
+- Contains all business rules
+- Decides **what is allowed, when, and why**
+- Orchestrates workflows
+- Calls repositories via interfaces
+- MUST be fully testable without infrastructure
+
+MUST NOT:
+- Know about HTTP, headers, or framework APIs
+- Perform SQL, ORM, RPC, or chain calls
+
+> This layer is the brain of the system.
+
+---
+
+#### Repository (Data Access Boundary)
+
+- Fetches and persists data
+- Abstracts DB / chain / indexer / external APIs
+- Maps raw data into domain models
+
+MUST NOT:
+- Contain business rules
+- Perform authorization or validation
+- Make time-based or state-based decisions
+- Depend on UI, controllers, or use cases
+
+> Repositories are dumb by design.
+
+---
+
+#### DB / Chain / External API (Infrastructure)
+
+- Stores and returns data
+- Executes queries or RPC calls
+
+MUST NOT:
+- Know business rules
+- Call application code
+
+> Infrastructure is volatile and replaceable.
+
+---
+
+### Absolute Prohibitions
+
+The following are **strictly forbidden**:
+
+- UI → Repository direct calls
+- API → DB / Chain direct access
+- Repository → Business Logic calls
+- Business Logic → HTTP or framework dependencies
+- Business rules inside repositories
+
+Violation = **architectural failure**.
+
+---
+
+### Decision Ownership Rule
+
+| Question | Owner |
+|------|------|
+| How is data displayed? | UI |
+| How does data enter the system? | API |
+| Is this allowed? | Business Logic |
+| What rules apply? | Business Logic |
+| Where does data come from? | Repository |
+| How is data stored? | Infrastructure |
+
+If a component answers more than one category → **it is wrong**.
+
+---
+
+### Canonical Rule
+
+> **UI shows.  
+> API transports.  
+> Business Logic decides.  
+> Repository fetches.  
+> Infrastructure stores.**
+
+Anything else is an anti-pattern.
+
+---
+
+
 ## Assumptions & Accuracy
 
 * **Do NOT make assumptions**

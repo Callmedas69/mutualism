@@ -7,6 +7,7 @@ import { useAccount } from "wagmi";
 import { getCoinUrl } from "@/lib/zora";
 import { TransitionLink } from "@/components/TransitionLink";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import GallerySkeleton from "@/components/gallery/GallerySkeleton";
 import { useAllCoins, type CoinWithCreator } from "@/hooks/useAllCoins";
 import { useCoinStats, type CoinStats } from "@/hooks/useCoinStats";
 import { useMiniApp } from "@/hooks/useMiniApp";
@@ -47,29 +48,7 @@ export default function GalleryPage() {
 
   // Loading state with shimmer
   if (isLoading) {
-    return (
-      <div className={`mx-auto max-w-7xl px-4 pb-safe sm:px-6 lg:px-8 ${isMiniApp ? "py-2" : "py-6 sm:py-8"}`}>
-        <div className={isMiniApp ? "mb-4" : "mb-8 sm:mb-10"}>
-          <div className="h-3 w-32 bg-zinc-100 dark:bg-zinc-800 skeleton-shimmer" />
-          <div className="mt-2 h-8 w-48 bg-zinc-100 dark:bg-zinc-800 skeleton-shimmer" />
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="flex items-center gap-4 p-4 border border-zinc-100 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/50">
-              <div className="h-10 w-10 shrink-0 rounded-full bg-zinc-100 dark:bg-zinc-800 skeleton-shimmer" />
-              <div className="flex-1 min-w-0 space-y-2">
-                <div className="h-4 w-32 bg-zinc-100 dark:bg-zinc-800 skeleton-shimmer" />
-                <div className="h-3 w-24 bg-zinc-100 dark:bg-zinc-800 skeleton-shimmer" />
-              </div>
-              <div className="flex flex-col items-end gap-1 shrink-0">
-                <div className="h-3 w-12 bg-zinc-100 dark:bg-zinc-800 skeleton-shimmer" />
-                <div className="h-2.5 w-8 bg-zinc-100 dark:bg-zinc-800 skeleton-shimmer" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+    return <GallerySkeleton />;
   }
 
   return (
@@ -99,7 +78,7 @@ export default function GalleryPage() {
 
       {/* Empty State */}
       {!hasCoins && !hasError && (
-        <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-12 text-center">
+        <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-8 sm:p-12 text-center">
           <Coins className="mx-auto h-12 w-12 text-zinc-300 dark:text-zinc-600" />
           <p className="mt-6 text-xs uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
             Nothing Here Yet
@@ -112,7 +91,7 @@ export default function GalleryPage() {
           </p>
           <TransitionLink
             href="/graph"
-            className="mt-6 inline-block px-6 py-3 text-xs uppercase tracking-[0.15em] font-medium border border-zinc-900 text-zinc-900 transition-all duration-200 hover:bg-zinc-900 hover:text-white dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-zinc-900"
+            className="mt-6 inline-block w-full sm:w-auto px-6 py-3 text-xs uppercase tracking-[0.15em] font-medium border border-zinc-900 text-zinc-900 transition-all duration-200 hover:bg-zinc-900 hover:text-white dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-zinc-900"
           >
             Go to Graph
           </TransitionLink>
@@ -205,7 +184,7 @@ const CoinCard = memo(function CoinCard({ coinData, stats, isStatsLoading, isOwn
       href={coinUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex items-center gap-4 p-4 border border-zinc-100 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/50 transition-all duration-300 ease-out hover:border-zinc-200 dark:hover:border-zinc-700 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+      className="group flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border border-zinc-100 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/50 transition-all duration-300 ease-out hover:border-zinc-200 dark:hover:border-zinc-700 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
     >
       {/* Image */}
       <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
@@ -225,7 +204,7 @@ const CoinCard = memo(function CoinCard({ coinData, stats, isStatsLoading, isOwn
       </div>
 
       {/* Name, Symbol & Creator */}
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-1 overflow-hidden">
         <div className="flex items-center gap-2">
           <p className="truncate text-sm font-medium uppercase tracking-wide text-zinc-900 dark:text-white">
             {name}
@@ -236,15 +215,13 @@ const CoinCard = memo(function CoinCard({ coinData, stats, isStatsLoading, isOwn
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-500">
+        <p className="truncate text-xs text-zinc-500 dark:text-zinc-500">
           <span className="font-mono">${symbol}</span>
-          <span className="text-zinc-300 dark:text-zinc-700">|</span>
-          {isOwner ? (
-            <span className="font-mono text-[10px]">{address.slice(0, 6)}...{address.slice(-4)}</span>
-          ) : (
-            <span className="font-mono text-[10px]">by {creator.slice(0, 6)}...{creator.slice(-4)}</span>
-          )}
-        </div>
+          <span className="mx-1.5 text-zinc-300 dark:text-zinc-700">|</span>
+          <span className="font-mono text-[11px]">
+            {isOwner ? `${address.slice(0, 6)}...${address.slice(-4)}` : `by ${creator.slice(0, 6)}...${creator.slice(-4)}`}
+          </span>
+        </p>
       </div>
 
       {/* Stats - Market Cap + 24h Change stacked */}

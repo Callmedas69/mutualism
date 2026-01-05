@@ -24,7 +24,6 @@ export default function Home() {
         .from(".hero-tag", { opacity: 0, x: -20, duration: 0.6 }, "-=0.4")
         .from(".hero-subtext", { opacity: 0, y: 20, duration: 0.6 }, "-=0.3")
         .from(".hero-cta", { opacity: 0, y: 20, duration: 0.6 }, "-=0.2")
-        .from(".scroll-indicator", { opacity: 0, y: -10, duration: 0.6 }, "-=0.2");
     },
     { scope: heroRef }
   );

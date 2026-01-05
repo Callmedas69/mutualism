@@ -14,6 +14,7 @@ import NodeInfoCard from "./NodeInfoCard";
 import ExportButton from "./ExportButton";
 import ShareGraphButton from "./ShareGraphButton";
 import TokenizeButton from "./TokenizeButton";
+import MiniAppTokenizeButton from "./MiniAppTokenizeButton";
 import { useMiniAppContext } from "@/context/MiniAppProvider";
 
 const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
@@ -616,34 +617,41 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
       </div>
 
       {/* Top Bar */}
-      <div className="absolute left-2 right-2 top-2 flex flex-col gap-2 sm:left-4 sm:right-4 sm:top-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="flex items-center gap-2 border border-zinc-200 bg-white/95 px-3 py-2 text-[10px] uppercase tracking-[0.05em] sm:gap-4 sm:px-4 sm:text-xs dark:border-zinc-700 dark:bg-zinc-900/95">
-            <span className="font-medium text-zinc-500">Score</span>
-            <div className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 bg-[#22c55e] sm:h-3 sm:w-3" />
-              <span className="hidden text-zinc-600 dark:text-zinc-400 sm:inline">High</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 bg-[#eab308] sm:h-3 sm:w-3" />
-              <span className="hidden text-zinc-600 dark:text-zinc-400 sm:inline">Med</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 bg-[#71717a] sm:h-3 sm:w-3" />
-              <span className="hidden text-zinc-600 dark:text-zinc-400 sm:inline">Low</span>
-            </div>
+      <div className="absolute left-2 right-2 top-2 flex items-center justify-between gap-2 sm:left-4 sm:right-4 sm:top-4">
+        {/* Score Legend */}
+        <div className="flex items-center gap-1.5 border border-zinc-200 bg-white/95 px-2 py-1.5 text-[9px] uppercase tracking-[0.05em] sm:gap-4 sm:px-4 sm:py-2 sm:text-xs dark:border-zinc-700 dark:bg-zinc-900/95">
+          <span className="font-medium text-zinc-500">Score</span>
+          <div className="flex items-center gap-1">
+            <span className="h-2 w-2 bg-[#22c55e] sm:h-3 sm:w-3" />
+            <span className="hidden text-zinc-600 dark:text-zinc-400 sm:inline">High</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="h-2 w-2 bg-[#eab308] sm:h-3 sm:w-3" />
+            <span className="hidden text-zinc-600 dark:text-zinc-400 sm:inline">Med</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="h-2 w-2 bg-[#71717a] sm:h-3 sm:w-3" />
+            <span className="hidden text-zinc-600 dark:text-zinc-400 sm:inline">Low</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Action Buttons */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {isMiniApp ? (
-            <ShareGraphButton
-              graphType={type === "mutuals" ? "Mutuals" : type === "attention" ? "Attention" : "Influence"}
-              username={centerUser.username}
-              getGraphBlob={getGraphBlob}
-              composeCast={composeCast}
-              disabled={isEngineRunning}
-            />
+            <>
+              <ShareGraphButton
+                graphType={type === "mutuals" ? "Mutuals" : type === "attention" ? "Attention" : "Influence"}
+                username={centerUser.username}
+                getGraphBlob={getGraphBlob}
+                composeCast={composeCast}
+                disabled={isEngineRunning}
+              />
+              <MiniAppTokenizeButton
+                getGraphBlob={getGraphBlob}
+                graphData={tokenizeData}
+                disabled={isEngineRunning}
+              />
+            </>
           ) : (
             <>
               <ExportButton

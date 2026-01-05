@@ -1,16 +1,96 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { usePathname } from "next/navigation";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Menu, X } from "lucide-react";
 import { useFarcasterUser } from "@/context/FarcasterProvider";
 import { useMiniApp } from "@/hooks/useMiniApp";
 import { TransitionLink } from "./TransitionLink";
 
 export default function Navbar() {
+  const pathname = usePathname();
   const { isMiniApp } = useMiniApp();
   const { user, signOut } = useFarcasterUser();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [mobileMenuState, setMobileMenuState] = useState<"closed" | "open" | "closing">("closed");
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Close mobile menu with animation
+  const closeMobileMenu = useCallback(() => {
+    setMobileMenuState((prev) => {
+      if (prev === "open") {
+        closeTimeoutRef.current = setTimeout(() => setMobileMenuState("closed"), 150);
+        return "closing";
+      }
+      return prev;
+    });
+  }, []);
+
+  // Toggle mobile menu
+  const toggleMobileMenu = useCallback(() => {
+    setMobileMenuState((prev) => {
+      if (prev === "closed") return "open";
+      if (prev === "open") {
+        closeTimeoutRef.current = setTimeout(() => setMobileMenuState("closed"), 150);
+        return "closing";
+      }
+      return prev;
+    });
+  }, []);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Body scroll lock when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuState === "open") {
+      document.body.style.overflow = "hidden";
+    } else if (mobileMenuState === "closed") {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuState]);
+
+  // Escape key and click outside handlers
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && mobileMenuState === "open") {
+        closeMobileMenu();
+      }
+    };
+
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (
+        mobileMenuState === "open" &&
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(target)
+      ) {
+        // Check if click is on the toggle button (allow toggle to handle it)
+        const toggleButton = document.querySelector('[aria-label="Close menu"]');
+        if (toggleButton && toggleButton.contains(target)) return;
+        closeMobileMenu();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [mobileMenuState, closeMobileMenu]);
 
   // Hide navbar in miniapp mode (Farcaster client provides header)
   if (isMiniApp) return null;
@@ -26,6 +106,9 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Check if link is active
+  const isActive = (href: string) => pathname === href;
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm dark:bg-zinc-950/90">
       <div className="flex h-16 items-center justify-between px-4 sm:px-8 lg:px-16">
@@ -40,19 +123,31 @@ export default function Navbar() {
         <div className="hidden items-center gap-8 md:flex">
           <TransitionLink
             href="/"
-            className="text-xs uppercase tracking-[0.15em] font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+            className={`text-xs uppercase tracking-[0.15em] font-medium transition-colors ${
+              isActive("/")
+                ? "text-[#f25b28]"
+                : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+            }`}
           >
             Home
           </TransitionLink>
           <TransitionLink
             href="/graph"
-            className="text-xs uppercase tracking-[0.15em] font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+            className={`text-xs uppercase tracking-[0.15em] font-medium transition-colors ${
+              isActive("/graph")
+                ? "text-[#f25b28]"
+                : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+            }`}
           >
             Graph
           </TransitionLink>
           <TransitionLink
             href="/gallery"
-            className="text-xs uppercase tracking-[0.15em] font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+            className={`text-xs uppercase tracking-[0.15em] font-medium transition-colors ${
+              isActive("/gallery")
+                ? "text-[#f25b28]"
+                : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+            }`}
           >
             Gallery
           </TransitionLink>
@@ -60,7 +155,7 @@ export default function Navbar() {
 
         {/* Auth Section */}
         <div className="flex items-center gap-4">
-          {/* Farcaster User with Dropdown */}
+          {/* Farcaster User with Dropdown - Desktop */}
           {user && (
             <div ref={dropdownRef} className="relative hidden sm:block">
               <button
@@ -111,8 +206,82 @@ export default function Navbar() {
               largeScreen: "address",
             }}
           />
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={toggleMobileMenu}
+            className="flex h-10 w-10 items-center justify-center text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white md:hidden"
+            aria-label={mobileMenuState !== "closed" ? "Close menu" : "Open menu"}
+          >
+            {mobileMenuState !== "closed" ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {mobileMenuState !== "closed" && (
+        <div
+          ref={mobileMenuRef}
+          className={`border-t border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950 md:hidden ${
+            mobileMenuState === "open"
+              ? "animate-in slide-in-from-top-2 fade-in duration-150"
+              : "animate-out slide-out-to-top-2 fade-out duration-150"
+          }`}
+        >
+          <div className="flex flex-col px-4 py-4">
+            <TransitionLink
+              href="/"
+              onClick={closeMobileMenu}
+              className={`py-3 text-sm uppercase tracking-[0.1em] font-medium transition-colors ${
+                isActive("/")
+                  ? "text-[#f25b28]"
+                  : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+              }`}
+            >
+              Home
+            </TransitionLink>
+            <TransitionLink
+              href="/graph"
+              onClick={closeMobileMenu}
+              className={`py-3 text-sm uppercase tracking-[0.1em] font-medium transition-colors ${
+                isActive("/graph")
+                  ? "text-[#f25b28]"
+                  : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+              }`}
+            >
+              Graph
+            </TransitionLink>
+            <TransitionLink
+              href="/gallery"
+              onClick={closeMobileMenu}
+              className={`py-3 text-sm uppercase tracking-[0.1em] font-medium transition-colors ${
+                isActive("/gallery")
+                  ? "text-[#f25b28]"
+                  : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+              }`}
+            >
+              Gallery
+            </TransitionLink>
+            {user && (
+              <>
+                <div className="my-2 border-t border-zinc-200 dark:border-zinc-800" />
+                <div className="py-2 text-xs uppercase tracking-[0.1em] text-zinc-400">
+                  @{user.username}
+                </div>
+                <button
+                  onClick={() => {
+                    signOut();
+                    closeMobileMenu();
+                  }}
+                  className="py-3 text-left text-sm uppercase tracking-[0.1em] font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors"
+                >
+                  Sign Out
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
