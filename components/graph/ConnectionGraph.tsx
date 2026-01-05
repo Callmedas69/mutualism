@@ -574,6 +574,8 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
     <div
       ref={containerRef}
       id="graph-container"
+      role="application"
+      aria-label={`Interactive ${type} connection graph for ${centerUser.username} with ${connections.length} connections`}
       className="relative overflow-hidden border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
     >
       {/* Graph Canvas with smooth blur transition */}
@@ -600,11 +602,15 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
       </div>
 
       {/* Loading Overlay - fades out smoothly */}
-      <div className={`absolute inset-0 z-10 flex items-center justify-center pointer-events-none transition-opacity duration-500 ease-out ${isGraphReady ? "opacity-0" : "opacity-100"}`}>
+      <div
+        role="status"
+        aria-live="polite"
+        className={`absolute inset-0 z-10 flex items-center justify-center pointer-events-none transition-opacity duration-500 ease-out ${isGraphReady ? "opacity-0" : "opacity-100"}`}
+      >
         <div className="flex flex-col items-center gap-2 bg-white/80 dark:bg-zinc-900/80 px-6 py-4 rounded-lg">
-          <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-zinc-400" aria-hidden="true" />
           <span className="text-xs uppercase tracking-wider text-zinc-500">
-            Loading...
+            {isGraphReady ? "Graph loaded" : "Loading graph..."}
           </span>
         </div>
       </div>

@@ -27,6 +27,8 @@ const ConnectionItem = memo(function ConnectionItem({ user, type }: ConnectionIt
       href={`${URLS.warpcast}/${user.username}`}
       target="_blank"
       rel="noopener noreferrer"
+      role="listitem"
+      aria-label={`${user.username}, rank ${user.rank}`}
       className="group flex items-center gap-4 p-4 border border-zinc-100 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/50 transition-all duration-300 ease-out hover:border-zinc-200 dark:hover:border-zinc-700 hover:-translate-y-0.5"
     >
       <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
@@ -127,9 +129,9 @@ export default function ConnectionList({ connections, type }: ConnectionListProp
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" aria-label={`${type} connections list`}>
       {/* Grid */}
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2" role="list" aria-label={`${connections.length} ${type} connections`}>
         {paginatedConnections.map((user) => (
           <ConnectionItem key={user.fid} user={user} type={type} />
         ))}
@@ -137,14 +139,18 @@ export default function ConnectionList({ connections, type }: ConnectionListProp
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex flex-col gap-3 border-t border-zinc-100 dark:border-zinc-800/50 pt-6 sm:flex-row sm:items-center sm:justify-between">
+        <nav
+          aria-label="Connection list pagination"
+          className="flex flex-col gap-3 border-t border-zinc-100 dark:border-zinc-800/50 pt-6 sm:flex-row sm:items-center sm:justify-between"
+        >
           <p className="text-center text-xs uppercase tracking-[0.1em] text-zinc-500 sm:text-left dark:text-zinc-400">
             Showing {startIndex + 1}-{endIndex} of {connections.length}
           </p>
-          <div className="flex items-center justify-center gap-0">
+          <div className="flex items-center justify-center gap-0" role="group" aria-label="Pagination controls">
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
+              aria-label="Previous page"
               className="px-5 py-2.5 text-xs uppercase tracking-[0.1em] font-medium border border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 transition-all duration-200 hover:border-zinc-900 hover:text-zinc-900 dark:hover:border-white dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-zinc-300 disabled:hover:text-zinc-600 dark:disabled:hover:border-zinc-700 dark:disabled:hover:text-zinc-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
             >
               Prev
@@ -166,6 +172,8 @@ export default function ConnectionList({ connections, type }: ConnectionListProp
                   <button
                     key={pageNum}
                     onClick={() => setCurrentPage(pageNum)}
+                    aria-label={`Page ${pageNum}`}
+                    aria-current={currentPage === pageNum ? "page" : undefined}
                     className={`w-10 h-10 text-xs font-medium border-y border-zinc-300 dark:border-zinc-700 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 ${
                       currentPage === pageNum
                         ? "bg-zinc-900 text-white border-zinc-900 dark:bg-white dark:text-zinc-900 dark:border-white"
@@ -184,12 +192,13 @@ export default function ConnectionList({ connections, type }: ConnectionListProp
             <button
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
+              aria-label="Next page"
               className="px-5 py-2.5 text-xs uppercase tracking-[0.1em] font-medium border border-l-0 border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 transition-all duration-200 hover:border-zinc-900 hover:text-zinc-900 dark:hover:border-white dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-zinc-300 disabled:hover:text-zinc-600 dark:disabled:hover:border-zinc-700 dark:disabled:hover:text-zinc-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
             >
               Next
             </button>
           </div>
-        </div>
+        </nav>
       )}
     </div>
   );
