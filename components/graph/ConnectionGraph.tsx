@@ -638,19 +638,14 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
                 onExport={handleExportPNG}
                 disabled={isEngineRunning}
               />
-{/* <TokenizeButton
+              <TokenizeButton
                 getGraphBlob={getGraphBlob}
                 graphData={tokenizeData}
                 disabled={isEngineRunning}
-              /> */}
+              />
             </>
           )}
         </div>
-      </div>
-
-      {/* Touch hint - mobile only */}
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 border border-zinc-300 bg-white/90 px-3 py-1.5 text-[10px] uppercase tracking-[0.05em] text-zinc-600 sm:hidden dark:border-zinc-700 dark:bg-zinc-900/90 dark:text-zinc-400">
-        Pinch to zoom &bull; Drag to pan
       </div>
 
       {/* Node Info Card */}
