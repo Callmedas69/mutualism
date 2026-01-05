@@ -8,7 +8,7 @@ import { useMiniApp } from "@/hooks/useMiniApp";
 const navItems = [
   { href: "/", label: "Home", icon: Home },
   { href: "/graph", label: "Graph", icon: ArrowLeftRight },
-  { href: "/gallery", label: "Gallery", icon: Hexagon },
+  // { href: "/gallery", label: "Gallery", icon: Hexagon },
 ];
 
 export default function MiniAppNavbar() {
