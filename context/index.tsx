@@ -9,7 +9,7 @@ import { RainbowKitProvider, lightTheme } from "@rainbow-me/rainbowkit";
 import { OnchainKitProvider } from "@coinbase/onchainkit";
 import { base } from "wagmi/chains";
 import React, { type ReactNode, useState, useEffect } from "react";
-import { WagmiProvider } from "wagmi";
+import { WagmiProvider, useConnect, useAccount } from "wagmi";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +38,24 @@ function detectMiniAppMode(): boolean {
     // Cross-origin iframe access throws - we're likely in a miniapp
     return true;
   }
+}
+
+/**
+ * Auto-connect wallet in miniapp mode
+ * The farcasterMiniApp connector requires explicit connect() call
+ */
+function MiniAppAutoConnect({ children }: { children: ReactNode }) {
+  const { connect, connectors } = useConnect();
+  const { isConnected } = useAccount();
+
+  useEffect(() => {
+    // Auto-connect if not already connected and connector is available
+    if (!isConnected && connectors.length > 0) {
+      connect({ connector: connectors[0] });
+    }
+  }, [isConnected, connect, connectors]);
+
+  return <>{children}</>;
 }
 
 export default function ContextProvider({
@@ -71,7 +89,7 @@ export default function ContextProvider({
             }}
             miniKit={{ enabled: true }}
           >
-            {children}
+            <MiniAppAutoConnect>{children}</MiniAppAutoConnect>
           </OnchainKitProvider>
         </QueryClientProvider>
       </WagmiProvider>

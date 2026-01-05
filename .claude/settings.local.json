@@ -35,7 +35,10 @@
       "Bash(npm ls:*)",
       "Bash(npm prune:*)",
       "Bash(tsconfig:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(cd:*)",
+      "Bash(if exist .next rmdir /s /q .next)",
+      "Bash(if exist node_modules.cache rmdir /s /q node_modules.cache)"
     ]
   },
   "enableAllProjectMcpServers": true,

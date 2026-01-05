@@ -38,7 +38,7 @@ export default function Home() {
       ref={heroRef}
       className={`relative flex flex-col px-4 sm:px-8 lg:px-16 overflow-hidden ${
         isMiniApp
-          ? "min-h-screen justify-center items-center text-center"
+          ? "h-[calc(100dvh-5rem)] justify-center items-center text-center"
           : "min-h-[calc(100vh-9rem)] justify-end"
       }`}
     >

@@ -107,15 +107,15 @@ export default function ConnectionTabs() {
       {/* Header with tabs and view toggle */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Tabs - Underline style with shadcn */}
-        <TabsList className="h-auto w-full justify-start gap-0 rounded-none border-b border-zinc-200 bg-transparent p-0 dark:border-zinc-800 sm:w-auto overflow-x-auto scrollbar-hide">
+        <TabsList className="h-auto w-full justify-start gap-0 rounded-none border-b border-zinc-200 bg-transparent p-0 dark:border-zinc-800 sm:w-auto">
           {tabs.map((tab) => (
             <TabsTrigger
               key={tab.key}
               value={tab.key}
-              className="relative shrink-0 rounded-none border-none bg-transparent px-4 py-3 text-xs uppercase tracking-[0.1em] font-medium shadow-none transition-colors duration-200 data-[state=active]:bg-transparent data-[state=active]:text-zinc-900 data-[state=active]:shadow-none data-[state=inactive]:text-zinc-500 hover:text-zinc-700 dark:data-[state=active]:text-white dark:data-[state=inactive]:text-zinc-500 dark:hover:text-zinc-300 data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:right-0 data-[state=active]:after:h-0.5 data-[state=active]:after:bg-zinc-900 dark:data-[state=active]:after:bg-white"
+              className="relative shrink-0 rounded-none border-none bg-transparent px-2 py-2.5 text-[10px] uppercase tracking-[0.05em] font-medium shadow-none transition-colors duration-200 sm:px-4 sm:py-3 sm:text-xs sm:tracking-[0.1em] data-[state=active]:bg-transparent data-[state=active]:text-zinc-900 data-[state=active]:shadow-none data-[state=inactive]:text-zinc-500 hover:text-zinc-700 dark:data-[state=active]:text-white dark:data-[state=inactive]:text-zinc-500 dark:hover:text-zinc-300 data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:right-0 data-[state=active]:after:h-0.5 data-[state=active]:after:bg-zinc-900 dark:data-[state=active]:after:bg-white"
             >
               {tab.label}
-              <span className="ml-2 text-[10px] text-zinc-400">{tab.count}</span>
+              <span className="ml-1 text-[9px] text-zinc-400 sm:ml-2 sm:text-[10px]">{tab.count}</span>
             </TabsTrigger>
           ))}
         </TabsList>
