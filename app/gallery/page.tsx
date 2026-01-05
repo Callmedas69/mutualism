@@ -49,17 +49,21 @@ export default function GalleryPage() {
   if (isLoading) {
     return (
       <div className={`mx-auto max-w-7xl px-4 pb-safe sm:px-6 lg:px-8 ${isMiniApp ? "py-2" : "py-6 sm:py-8"}`}>
-        <div className="mb-8 sm:mb-10">
+        <div className={isMiniApp ? "mb-4" : "mb-8 sm:mb-10"}>
           <div className="h-3 w-32 bg-zinc-100 dark:bg-zinc-800 skeleton-shimmer" />
           <div className="mt-2 h-8 w-48 bg-zinc-100 dark:bg-zinc-800 skeleton-shimmer" />
         </div>
-        <div className="space-y-2">
-          {[1, 2, 3, 4].map((i) => (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
             <div key={i} className="flex items-center gap-4 p-4 border border-zinc-100 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/50">
-              <div className="h-10 w-10 rounded-full bg-zinc-100 dark:bg-zinc-800 skeleton-shimmer" />
-              <div className="flex-1 space-y-2">
+              <div className="h-10 w-10 shrink-0 rounded-full bg-zinc-100 dark:bg-zinc-800 skeleton-shimmer" />
+              <div className="flex-1 min-w-0 space-y-2">
                 <div className="h-4 w-32 bg-zinc-100 dark:bg-zinc-800 skeleton-shimmer" />
-                <div className="h-3 w-20 bg-zinc-100 dark:bg-zinc-800 skeleton-shimmer" />
+                <div className="h-3 w-24 bg-zinc-100 dark:bg-zinc-800 skeleton-shimmer" />
+              </div>
+              <div className="flex flex-col items-end gap-1 shrink-0">
+                <div className="h-3 w-12 bg-zinc-100 dark:bg-zinc-800 skeleton-shimmer" />
+                <div className="h-2.5 w-8 bg-zinc-100 dark:bg-zinc-800 skeleton-shimmer" />
               </div>
             </div>
           ))}
@@ -115,21 +119,12 @@ export default function GalleryPage() {
         </div>
       )}
 
-      {/* Coins List */}
+      {/* Coins Grid */}
       {hasCoins && (
         <ErrorBoundary name="GalleryList">
-        <div className="space-y-2">
-          {/* Header Row */}
-          <div className="flex items-center gap-4 px-4 text-[10px] uppercase tracking-wider text-zinc-400">
-            <div className="h-10 w-10 shrink-0" /> {/* Spacer for icon */}
-            <div className="min-w-0 flex-1">Coin</div>
-            <div className="w-16 text-center">Holders</div>
-            <div className="w-16 text-center">24h</div>
-            <div className="w-20 text-right">Cap</div>
-            <div className="w-[14px] shrink-0" /> {/* Spacer for link icon */}
-          </div>
-          {/* Coin Cards */}
-          <div className="space-y-2">
+        <div className="space-y-6">
+          {/* Coin Cards Grid */}
+          <div className="grid gap-3 sm:grid-cols-2">
             {coins.map((coinData) => (
               <CoinCard
                 key={coinData.coin}
@@ -143,26 +138,32 @@ export default function GalleryPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-4 pt-6">
-              <button
-                onClick={() => setPage((p) => Math.max(0, p - 1))}
-                disabled={page === 0}
-                className="flex items-center gap-1 px-3 py-2 text-xs uppercase tracking-wider border border-zinc-200 dark:border-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed hover:border-zinc-400 dark:hover:border-zinc-500 transition-colors"
-              >
-                <ChevronLeft size={14} />
-                Prev
-              </button>
-              <span className="text-xs text-zinc-500">
-                {page + 1} / {totalPages}
-              </span>
-              <button
-                onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-                disabled={page >= totalPages - 1}
-                className="flex items-center gap-1 px-3 py-2 text-xs uppercase tracking-wider border border-zinc-200 dark:border-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed hover:border-zinc-400 dark:hover:border-zinc-500 transition-colors"
-              >
-                Next
-                <ChevronRight size={14} />
-              </button>
+            <div className="flex flex-col gap-3 border-t border-zinc-100 dark:border-zinc-800/50 pt-6 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-center text-xs uppercase tracking-[0.1em] text-zinc-500 sm:text-left dark:text-zinc-400">
+                Page {page + 1} of {totalPages}
+              </p>
+              <div className="flex items-center justify-center gap-0">
+                <button
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  disabled={page === 0}
+                  className="flex items-center gap-1 px-5 py-2.5 min-h-[44px] text-xs uppercase tracking-[0.1em] font-medium border border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 transition-all duration-200 hover:border-zinc-900 hover:text-zinc-900 dark:hover:border-white dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-zinc-300 disabled:hover:text-zinc-600 dark:disabled:hover:border-zinc-700 dark:disabled:hover:text-zinc-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+                >
+                  <ChevronLeft size={14} />
+                  Prev
+                </button>
+                {/* Mobile page indicator */}
+                <span className="px-4 py-2.5 text-xs uppercase tracking-[0.1em] text-zinc-500 border-y border-zinc-300 dark:border-zinc-700 sm:hidden dark:text-zinc-400">
+                  {page + 1} / {totalPages}
+                </span>
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                  disabled={page >= totalPages - 1}
+                  className="flex items-center gap-1 px-5 py-2.5 min-h-[44px] text-xs uppercase tracking-[0.1em] font-medium border border-l-0 border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 transition-all duration-200 hover:border-zinc-900 hover:text-zinc-900 dark:hover:border-white dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-zinc-300 disabled:hover:text-zinc-600 dark:disabled:hover:border-zinc-700 dark:disabled:hover:text-zinc-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+                >
+                  Next
+                  <ChevronRight size={14} />
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -186,7 +187,6 @@ const CoinCard = memo(function CoinCard({ coinData, stats, isStatsLoading, isOwn
   const name = stats?.name || "Unknown Coin";
   const symbol = stats?.symbol || "???";
   const image = stats?.image || "";
-  const holders = stats?.uniqueHolders || 0;
 
   const formatMarketCap = (value: string | undefined) => {
     if (!value || value === "0") return "—";
@@ -205,7 +205,7 @@ const CoinCard = memo(function CoinCard({ coinData, stats, isStatsLoading, isOwn
       href={coinUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex items-center gap-4 p-4 border border-zinc-100 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/50 transition-all duration-300 ease-out hover:border-zinc-200 dark:hover:border-zinc-700 hover:-translate-y-0.5"
+      className="group flex items-center gap-4 p-4 border border-zinc-100 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/50 transition-all duration-300 ease-out hover:border-zinc-200 dark:hover:border-zinc-700 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
     >
       {/* Image */}
       <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
@@ -247,18 +247,18 @@ const CoinCard = memo(function CoinCard({ coinData, stats, isStatsLoading, isOwn
         </div>
       </div>
 
-      {/* Stats */}
+      {/* Stats - Market Cap + 24h Change stacked */}
       {isStatsLoading ? (
         <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />
       ) : (
-        <>
-          {/* Holders */}
-          <div className="w-16 text-center text-xs text-zinc-600 dark:text-zinc-400">
-            {holders}
-          </div>
+        <div className="flex flex-col items-end shrink-0">
+          {/* Market Cap - always visible */}
+          <span className="text-xs font-medium text-zinc-900 dark:text-white">
+            {formatMarketCap(stats?.marketCap)}
+          </span>
           {/* 24h Change */}
-          <div
-            className={`w-16 text-center text-xs ${
+          <span
+            className={`text-[10px] ${
               isPositive
                 ? "text-green-600 dark:text-green-400"
                 : isNegative
@@ -267,12 +267,8 @@ const CoinCard = memo(function CoinCard({ coinData, stats, isStatsLoading, isOwn
             }`}
           >
             {priceChange !== 0 ? `${isPositive ? "+" : ""}${priceChange.toFixed(1)}%` : "—"}
-          </div>
-          {/* Market Cap */}
-          <div className="w-20 text-right text-xs text-zinc-600 dark:text-zinc-400">
-            {formatMarketCap(stats?.marketCap)}
-          </div>
-        </>
+          </span>
+        </div>
       )}
 
       {/* External Link Icon */}

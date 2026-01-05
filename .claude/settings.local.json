@@ -33,7 +33,9 @@
       "Bash(curl:*)",
       "Bash(del \"D:\\\\Harry\\\\BasedNouns\\\\CodeProject\\\\quotientmutual\\\\public\\\\farcaster_logo.png\")",
       "Bash(npm ls:*)",
-      "Bash(npm prune:*)"
+      "Bash(npm prune:*)",
+      "Bash(tsconfig:*)",
+      "Bash(next \")"
     ]
   },
   "enableAllProjectMcpServers": true,

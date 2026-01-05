@@ -39,8 +39,8 @@ export default function Home() {
       ref={heroRef}
       className={`relative flex flex-col px-4 sm:px-8 lg:px-16 overflow-hidden ${
         isMiniApp
-          ? "min-h-screen pb-4 justify-center items-center text-center"
-          : "min-h-[calc(100vh-4rem)] pb-16 sm:pb-16 lg:pb-24 justify-end"
+          ? "min-h-screen justify-center items-center text-center"
+          : "min-h-[calc(100vh-9rem)] justify-end"
       }`}
     >
       {/* Main Typography */}
@@ -48,8 +48,8 @@ export default function Home() {
         {/* Overline Tag - hidden in miniapp */}
         {!isMiniApp && (
           <div className="hero-tag">
-            <p className="text-xs sm:text-sm lg:text-base uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
-              FARCASTER SOCIAL GRAPH
+            <p className="text-xs sm:text-sm lg:text-base tracking-[0.2em] text-zinc-500 dark:text-zinc-400 uppercase">
+              farcaster social graph
             </p>
           </div>
         )}
@@ -74,31 +74,14 @@ export default function Home() {
             <span>YOURS ? Y/N</span>
             <span className="inline-block w-[0.03em] h-[0.75em] bg-zinc-900 dark:bg-white ml-2 sm:ml-5 animate-blink" />
           </h1>
-
-          {/* Scroll Indicator */}
-          <div className="scroll-indicator hidden lg:flex flex-col items-center gap-2 pb-[1vw]">
-            <svg
-              className="w-8 h-8 text-zinc-400 dark:text-zinc-500 animate-bounce"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 14l-7 7m0 0l-7-7m7 7V3"
-              />
-            </svg>
-          </div>
         </div>
       </div>
 
       {/* Subtext and CTA - hidden in miniapp */}
       {!isMiniApp && (
-        <div className="mt-2 sm:mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
-          <p className="hero-subtext text-sm sm:text-base lg:text-2xl uppercase tracking-[0.15em] font-light text-zinc-500 dark:text-zinc-400 max-w-5xl leading-relaxed">
-            A FOLLOW IS NOT A RELATIONSHIP. SEE WHO ACTUALLY ENGAGES WITH YOU - AND WHO YOU ENGAGE WITH BACK.
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+          <p className="hero-subtext text-sm sm:text-base lg:text-xl text-zinc-400 dark:text-zinc-400 max-w-5xl italic">
+            a follow is not a relationship. see who actually engages with you, and who you engage with back.
           </p>
 
           <TransitionLink
