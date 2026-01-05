@@ -8,7 +8,7 @@ import { useMiniApp } from "@/hooks/useMiniApp";
 const navItems = [
   { href: "/", label: "Home", icon: Home },
   { href: "/graph", label: "Graph", icon: ArrowLeftRight },
-  { href: "/gallery", label: "Gallery", icon: Hexagon },
+  // { href: "/gallery", label: "Gallery", icon: Hexagon },
 ];
 
 export default function MiniAppNavbar() {
@@ -40,25 +40,6 @@ export default function MiniAppNavbar() {
             </Link>
           );
         })}
-
-        {/* Profile button - opens Farcaster profile */}
-        {user && (
-          <button
-            onClick={() => viewProfile(user.fid)}
-            className="flex flex-col items-center gap-1 px-3 py-2 text-[10px] uppercase tracking-wide text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-          >
-            {user.pfpUrl ? (
-              <img
-                src={user.pfpUrl}
-                alt={user.username || "Profile"}
-                className="h-5 w-5 rounded-full object-cover"
-              />
-            ) : (
-              <User size={20} strokeWidth={1.5} />
-            )}
-            <span className="font-medium">Profile</span>
-          </button>
-        )}
       </div>
 
       {/* Safe area padding for iOS */}
