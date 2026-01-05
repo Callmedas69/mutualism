@@ -50,12 +50,12 @@ export default function Navbar() {
           >
             Graph
           </TransitionLink>
-          {/* <TransitionLink
+          <TransitionLink
             href="/gallery"
             className="text-xs uppercase tracking-[0.15em] font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
           >
             Gallery
-          </TransitionLink> */}
+          </TransitionLink>
         </div>
 
         {/* Auth Section */}

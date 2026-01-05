@@ -286,8 +286,8 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
     maxNodes,
   });
 
-  // Graph is ready when images are loaded AND physics simulation has settled
-  const isGraphReady = imagesLoaded && !isEngineRunning;
+  // Graph is ready when images are loaded (physics can still run in background)
+  const isGraphReady = imagesLoaded;
 
   // Dimension tracking - uses ResizeObserver to detect visibility changes
   useEffect(() => {
@@ -638,11 +638,11 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
                 onExport={handleExportPNG}
                 disabled={isEngineRunning}
               />
-              {/* <TokenizeButton
+              <TokenizeButton
                 getGraphBlob={getGraphBlob}
                 graphData={tokenizeData}
                 disabled={isEngineRunning}
-              /> */}
+              />
             </>
           )}
         </div>
