@@ -43,7 +43,11 @@
       "WebFetch(domain:neynar.readme.io)",
       "Bash(timeout /t 10 /nobreak)",
       "Bash(taskkill:*)",
-      "Bash(if exist \"D:\\\\Harry\\\\BasedNouns\\\\CodeProject\\\\quotientmutual\\\\.next\\\\dev\\\\lock\" del /F \"D:\\\\Harry\\\\BasedNouns\\\\CodeProject\\\\quotientmutual\\\\.next\\\\dev\\\\lock\")"
+      "Bash(if exist \"D:\\\\Harry\\\\BasedNouns\\\\CodeProject\\\\quotientmutual\\\\.next\\\\dev\\\\lock\" del /F \"D:\\\\Harry\\\\BasedNouns\\\\CodeProject\\\\quotientmutual\\\\.next\\\\dev\\\\lock\")",
+      "WebFetch(domain:docs.airstack.xyz)",
+      "WebFetch(domain:docs.pinata.cloud)",
+      "WebFetch(domain:hub.pinata.cloud)",
+      "Bash(del \"D:\\\\Harry\\\\BasedNouns\\\\CodeProject\\\\quotientmutual\\\\.docs\\\\SMARTSEARCH.md\")"
     ]
   },
   "enableAllProjectMcpServers": true,

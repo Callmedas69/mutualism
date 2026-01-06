@@ -2,8 +2,6 @@ import type {
   ConnectionsAllResponse,
   ConnectionsResponse,
   ConnectionCategory,
-  MutualUser,
-  SharedMutualUser,
 } from "@/types/quotient";
 import { API } from "@/lib/constants";
 
@@ -64,58 +62,4 @@ export async function fetchConnections(
   }
 
   return res.json();
-}
-
-export interface SharedConnectionsResult {
-  shared: SharedMutualUser[];
-  count: number;
-  userAlreadyKnowsTarget: boolean;
-}
-
-/**
- * Find shared mutual connections between two users
- * @param userFid - The logged-in user's FID
- * @param targetFid - The target user's FID
- * @returns Shared connections with both user and target scores
- */
-export async function findSharedConnections(
-  userFid: number,
-  targetFid: number
-): Promise<SharedConnectionsResult> {
-  // Fetch mutuals for both users in parallel
-  const [userMutuals, targetMutuals] = await Promise.all([
-    fetchAllMutuals(userFid, 200),
-    fetchAllMutuals(targetFid, 200),
-  ]);
-
-  // Check if user already knows target (target is in user's mutuals)
-  const userAlreadyKnowsTarget = userMutuals.mutuals.some(
-    (m) => m.fid === targetFid
-  );
-
-  // Create lookup for target's mutuals: fid → combined_score
-  const targetScoreLookup = new Map(
-    targetMutuals.mutuals.map((m) => [m.fid, m.combined_score])
-  );
-
-  // Find intersection and add target's score for each connector
-  const shared: SharedMutualUser[] = userMutuals.mutuals
-    .filter((m) => targetScoreLookup.has(m.fid) && m.fid !== targetFid)
-    .map((m) => ({
-      ...m,
-      target_combined_score: targetScoreLookup.get(m.fid) || 0,
-    }));
-
-  // Sort by product of both scores (warmest path = strong on both sides)
-  shared.sort((a, b) => {
-    const scoreA = a.combined_score * a.target_combined_score;
-    const scoreB = b.combined_score * b.target_combined_score;
-    return scoreB - scoreA;
-  });
-
-  return {
-    shared,
-    count: shared.length,
-    userAlreadyKnowsTarget,
-  };
 }

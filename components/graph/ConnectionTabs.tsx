@@ -8,10 +8,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import ConnectionList from "./ConnectionList";
 import ConnectionGraph from "./ConnectionGraph";
 import ConnectionSkeleton from "./ConnectionSkeleton";
-import SharedConnections from "./SharedConnections";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
-type TabType = "mutuals" | "attention" | "influence" | "warmintro";
+type TabType = "mutuals" | "attention" | "influence";
 type ViewType = "list" | "graph";
 
 export default function ConnectionTabs() {
@@ -25,7 +24,6 @@ export default function ConnectionTabs() {
     { key: "mutuals", label: "Mutuals", count: mutuals.length, description: "People who engage with you and you engage back" },
     { key: "attention", label: "Attention", count: attention.length, description: "People you engage with the most" },
     { key: "influence", label: "Influence", count: influence.length, description: "People who engage with you the most" },
-    { key: "warmintro", label: "Warm Intro", count: null, description: "Search for someone you want to meet. We'll show you who knows both of you." },
   ];
 
   const activeTabData = tabs.find((t) => t.key === activeTab);
@@ -38,8 +36,6 @@ export default function ConnectionTabs() {
         return attention;
       case "influence":
         return influence;
-      case "warmintro":
-        return []; // Not used for warmintro tab
     }
   };
 
@@ -126,9 +122,8 @@ export default function ConnectionTabs() {
           ))}
         </TabsList>
 
-        {/* View Toggle - Hidden for warmintro tab */}
-        {activeTab !== "warmintro" && (
-          <div className="flex">
+        {/* View Toggle */}
+        <div className="flex">
             <button
               onClick={() => setViewType("list")}
               className={`min-h-[44px] px-5 py-3 text-xs uppercase tracking-[0.1em] font-medium border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 ${
@@ -150,7 +145,6 @@ export default function ConnectionTabs() {
               Graph
             </button>
           </div>
-        )}
       </div>
 
       {/* Tab description */}
@@ -167,33 +161,27 @@ export default function ConnectionTabs() {
           value={tab.key}
           className="mt-0 animate-in fade-in duration-300"
         >
-          {tab.key === "warmintro" ? (
-            <SharedConnections />
-          ) : (
-            <>
-              {/* List View */}
-              <div className={viewType === "list" ? "block" : "hidden"}>
-                <ConnectionList
-                  connections={getConnections(tab.key)}
-                  type={tab.key === "mutuals" ? "mutual" : tab.key}
-                />
-              </div>
-              {/* Graph View - stays mounted to preserve state */}
-              <div className={viewType === "graph" ? "block" : "hidden"}>
-                <ErrorBoundary name="ConnectionGraph">
-                  <ConnectionGraph
-                    connections={getConnections(tab.key)}
-                    centerUser={{
-                      fid: user?.fid || 0,
-                      username: user?.username || "",
-                      pfp_url: user?.pfp_url || null,
-                    }}
-                    type={tab.key}
-                  />
-                </ErrorBoundary>
-              </div>
-            </>
-          )}
+          {/* List View */}
+          <div className={viewType === "list" ? "block" : "hidden"}>
+            <ConnectionList
+              connections={getConnections(tab.key)}
+              type={tab.key === "mutuals" ? "mutual" : tab.key}
+            />
+          </div>
+          {/* Graph View - stays mounted to preserve state */}
+          <div className={viewType === "graph" ? "block" : "hidden"}>
+            <ErrorBoundary name="ConnectionGraph">
+              <ConnectionGraph
+                connections={getConnections(tab.key)}
+                centerUser={{
+                  fid: user?.fid || 0,
+                  username: user?.username || "",
+                  pfp_url: user?.pfp_url || null,
+                }}
+                type={tab.key}
+              />
+            </ErrorBoundary>
+          </div>
         </TabsContent>
       ))}
     </Tabs>
