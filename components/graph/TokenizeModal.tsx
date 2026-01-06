@@ -52,6 +52,8 @@ export default function TokenizeModal({
   const [coinAddress, setCoinAddress] = useState<Address | null>(null);
   const [coinUrl, setCoinUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [feePaid, setFeePaid] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   // Generate coin name and symbol once (stable across re-renders)
   const [coinName] = useState(() =>
@@ -187,6 +189,7 @@ export default function TokenizeModal({
   // Trigger upload after fee confirmed
   useEffect(() => {
     if (isFeeConfirmed && step === "payment") {
+      setFeePaid(true);
       handleUploadAndCreate();
     }
   }, [isFeeConfirmed, step, handleUploadAndCreate]);
@@ -271,6 +274,7 @@ export default function TokenizeModal({
     setError(null);
     setCoinAddress(null);
     setCoinUrl(null);
+    setFeePaid(false);
     onClose();
   }, [onClose]);
 
@@ -293,29 +297,83 @@ export default function TokenizeModal({
     return () => document.removeEventListener("keydown", handleEscape);
   }, []);
 
+  // Focus trap for accessibility
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const modal = modalRef.current;
+    if (!modal) return;
+
+    const focusableElements = modal.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    setTimeout(() => firstElement?.focus(), 0);
+
+    const handleTab = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+
+      if (e.shiftKey && document.activeElement === firstElement) {
+        e.preventDefault();
+        lastElement?.focus();
+      } else if (!e.shiftKey && document.activeElement === lastElement) {
+        e.preventDefault();
+        firstElement?.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleTab);
+    return () => document.removeEventListener("keydown", handleTab);
+  }, [isOpen, step]);
+
   if (!isOpen) return null;
 
   // Progress indicator
   const currentStepIndex = STEPS.findIndex((s) => s.id === step);
 
+  // Helper for contextual error titles (casual)
+  const getErrorTitle = () => {
+    if (feeError) return "Payment didn't go through";
+    if (coinError) return "Couldn't create your coin";
+    return "Something went wrong";
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="relative w-full max-w-md border border-zinc-200 bg-white p-6 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      role="presentation"
+    >
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tokenize-modal-title"
+        className="relative w-full max-w-md border border-zinc-200 bg-white p-6 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900"
+      >
         {/* Close button (disabled during processing) */}
         {step !== "payment" && step !== "uploading" && step !== "creating" && step !== "registering" && (
           <button
             onClick={handleClose}
+            aria-label="Close"
             className="absolute right-3 top-3 z-10 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
           >
-            <X size={20} />
+            <X size={20} aria-hidden="true" />
           </button>
         )}
 
         {/* Progress Steps */}
-        <div className="mb-6 flex items-center justify-between pr-8">
+        <div
+          className="mb-6 flex items-center justify-between pr-8"
+          role="group"
+          aria-label={`Step ${currentStepIndex + 1} of ${STEPS.length - 1}`}
+        >
           {STEPS.slice(0, -1).map((s, i) => (
             <div key={s.id} className="flex items-center">
               <div
+                aria-current={i === currentStepIndex ? "step" : undefined}
+                aria-label={`${s.label}: ${i < currentStepIndex ? "completed" : i === currentStepIndex ? "current" : "pending"}`}
                 className={`flex h-6 w-6 items-center justify-center border text-[10px] font-medium sm:h-8 sm:w-8 sm:text-xs ${
                   i < currentStepIndex
                     ? "border-green-500 bg-green-500 text-white"
@@ -324,7 +382,7 @@ export default function TokenizeModal({
                     : "border-zinc-300 bg-zinc-100 text-zinc-500 dark:border-zinc-600 dark:bg-zinc-800"
                 }`}
               >
-                {i < currentStepIndex ? <Check size={12} className="sm:h-3.5 sm:w-3.5" /> : i + 1}
+                {i < currentStepIndex ? <Check size={12} className="sm:h-3.5 sm:w-3.5" aria-hidden="true" /> : i + 1}
               </div>
               {i < STEPS.length - 2 && (
                 <div
@@ -333,6 +391,7 @@ export default function TokenizeModal({
                       ? "bg-green-500"
                       : "bg-zinc-300 dark:bg-zinc-600"
                   }`}
+                  aria-hidden="true"
                 />
               )}
             </div>
@@ -342,7 +401,7 @@ export default function TokenizeModal({
         {/* Preview Step */}
         {step === "preview" && (
           <div className="space-y-4">
-            <p className="text-lg font-bold py-3">
+            <p id="tokenize-modal-title" className="text-lg font-bold py-3">
               Turn your social graph into a tradeable coin.
             </p>
 
@@ -394,25 +453,30 @@ export default function TokenizeModal({
         {/* Payment Step */}
         {step === "payment" && (
           <div className="space-y-4 text-center">
-            <Loader2 className="mx-auto h-12 w-12 animate-spin text-[#f25b28]" />
-            <h2 className="text-xl font-bold">
-              {isFeePending ? "Check your wallet" : "Sending fee..."}
+            <Loader2 className="mx-auto h-12 w-12 animate-spin text-[#f25b28]" aria-hidden="true" />
+            <h2 id="tokenize-modal-title" className="text-xl font-bold">
+              {isFeePending ? "Approve in your wallet" : "Sending..."}
             </h2>
             <p className="text-sm text-zinc-500">
               {isFeePending
-                ? `Approve ${TOKENIZE_FEE} ETH${feeInUsd ? ` (~$${feeInUsd})` : ""} to continue`
-                : "Hang tight, confirming..."}
+                ? `${TOKENIZE_FEE} ETH${feeInUsd ? ` (~$${feeInUsd})` : ""} — small fee to cover costs`
+                : "Hang tight..."}
             </p>
+            {feeHash && !isFeePending && (
+              <p className="font-mono text-xs text-zinc-400">
+                Tx: {feeHash.slice(0, 8)}...{feeHash.slice(-6)}
+              </p>
+            )}
           </div>
         )}
 
         {/* Uploading Step */}
         {step === "uploading" && (
           <div className="space-y-4 text-center">
-            <Loader2 className="mx-auto h-12 w-12 animate-spin text-[#f25b28]" />
-            <h2 className="text-xl font-bold">Preparing your coin</h2>
+            <Loader2 className="mx-auto h-12 w-12 animate-spin text-[#f25b28]" aria-hidden="true" />
+            <h2 id="tokenize-modal-title" className="text-xl font-bold">Saving your graph...</h2>
             <p className="text-sm text-zinc-500">
-              Capturing your graph...
+              Almost ready...
             </p>
           </div>
         )}
@@ -420,29 +484,34 @@ export default function TokenizeModal({
         {/* Creating Step */}
         {step === "creating" && (
           <div className="space-y-4 text-center">
-            <Loader2 className="mx-auto h-12 w-12 animate-spin text-[#f25b28]" />
-            <h2 className="text-xl font-bold">
-              {isCoinPending ? "Check your wallet" : "Minting your coin..."}
+            <Loader2 className="mx-auto h-12 w-12 animate-spin text-[#f25b28]" aria-hidden="true" />
+            <h2 id="tokenize-modal-title" className="text-xl font-bold">
+              {isCoinPending ? "One more approval" : "Minting..."}
             </h2>
             <p className="text-sm text-zinc-500">
               {isCoinPending
-                ? "Approve to deploy on Zora"
+                ? "Making it official..."
                 : "Almost there..."}
             </p>
+            {coinHash && !isCoinPending && (
+              <p className="font-mono text-xs text-zinc-400">
+                Tx: {coinHash.slice(0, 8)}...{coinHash.slice(-6)}
+              </p>
+            )}
           </div>
         )}
 
         {/* Registering Step */}
         {step === "registering" && (
           <div className="space-y-4 text-center">
-            <Loader2 className="mx-auto h-12 w-12 animate-spin text-[#f25b28]" />
-            <h2 className="text-xl font-bold">
-              {isRegistryPending ? "One more signature" : "Adding to gallery..."}
+            <Loader2 className="mx-auto h-12 w-12 animate-spin text-[#f25b28]" aria-hidden="true" />
+            <h2 id="tokenize-modal-title" className="text-xl font-bold">
+              {isRegistryPending ? "Last one, promise!" : "Finishing up..."}
             </h2>
             <p className="text-sm text-zinc-500">
               {isRegistryPending
-                ? "Approve to save your coin"
-                : "Wrapping up..."}
+                ? "Adding to the gallery..."
+                : "Almost done..."}
             </p>
           </div>
         )}
@@ -451,9 +520,9 @@ export default function TokenizeModal({
         {step === "success" && (
           <div className="space-y-4 text-center">
             <div className="mx-auto flex h-16 w-16 items-center justify-center border-2 border-green-500 bg-green-50 dark:bg-green-900/30">
-              <Check className="h-8 w-8 text-green-600" />
+              <Check className="h-8 w-8 text-green-600" aria-hidden="true" />
             </div>
-            <h2 className="text-xl font-bold">You're live!</h2>
+            <h2 id="tokenize-modal-title" className="text-xl font-bold">You&apos;re live!</h2>
             <p className="text-sm text-zinc-500">
               Your coin is ready to trade on Zora.
             </p>
@@ -461,7 +530,7 @@ export default function TokenizeModal({
             {/* Warning if registry failed */}
             {error && (
               <div className="flex items-center gap-2 rounded-lg bg-amber-50 p-3 text-left dark:bg-amber-900/20">
-                <AlertCircle size={16} className="shrink-0 text-amber-600" />
+                <AlertCircle size={16} className="shrink-0 text-amber-600" aria-hidden="true" />
                 <p className="text-xs text-amber-700 dark:text-amber-400">{error}</p>
               </div>
             )}
@@ -499,13 +568,13 @@ export default function TokenizeModal({
                 />
                 <button
                   onClick={handleCopy}
+                  aria-label={copied ? "Link copied" : "Copy link"}
                   className="border border-zinc-300 p-1.5 transition-colors hover:border-zinc-500 hover:bg-zinc-100 dark:border-zinc-600 dark:hover:border-zinc-400 dark:hover:bg-zinc-700"
-                  title="Copy link"
                 >
                   {copied ? (
-                    <Check size={14} className="text-green-500" />
+                    <Check size={14} className="text-green-500" aria-hidden="true" />
                   ) : (
-                    <Copy size={14} />
+                    <Copy size={14} aria-hidden="true" />
                   )}
                 </button>
               </div>
@@ -527,7 +596,7 @@ export default function TokenizeModal({
                   className="flex flex-1 items-center justify-center gap-2 border border-[#f25b28] bg-[#f25b28] px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-white transition-colors hover:border-[#d94f22] hover:bg-[#d94f22] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f25b28] focus-visible:ring-offset-2"
                 >
                   View on Zora
-                  <ExternalLink size={12} />
+                  <ExternalLink size={12} aria-hidden="true" />
                 </a>
               )}
             </div>
@@ -538,9 +607,9 @@ export default function TokenizeModal({
         {step === "error" && (
           <div className="space-y-4 text-center">
             <div className="mx-auto flex h-16 w-16 items-center justify-center border-2 border-red-500 bg-red-50 dark:bg-red-900/30">
-              <AlertCircle className="h-8 w-8 text-red-600" />
+              <AlertCircle className="h-8 w-8 text-red-600" aria-hidden="true" />
             </div>
-            <h2 className="text-xl font-bold">Something Went Wrong</h2>
+            <h2 id="tokenize-modal-title" className="text-xl font-bold">{getErrorTitle()}</h2>
             <p className="text-sm text-red-500">{error}</p>
 
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:gap-3">
@@ -553,11 +622,15 @@ export default function TokenizeModal({
               <button
                 onClick={() => {
                   setError(null);
-                  setStep("preview");
+                  if (feePaid) {
+                    handleUploadAndCreate();
+                  } else {
+                    setStep("preview");
+                  }
                 }}
                 className="flex-1 border border-[#f25b28] bg-[#f25b28] px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-white transition-colors hover:border-[#d94f22] hover:bg-[#d94f22] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f25b28] focus-visible:ring-offset-2"
               >
-                Try Again
+                {feePaid ? "Try again (no extra fee)" : "Try again"}
               </button>
             </div>
           </div>

@@ -34,3 +34,22 @@ export interface ConnectionsResponse {
 }
 
 export type ConnectionCategory = "attention" | "influence" | "mutuals";
+
+// Shared connections (warm intro) types
+export interface SharedConnectionsTarget {
+  fid: number;
+  username: string;
+  display_name: string | null;
+  pfp_url: string | null;
+}
+
+export interface SharedMutualUser extends MutualUser {
+  target_combined_score: number;
+}
+
+export interface SharedConnectionsResponse {
+  target: SharedConnectionsTarget;
+  shared: SharedMutualUser[];
+  count: number;
+  userAlreadyKnowsTarget: boolean;
+}

@@ -8,9 +8,10 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import ConnectionList from "./ConnectionList";
 import ConnectionGraph from "./ConnectionGraph";
 import ConnectionSkeleton from "./ConnectionSkeleton";
+import SharedConnections from "./SharedConnections";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
-type TabType = "mutuals" | "attention" | "influence";
+type TabType = "mutuals" | "attention" | "influence" | "warmintro";
 type ViewType = "list" | "graph";
 
 export default function ConnectionTabs() {
@@ -20,10 +21,11 @@ export default function ConnectionTabs() {
 
   const { mutuals, attention, influence, loading, error, retry } = useConnectionData(user?.fid);
 
-  const tabs: { key: TabType; label: string; count: number; description: string }[] = [
+  const tabs: { key: TabType; label: string; count: number | null; description: string }[] = [
     { key: "mutuals", label: "Mutuals", count: mutuals.length, description: "People who engage with you and you engage back" },
     { key: "attention", label: "Attention", count: attention.length, description: "People you engage with the most" },
     { key: "influence", label: "Influence", count: influence.length, description: "People who engage with you the most" },
+    { key: "warmintro", label: "Warm Intro", count: null, description: "Search for someone you want to meet. We'll show you who knows both of you." },
   ];
 
   const activeTabData = tabs.find((t) => t.key === activeTab);
@@ -36,6 +38,8 @@ export default function ConnectionTabs() {
         return attention;
       case "influence":
         return influence;
+      case "warmintro":
+        return []; // Not used for warmintro tab
     }
   };
 
@@ -115,34 +119,38 @@ export default function ConnectionTabs() {
               className="relative shrink-0 rounded-none border-none bg-transparent px-2 py-2.5 text-[10px] uppercase tracking-[0.05em] font-medium shadow-none transition-colors duration-200 sm:px-4 sm:py-3 sm:text-xs sm:tracking-[0.1em] data-[state=active]:bg-transparent data-[state=active]:text-zinc-900 data-[state=active]:shadow-none data-[state=inactive]:text-zinc-500 hover:text-zinc-700 dark:data-[state=active]:text-white dark:data-[state=inactive]:text-zinc-500 dark:hover:text-zinc-300 data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:right-0 data-[state=active]:after:h-0.5 data-[state=active]:after:bg-zinc-900 dark:data-[state=active]:after:bg-white"
             >
               {tab.label}
-              <span className="ml-1 text-[9px] text-zinc-400 sm:ml-2 sm:text-[10px]">{tab.count}</span>
+              {tab.count !== null && (
+                <span className="ml-1 text-[9px] text-zinc-400 sm:ml-2 sm:text-[10px]">{tab.count}</span>
+              )}
             </TabsTrigger>
           ))}
         </TabsList>
 
-        {/* View Toggle - Sharp border style, 44px min touch target */}
-        <div className="flex">
-          <button
-            onClick={() => setViewType("list")}
-            className={`min-h-[44px] px-5 py-3 text-xs uppercase tracking-[0.1em] font-medium border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 ${
-              viewType === "list"
-                ? "bg-zinc-900 text-white border-zinc-900 dark:bg-white dark:text-zinc-900 dark:border-white"
-                : "bg-transparent text-zinc-600 border-zinc-300 hover:border-zinc-900 hover:text-zinc-900 dark:text-zinc-400 dark:border-zinc-700 dark:hover:border-white dark:hover:text-white"
-            }`}
-          >
-            List
-          </button>
-          <button
-            onClick={() => setViewType("graph")}
-            className={`min-h-[44px] px-5 py-3 text-xs uppercase tracking-[0.1em] font-medium border border-l-0 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 ${
-              viewType === "graph"
-                ? "bg-zinc-900 text-white border-zinc-900 dark:bg-white dark:text-zinc-900 dark:border-white"
-                : "bg-transparent text-zinc-600 border-zinc-300 hover:border-zinc-900 hover:text-zinc-900 dark:text-zinc-400 dark:border-zinc-700 dark:hover:border-white dark:hover:text-white"
-            }`}
-          >
-            Graph
-          </button>
-        </div>
+        {/* View Toggle - Hidden for warmintro tab */}
+        {activeTab !== "warmintro" && (
+          <div className="flex">
+            <button
+              onClick={() => setViewType("list")}
+              className={`min-h-[44px] px-5 py-3 text-xs uppercase tracking-[0.1em] font-medium border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 ${
+                viewType === "list"
+                  ? "bg-zinc-900 text-white border-zinc-900 dark:bg-white dark:text-zinc-900 dark:border-white"
+                  : "bg-transparent text-zinc-600 border-zinc-300 hover:border-zinc-900 hover:text-zinc-900 dark:text-zinc-400 dark:border-zinc-700 dark:hover:border-white dark:hover:text-white"
+              }`}
+            >
+              List
+            </button>
+            <button
+              onClick={() => setViewType("graph")}
+              className={`min-h-[44px] px-5 py-3 text-xs uppercase tracking-[0.1em] font-medium border border-l-0 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 ${
+                viewType === "graph"
+                  ? "bg-zinc-900 text-white border-zinc-900 dark:bg-white dark:text-zinc-900 dark:border-white"
+                  : "bg-transparent text-zinc-600 border-zinc-300 hover:border-zinc-900 hover:text-zinc-900 dark:text-zinc-400 dark:border-zinc-700 dark:hover:border-white dark:hover:text-white"
+              }`}
+            >
+              Graph
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Tab description */}
@@ -159,27 +167,33 @@ export default function ConnectionTabs() {
           value={tab.key}
           className="mt-0 animate-in fade-in duration-300"
         >
-          {/* List View */}
-          <div className={viewType === "list" ? "block" : "hidden"}>
-            <ConnectionList
-              connections={getConnections(tab.key)}
-              type={tab.key === "mutuals" ? "mutual" : tab.key}
-            />
-          </div>
-          {/* Graph View - stays mounted to preserve state */}
-          <div className={viewType === "graph" ? "block" : "hidden"}>
-            <ErrorBoundary name="ConnectionGraph">
-              <ConnectionGraph
-                connections={getConnections(tab.key)}
-                centerUser={{
-                  fid: user?.fid || 0,
-                  username: user?.username || "",
-                  pfp_url: user?.pfp_url || null,
-                }}
-                type={tab.key}
-              />
-            </ErrorBoundary>
-          </div>
+          {tab.key === "warmintro" ? (
+            <SharedConnections />
+          ) : (
+            <>
+              {/* List View */}
+              <div className={viewType === "list" ? "block" : "hidden"}>
+                <ConnectionList
+                  connections={getConnections(tab.key)}
+                  type={tab.key === "mutuals" ? "mutual" : tab.key}
+                />
+              </div>
+              {/* Graph View - stays mounted to preserve state */}
+              <div className={viewType === "graph" ? "block" : "hidden"}>
+                <ErrorBoundary name="ConnectionGraph">
+                  <ConnectionGraph
+                    connections={getConnections(tab.key)}
+                    centerUser={{
+                      fid: user?.fid || 0,
+                      username: user?.username || "",
+                      pfp_url: user?.pfp_url || null,
+                    }}
+                    type={tab.key}
+                  />
+                </ErrorBoundary>
+              </div>
+            </>
+          )}
         </TabsContent>
       ))}
     </Tabs>

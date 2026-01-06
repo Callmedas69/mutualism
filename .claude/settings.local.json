@@ -38,7 +38,12 @@
       "Bash(ls:*)",
       "Bash(cd:*)",
       "Bash(if exist .next rmdir /s /q .next)",
-      "Bash(if exist node_modules.cache rmdir /s /q node_modules.cache)"
+      "Bash(if exist node_modules.cache rmdir /s /q node_modules.cache)",
+      "WebFetch(domain:docs.neynar.com)",
+      "WebFetch(domain:neynar.readme.io)",
+      "Bash(timeout /t 10 /nobreak)",
+      "Bash(taskkill:*)",
+      "Bash(if exist \"D:\\\\Harry\\\\BasedNouns\\\\CodeProject\\\\quotientmutual\\\\.next\\\\dev\\\\lock\" del /F \"D:\\\\Harry\\\\BasedNouns\\\\CodeProject\\\\quotientmutual\\\\.next\\\\dev\\\\lock\")"
     ]
   },
   "enableAllProjectMcpServers": true,

@@ -49,6 +49,9 @@ export default function MiniAppTokenizeModal({
   const [error, setError] = useState<string | null>(null);
   const [coinAddress, setCoinAddress] = useState<Address | null>(null);
   const [coinUrl, setCoinUrl] = useState<string | null>(null);
+  const [registryFailed, setRegistryFailed] = useState(false);
+  const [feePaid, setFeePaid] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const { composeCast, openUrl } = useMiniAppContext();
 
@@ -170,6 +173,7 @@ export default function MiniAppTokenizeModal({
   // Trigger upload after fee confirmed
   useEffect(() => {
     if (isFeeConfirmed && step === "payment") {
+      setFeePaid(true);
       handleUploadAndCreate();
     }
   }, [isFeeConfirmed, step, handleUploadAndCreate]);
@@ -227,6 +231,7 @@ export default function MiniAppTokenizeModal({
       setStep("error");
     }
     if (registryError) {
+      setRegistryFailed(true);
       setStep("success");
     }
   }, [feeError, coinError, registryError]);
@@ -254,6 +259,8 @@ export default function MiniAppTokenizeModal({
     setError(null);
     setCoinAddress(null);
     setCoinUrl(null);
+    setRegistryFailed(false);
+    setFeePaid(false);
     onClose();
   }, [onClose]);
 
@@ -275,6 +282,38 @@ export default function MiniAppTokenizeModal({
     return () => document.removeEventListener("keydown", handleEscape);
   }, []);
 
+  // Focus trap for accessibility
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const modal = modalRef.current;
+    if (!modal) return;
+
+    const focusableElements = modal.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    // Focus first focusable element
+    setTimeout(() => firstElement?.focus(), 0);
+
+    const handleTab = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+
+      if (e.shiftKey && document.activeElement === firstElement) {
+        e.preventDefault();
+        lastElement?.focus();
+      } else if (!e.shiftKey && document.activeElement === lastElement) {
+        e.preventDefault();
+        firstElement?.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleTab);
+    return () => document.removeEventListener("keydown", handleTab);
+  }, [isOpen, step]);
+
   if (!isOpen) return null;
 
   const currentStepIndex = STEPS.findIndex((s) => s.id === step ||
@@ -282,24 +321,47 @@ export default function MiniAppTokenizeModal({
 
   const isProcessing = ["payment", "uploading", "creating", "registering"].includes(step);
 
+  // Helper for contextual error titles (casual)
+  const getErrorTitle = () => {
+    if (feeError) return "Payment didn't go through";
+    if (coinError) return "Couldn't create your coin";
+    return "Something went wrong";
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="relative w-full max-w-sm border border-zinc-200 bg-white p-5 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      role="presentation"
+    >
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tokenize-modal-title"
+        className="relative w-full max-w-sm border border-zinc-200 bg-white p-5 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900"
+      >
         {/* Close button */}
         {!isProcessing && (
           <button
             onClick={handleClose}
+            aria-label="Close tokenize modal"
             className="absolute right-3 top-3 z-10 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
           >
-            <X size={18} />
+            <X size={18} aria-hidden="true" />
           </button>
         )}
 
         {/* Simplified Progress */}
-        <div className="mb-5 flex items-center justify-center gap-2">
+        <div
+          className="mb-5 flex items-center justify-center gap-2"
+          role="group"
+          aria-label={`Step ${currentStepIndex + 1} of ${STEPS.length - 1}`}
+        >
           {STEPS.slice(0, -1).map((s, i) => (
             <div key={s.id} className="flex items-center gap-2">
               <div
+                aria-current={i === currentStepIndex ? "step" : undefined}
+                aria-label={`${s.label}: ${i < currentStepIndex ? "completed" : i === currentStepIndex ? "current" : "pending"}`}
                 className={`flex h-6 w-6 items-center justify-center text-[10px] font-bold ${
                   i < currentStepIndex
                     ? "bg-green-500 text-white"
@@ -308,10 +370,13 @@ export default function MiniAppTokenizeModal({
                     : "bg-zinc-200 text-zinc-500 dark:bg-zinc-700"
                 }`}
               >
-                {i < currentStepIndex ? <Check size={12} /> : i + 1}
+                {i < currentStepIndex ? <Check size={12} aria-hidden="true" /> : i + 1}
               </div>
               {i < STEPS.length - 2 && (
-                <div className={`h-px w-6 ${i < currentStepIndex ? "bg-green-500" : "bg-zinc-300 dark:bg-zinc-600"}`} />
+                <div
+                  className={`h-px w-6 ${i < currentStepIndex ? "bg-green-500" : "bg-zinc-300 dark:bg-zinc-600"}`}
+                  aria-hidden="true"
+                />
               )}
             </div>
           ))}
@@ -320,7 +385,7 @@ export default function MiniAppTokenizeModal({
         {/* Preview Step */}
         {step === "preview" && (
           <div className="space-y-4">
-            <h2 className="text-center text-base font-bold">Tokenize Graph</h2>
+            <h2 id="tokenize-modal-title" className="text-center text-base font-bold">Tokenize Graph</h2>
 
             <div className="space-y-2">
               <div className="flex justify-between bg-zinc-50 p-2 text-sm dark:bg-zinc-800">
@@ -357,13 +422,30 @@ export default function MiniAppTokenizeModal({
         {/* Processing Steps */}
         {isProcessing && (
           <div className="space-y-4 py-4 text-center">
-            <Loader2 className="mx-auto h-10 w-10 animate-spin text-[#f25b28]" />
-            <h2 className="text-base font-bold">
-              {step === "payment" && (isFeePending ? "Confirm in wallet" : "Processing...")}
-              {step === "uploading" && "Uploading..."}
-              {step === "creating" && (isCoinPending ? "Confirm in wallet" : "Creating...")}
-              {step === "registering" && (isRegistryPending ? "One more..." : "Registering...")}
+            <Loader2 className="mx-auto h-10 w-10 animate-spin text-[#f25b28]" aria-hidden="true" />
+            <h2 id="tokenize-modal-title" className="text-base font-bold">
+              {step === "payment" && (isFeePending ? "Approve in your wallet" : "Sending...")}
+              {step === "uploading" && "Saving your graph..."}
+              {step === "creating" && (isCoinPending ? "One more approval" : "Minting...")}
+              {step === "registering" && (isRegistryPending ? "Last one, promise!" : "Finishing up...")}
             </h2>
+            <p className="text-xs text-zinc-500">
+              {step === "payment" && "Small fee to cover costs"}
+              {step === "uploading" && "Almost ready..."}
+              {step === "creating" && "Making it official..."}
+              {step === "registering" && "Adding to the gallery..."}
+            </p>
+            {/* Transaction hash display */}
+            {(feeHash && step === "payment") && (
+              <p className="font-mono text-xs text-zinc-400">
+                Tx: {feeHash.slice(0, 8)}...{feeHash.slice(-6)}
+              </p>
+            )}
+            {(coinHash && (step === "creating" || step === "registering")) && (
+              <p className="font-mono text-xs text-zinc-400">
+                Tx: {coinHash.slice(0, 8)}...{coinHash.slice(-6)}
+              </p>
+            )}
           </div>
         )}
 
@@ -371,14 +453,26 @@ export default function MiniAppTokenizeModal({
         {step === "success" && (
           <div className="space-y-4 text-center">
             <div className="mx-auto flex h-12 w-12 items-center justify-center bg-green-500">
-              <Check className="h-6 w-6 text-white" />
+              <Check className="h-6 w-6 text-white" aria-hidden="true" />
             </div>
-            <h2 className="text-base font-bold">Live on Zora!</h2>
+            <h2 id="tokenize-modal-title" className="text-base font-bold">
+              {registryFailed ? "Coin Created" : "Live on Zora!"}
+            </h2>
 
             {coinAddress && (
               <p className="font-mono text-xs text-zinc-500">
                 {coinAddress.slice(0, 8)}...{coinAddress.slice(-6)}
               </p>
+            )}
+
+            {/* Registry failure warning */}
+            {registryFailed && (
+              <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 p-3 text-left dark:bg-amber-900/20 dark:border-amber-800">
+                <AlertCircle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                <p className="text-xs text-amber-700 dark:text-amber-400">
+                  Your coin is live but won&apos;t show in the gallery yet.
+                </p>
+              </div>
             )}
 
             <div className="flex flex-col gap-2">
@@ -393,7 +487,7 @@ export default function MiniAppTokenizeModal({
                 className="flex w-full items-center justify-center gap-1 bg-[#f25b28] py-2.5 text-xs font-medium uppercase tracking-wide text-white"
               >
                 View on Zora
-                <ExternalLink size={12} />
+                <ExternalLink size={12} aria-hidden="true" />
               </button>
               <button
                 onClick={handleClose}
@@ -409,9 +503,9 @@ export default function MiniAppTokenizeModal({
         {step === "error" && (
           <div className="space-y-4 text-center">
             <div className="mx-auto flex h-12 w-12 items-center justify-center bg-red-500">
-              <AlertCircle className="h-6 w-6 text-white" />
+              <AlertCircle className="h-6 w-6 text-white" aria-hidden="true" />
             </div>
-            <h2 className="text-base font-bold">Failed</h2>
+            <h2 id="tokenize-modal-title" className="text-base font-bold">{getErrorTitle()}</h2>
             <p className="text-sm text-red-500">{error}</p>
 
             <div className="flex gap-2">
@@ -424,11 +518,16 @@ export default function MiniAppTokenizeModal({
               <button
                 onClick={() => {
                   setError(null);
-                  setStep("preview");
+                  if (feePaid) {
+                    // Resume from upload if already paid
+                    handleUploadAndCreate();
+                  } else {
+                    setStep("preview");
+                  }
                 }}
                 className="flex-1 bg-[#f25b28] py-2.5 text-xs font-medium uppercase tracking-wide text-white"
               >
-                Retry
+                {feePaid ? "Try again (no extra fee)" : "Try again"}
               </button>
             </div>
           </div>
