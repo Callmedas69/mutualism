@@ -135,21 +135,29 @@ async function handleSnapshotUpload(
   }
 
   // Step 4: Delegate to use case
-  const result = await createSnapshot({
-    imageFile,
-    fid,
-    username,
-    view,
-    timeWindow,
-  });
+  try {
+    const result = await createSnapshot({
+      imageFile,
+      fid,
+      username,
+      view,
+      timeWindow,
+    });
 
-  // Step 5: Return response
-  return NextResponse.json({
-    folderCid: result.folderCid,
-    imageCid: result.imageCid,
-    metadataUri: result.metadataUri,
-    gatewayUrl: result.gatewayUrl,
-  });
+    // Step 5: Return response
+    return NextResponse.json({
+      folderCid: result.folderCid,
+      imageCid: result.imageCid,
+      metadataUri: result.metadataUri,
+      gatewayUrl: result.gatewayUrl,
+    });
+  } catch (error) {
+    console.error("createSnapshot failed:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Snapshot creation failed" },
+      { status: 500 }
+    );
+  }
 }
 
 // ============================================

@@ -39,8 +39,15 @@ async function uploadSnapshotInternal(
   });
 
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || "Failed to upload snapshot");
+    let errorMsg = "Failed to upload snapshot";
+    try {
+      const error = await response.json();
+      errorMsg = error.error || errorMsg;
+    } catch {
+      // Response body was empty or not valid JSON
+      errorMsg = `Server error (${response.status})`;
+    }
+    throw new Error(errorMsg);
   }
 
   return response.json();
@@ -80,8 +87,14 @@ async function uploadImage(blob: Blob, filename: string): Promise<UploadResult> 
   });
 
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || "Failed to upload image");
+    let errorMsg = "Failed to upload image";
+    try {
+      const error = await response.json();
+      errorMsg = error.error || errorMsg;
+    } catch {
+      errorMsg = `Server error (${response.status})`;
+    }
+    throw new Error(errorMsg);
   }
 
   const data: IPFSUploadResponse = await response.json();
@@ -105,8 +118,14 @@ async function uploadMetadata(metadata: CoinMetadata): Promise<string> {
   });
 
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || "Failed to upload metadata");
+    let errorMsg = "Failed to upload metadata";
+    try {
+      const error = await response.json();
+      errorMsg = error.error || errorMsg;
+    } catch {
+      errorMsg = `Server error (${response.status})`;
+    }
+    throw new Error(errorMsg);
   }
 
   const data: IPFSUploadResponse = await response.json();

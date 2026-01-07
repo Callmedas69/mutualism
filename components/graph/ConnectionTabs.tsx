@@ -33,6 +33,9 @@ export default function ConnectionTabs() {
     ? allTabs.filter((t) => t.key !== "attention")
     : allTabs;
 
+  // Mini App: Always show graph view (no list option)
+  const effectiveViewType = isMiniApp ? "graph" : viewType;
+
   const activeTabData = tabs.find((t) => t.key === activeTab);
 
   const getConnections = (tab: TabType) => {
@@ -48,7 +51,7 @@ export default function ConnectionTabs() {
 
   if (loading) {
     // Graph view: spinner style (consistent with image loading overlay)
-    if (viewType === "graph") {
+    if (effectiveViewType === "graph") {
       return (
         <div className="relative h-[600px] border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
           <div className="absolute inset-0 flex items-center justify-center">
@@ -129,8 +132,9 @@ export default function ConnectionTabs() {
           ))}
         </TabsList>
 
-        {/* View Toggle */}
-        <div className="flex">
+        {/* View Toggle - hidden in mini app (graph only) */}
+        {!isMiniApp && (
+          <div className="flex">
             <button
               onClick={() => setViewType("list")}
               className={`min-h-[44px] px-5 py-3 text-xs uppercase tracking-[0.1em] font-medium border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 ${
@@ -152,6 +156,7 @@ export default function ConnectionTabs() {
               Graph
             </button>
           </div>
+        )}
       </div>
 
       {/* Tab description */}
@@ -169,14 +174,14 @@ export default function ConnectionTabs() {
           className="mt-0 animate-in fade-in duration-300"
         >
           {/* List View */}
-          <div className={viewType === "list" ? "block" : "hidden"}>
+          <div className={effectiveViewType === "list" ? "block" : "hidden"}>
             <ConnectionList
               connections={getConnections(tab.key)}
               type={tab.key === "mutuals" ? "mutual" : tab.key}
             />
           </div>
           {/* Graph View - stays mounted to preserve state */}
-          <div className={viewType === "graph" ? "block" : "hidden"}>
+          <div className={effectiveViewType === "graph" ? "block" : "hidden"}>
             {/* Mini App: Count badge above graph */}
             {isMiniApp && (
               <div className="mb-4 text-center">
