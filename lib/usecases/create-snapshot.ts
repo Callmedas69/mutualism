@@ -6,8 +6,8 @@
  */
 
 import type { SnapshotView, TimeWindow, SnapshotUploadResponse } from "@/types/tokenize";
-import { generateSnapshotMetadata, generateFolderName } from "@/lib/services/coin-generator";
-import { uploadFileToIPFS, uploadFolderToIPFS, getGatewayUrl } from "@/lib/repositories/pinata";
+import { generateSnapshotMetadata, generateSnapshotBaseName } from "@/lib/services/coin-generator";
+import { uploadFileToIPFS, getGatewayUrl } from "@/lib/repositories/pinata";
 import { insertSnapshot } from "@/lib/repositories/snapshot-index";
 
 // ============================================
@@ -31,54 +31,56 @@ export interface CreateSnapshotResult extends SnapshotUploadResponse {
 // ============================================
 
 /**
- * Create a snapshot: upload to IPFS and record in database
+ * Create a snapshot: upload image and metadata to IPFS, record in database
  *
  * Workflow:
- * 1. Upload image to IPFS → get imageCid
- * 2. Generate metadata JSON with imageCid
- * 3. Upload folder (image + metadata) → get folderCid
- * 4. Insert pointer record into database
- * 5. Return CIDs and URIs
+ * 1. Generate base name for files
+ * 2. Upload image to IPFS → get imageCid
+ * 3. Generate metadata JSON with imageCid
+ * 4. Upload metadata to IPFS → get metadataCid
+ * 5. Insert pointer record into database
+ * 6. Return CIDs and URIs
  */
 export async function createSnapshot(
   params: CreateSnapshotParams
 ): Promise<CreateSnapshotResult> {
   const { imageFile, fid, username, view, timeWindow } = params;
 
-  // Step 1: Upload image first to get CID (needed for metadata)
-  const renamedImage = new File([imageFile], "image.png", { type: "image/png" });
-  const imageResult = await uploadFileToIPFS(renamedImage);
+  // Step 1: Generate base name for files
+  const baseName = generateSnapshotBaseName(view, fid, timeWindow);
+
+  // Step 2: Upload image with naming convention
+  const namedImage = new File([imageFile], `${baseName}.png`, { type: "image/png" });
+  const imageResult = await uploadFileToIPFS(namedImage);
   const imageCid = imageResult.cid;
 
-  // Step 2: Generate metadata with image CID
+  // Step 3: Generate metadata with image CID
   const metadata = generateSnapshotMetadata(username, fid, view, timeWindow, imageCid);
   const metadataBlob = new Blob([JSON.stringify(metadata, null, 2)], {
     type: "application/json",
   });
-  const metadataFile = new File([metadataBlob], "metadata.json", {
+  const metadataFile = new File([metadataBlob], `${baseName}.json`, {
     type: "application/json",
   });
 
-  // Step 3: Upload folder with both files
-  const folderName = generateFolderName(view, fid, timeWindow);
-  const imageForFolder = new File([imageFile], "image.png", { type: "image/png" });
-  const folderResult = await uploadFolderToIPFS([imageForFolder, metadataFile], folderName);
-  const folderCid = folderResult.cid;
+  // Step 4: Upload metadata with naming convention
+  const metadataResult = await uploadFileToIPFS(metadataFile);
+  const metadataCid = metadataResult.cid;
 
-  // Step 4: Insert database record (pointer only)
+  // Step 5: Insert database record (pointer to metadata CID)
   const dbResult = await insertSnapshot({
     user_fid: fid,
     view,
     time_window: timeWindow,
-    cid: folderCid,
+    cid: metadataCid,
   });
 
-  // Step 5: Return result
+  // Step 6: Return result
   return {
-    folderCid,
     imageCid,
-    metadataUri: `ipfs://${folderCid}/metadata.json`,
-    gatewayUrl: getGatewayUrl(folderCid),
+    metadataCid,
+    metadataUri: `ipfs://${metadataCid}`,
+    gatewayUrl: getGatewayUrl(imageCid),
     snapshotId: dbResult?.snapshot_id,
   };
 }

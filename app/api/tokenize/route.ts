@@ -146,8 +146,8 @@ async function handleSnapshotUpload(
 
     // Step 5: Return response
     return NextResponse.json({
-      folderCid: result.folderCid,
       imageCid: result.imageCid,
+      metadataCid: result.metadataCid,
       metadataUri: result.metadataUri,
       gatewayUrl: result.gatewayUrl,
     });

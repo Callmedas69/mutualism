@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { TransitionLink } from "@/components/TransitionLink";
-import { sdk } from "@farcaster/miniapp-sdk";
 import { useMiniAppContext } from "@/context/MiniAppProvider";
 
 export default function Home() {
@@ -36,11 +35,6 @@ export default function Home() {
     },
     { scope: heroRef }
   );
-
-  // Signal to Farcaster that the app is ready (hides splash screen)
-  useEffect(() => {
-    sdk.actions.ready();
-  }, []);
 
   return (
     <section

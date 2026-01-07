@@ -37,12 +37,12 @@ export interface SnapshotMetadata {
 }
 
 /**
- * Response from snapshot folder upload
+ * Response from snapshot upload
  */
 export interface SnapshotUploadResponse {
-  folderCid: string;
   imageCid: string;
-  metadataUri: string; // ipfs://{folderCid}/metadata.json
+  metadataCid: string;
+  metadataUri: string; // ipfs://{metadataCid}
   gatewayUrl: string;
 }
 

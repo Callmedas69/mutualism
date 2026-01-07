@@ -42,21 +42,6 @@ export async function uploadFileToIPFS(file: File): Promise<UploadResult> {
 }
 
 /**
- * Upload multiple files as a folder to IPFS
- */
-export async function uploadFolderToIPFS(
-  files: File[],
-  folderName: string
-): Promise<UploadResult> {
-  const upload = await pinata.upload.public.fileArray(files).name(folderName);
-
-  return {
-    cid: upload.cid,
-    gatewayUrl: `https://${PINATA_GATEWAY}/ipfs/${upload.cid}`,
-  };
-}
-
-/**
  * Get gateway URL for a CID
  */
 export function getGatewayUrl(cid: string): string {

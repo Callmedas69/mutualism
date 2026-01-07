@@ -1,122 +1,55 @@
-UnfocusedCast-BfrqOpQ4.js:41 Uncaught (in promise) Event
-UnfocusedCast-BfrqOpQ4.js:41 Uncaught (in promise) Event
-UnfocusedCast-BfrqOpQ4.js:41 Uncaught (in promise) Event
-UnfocusedCast-BfrqOpQ4.js:41 Uncaught (in promise) Event
-UnfocusedCast-BfrqOpQ4.js:41 Uncaught (in promise) Event
-UnfocusedCast-BfrqOpQ4.js:41 Uncaught (in promise) Event
-UnfocusedCast-BfrqOpQ4.js:41 Uncaught (in promise) Event
-UnfocusedCast-BfrqOpQ4.js:41 Uncaught (in promise) Event
-UnfocusedCast-BfrqOpQ4.js:41 Uncaught (in promise) Event
-UnfocusedCast-BfrqOpQ4.js:41 Uncaught (in promise) Event
-UnfocusedCast-BfrqOpQ4.js:41 Uncaught (in promise) Event
-UnfocusedCast-BfrqOpQ4.js:41 Uncaught (in promise) Event
-UnfocusedCast-BfrqOpQ4.js:41 Uncaught (in promise) Event
-UnfocusedCast-BfrqOpQ4.js:41 Uncaught (in promise) Event
-UnfocusedCast-BfrqOpQ4.js:41 Uncaught (in promise) Event
-UnfocusedCast-BfrqOpQ4.js:41 Uncaught (in promise) Event
-index-DpS8Bbnm.js:104 Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://wallet.farcaster.xyz') does not match the recipient window's origin ('https://farcaster.xyz').
-(anonymous) @ index-DpS8Bbnm.js:104
-index-DpS8Bbnm.js:104 Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://wallet.farcaster.xyz') does not match the recipient window's origin ('https://farcaster.xyz').
-(anonymous) @ index-DpS8Bbnm.js:104
-index-DpS8Bbnm.js:104 Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://wallet.farcaster.xyz') does not match the recipient window's origin ('https://farcaster.xyz').
-(anonymous) @ index-DpS8Bbnm.js:104
-index.min.js:1 Shims Injected:
-index.min.js:1   - nextTick
-api.ts:26 Object
-index.min.js:1 Shims Injected:
-index.min.js:1   - nextTick
-api.ts:26 Object
-index.min.js:1 Shims Injected:
-index.min.js:1   - nextTick
-api.ts:26 Object
-Api.ts:26 Object
-Api.ts:26 Object
-Api.ts:26 Object
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-[Intervention] Slow network is detected. See <URL> for more details. Fallback font will be used while loading: <URL>
-instrumentMethod.js:67 Connecting to 'https://explorer-api.walletconnect.com/v3/wallets?projectId=34357d3c125c2bcf2ce2bc3309d98715' violates the following Content Security Policy directive: "connect-src 'self' https://farcaster.xyz https://client.farcaster.xyz https://warpcast.com https://client.warpcast.com https://wrpcd.net https://*.wrpcd.net https://privy.farcaster.xyz https://privy.warpcast.com https://auth.privy.io https://*.rpc.privy.systems https://cloudflareinsights.com". The action has been blocked.
-h @ instrumentMethod.js:67
-instrumentMethod.js:67 Fetch API cannot load https://explorer-api.walletconnect.com/v3/wallets?projectId=34357d3c125c2bcf2ce2bc3309d98715. Refused to connect because it violates the document's Content Security Policy.
-h @ instrumentMethod.js:67
-consoleObservable.js:33 TypeError: Failed to fetch. Refused to connect because it violates the document's Content Security Policy.
-    at h (instrumentMethod.js:67:31)
-    at privy-provider-Dg-HUZ-W.js:9:1544
-    at privy-provider-Dg-HUZ-W.js:9:1415
-    at eu (react-dom-client.production.js:7485:24)
-    at Uu (react-dom-client.production.js:8940:23)
-    at Iu (react-dom-client.production.js:8915:7)
-    at Uu (react-dom-client.production.js:9034:7)
-    at Iu (react-dom-client.production.js:8915:7)
-    at Uu (react-dom-client.production.js:8934:7)
-    at Iu (react-dom-client.production.js:8915:7)
-t.globalConsole.<computed> @ consoleObservable.js:33
-instrumentMethod.js:67 Connecting to 'https://explorer-api.walletconnect.com/v3/wallets?projectId=34357d3c125c2bcf2ce2bc3309d98715' violates the following Content Security Policy directive: "connect-src 'self' https://farcaster.xyz https://client.farcaster.xyz https://warpcast.com https://client.warpcast.com https://wrpcd.net https://*.wrpcd.net https://privy.farcaster.xyz https://privy.warpcast.com https://auth.privy.io https://*.rpc.privy.systems https://cloudflareinsights.com". The action has been blocked.
-h @ instrumentMethod.js:67
-instrumentMethod.js:67 Fetch API cannot load https://explorer-api.walletconnect.com/v3/wallets?projectId=34357d3c125c2bcf2ce2bc3309d98715. Refused to connect because it violates the document's Content Security Policy.
-h @ instrumentMethod.js:67
-consoleObservable.js:33 TypeError: Failed to fetch. Refused to connect because it violates the document's Content Security Policy.
-    at h (instrumentMethod.js:67:31)
-    at privy-provider-Dg-HUZ-W.js:9:1544
-    at privy-provider-Dg-HUZ-W.js:9:1415
-    at eu (react-dom-client.production.js:7485:24)
-    at Uu (react-dom-client.production.js:8940:23)
-    at Iu (react-dom-client.production.js:8915:7)
-    at Uu (react-dom-client.production.js:9034:7)
-    at Iu (react-dom-client.production.js:8915:7)
-    at Uu (react-dom-client.production.js:8934:7)
-    at Iu (react-dom-client.production.js:8915:7)
-t.globalConsole.<computed> @ consoleObservable.js:33
-privy-provider-Dg-HUZ-W.js:26 Failed to add embedded wallet connector: Wallet proxy not initialized
-privy-provider-Dg-HUZ-W.js:26 Failed to add embedded wallet connector: Wallet proxy not initialized
-privy-provider-Dg-HUZ-W.js:26 Failed to add embedded wallet connector: Wallet proxy not initialized
-embedded-wallets-68d21a7852e6275e.js?dpl=dpl_DsskEMwfNrk44GQzC6oHVNSssJ9X:1 Warning!
-embedded-wallets-68d21a7852e6275e.js?dpl=dpl_DsskEMwfNrk44GQzC6oHVNSssJ9X:1 You are reading this message because you opened the browser console, a developer tool. Do not enter or paste code you do not understand. Never share your tokens or any other info with anyone. If someone told you to do this, it is very likely a scam.
-embedded-wallets-68d21a7852e6275e.js?dpl=dpl_DsskEMwfNrk44GQzC6oHVNSssJ9X:1 Warning!
-embedded-wallets-68d21a7852e6275e.js?dpl=dpl_DsskEMwfNrk44GQzC6oHVNSssJ9X:1 You are reading this message because you opened the browser console, a developer tool. Do not enter or paste code you do not understand. Never share your tokens or any other info with anyone. If someone told you to do this, it is very likely a scam.
-embedded-wallets-68d21a7852e6275e.js?dpl=dpl_DsskEMwfNrk44GQzC6oHVNSssJ9X:1 Warning!
-embedded-wallets-68d21a7852e6275e.js?dpl=dpl_DsskEMwfNrk44GQzC6oHVNSssJ9X:1 You are reading this message because you opened the browser console, a developer tool. Do not enter or paste code you do not understand. Never share your tokens or any other info with anyone. If someone told you to do this, it is very likely a scam.
-privy-provider-Dg-HUZ-W.js:1 Embedded1193Provider.request() called with args Object
-privy-provider-Dg-HUZ-W.js:1 eth_accounts for privy: Array(1)
-privy-provider-Dg-HUZ-W.js:1 Embedded1193Provider.request() called with args Object
-privy-provider-Dg-HUZ-W.js:1 Embedded1193Provider.request() called with args Object
-privy-provider-Dg-HUZ-W.js:1 eth_accounts for privy: Array(1)
-privy-provider-Dg-HUZ-W.js:1 Embedded1193Provider.request() called with args Object
-privy-provider-Dg-HUZ-W.js:1 Embedded1193Provider.request() called with args Object
-privy-provider-Dg-HUZ-W.js:1 eth_accounts for privy: Array(1)
-privy-provider-Dg-HUZ-W.js:1 Embedded1193Provider.request() called with args Object
-5714-ed5065a58a5afe45.js?dpl=dpl_DsskEMwfNrk44GQzC6oHVNSssJ9X:1 Successfully verified access token.
-5714-ed5065a58a5afe45.js?dpl=dpl_DsskEMwfNrk44GQzC6oHVNSssJ9X:1 Successfully verified access token.
-5714-ed5065a58a5afe45.js?dpl=dpl_DsskEMwfNrk44GQzC6oHVNSssJ9X:1 Successfully verified access token.
-privy-provider-Dg-HUZ-W.js:1 Embedded1193Provider.request() called with args Object
-privy-provider-Dg-HUZ-W.js:1 Embedded1193Provider.request() called with args Object
-privy-provider-Dg-HUZ-W.js:1 Embedded1193Provider.request() called with args Object
-privy-provider-Dg-HUZ-W.js:1 Embedded1193Provider.request() called with args Object
-privy-provider-Dg-HUZ-W.js:1 Embedded1193Provider.request() called with args Object
+index-DpS8Bbnm.js:9 Fetch finished loading: GET "https://farcaster.xyz/~api/v2/unseen".
+fetch @ index-DpS8Bbnm.js:9
+authedGet @ index-DpS8Bbnm.js:9
+getUnseen @ index-DpS8Bbnm.js:9
+(anonymous) @ index-DpS8Bbnm.js:10
+(anonymous) @ index-DpS8Bbnm.js:10
+(anonymous) @ index-DpS8Bbnm.js:10
+index-DpS8Bbnm.js:28 Error: <svg> attribute width: Expected length, "small".
+tt @ index-DpS8Bbnm.js:28
+Dr @ index-DpS8Bbnm.js:29
+on @ index-DpS8Bbnm.js:29
+Zp @ index-DpS8Bbnm.js:28
+so @ index-DpS8Bbnm.js:28
+rf @ index-DpS8Bbnm.js:28
+th @ index-DpS8Bbnm.js:28
+Jc @ index-DpS8Bbnm.js:28
+Xd @ index-DpS8Bbnm.js:28
+ff @ index-DpS8Bbnm.js:28
+ds @ index-DpS8Bbnm.js:28
+lh @ index-DpS8Bbnm.js:28
+(anonymous) @ index-DpS8Bbnm.js:28
+index-DpS8Bbnm.js:28 Error: <svg> attribute height: Expected length, "small".
+tt @ index-DpS8Bbnm.js:28
+Dr @ index-DpS8Bbnm.js:29
+on @ index-DpS8Bbnm.js:29
+Zp @ index-DpS8Bbnm.js:28
+so @ index-DpS8Bbnm.js:28
+rf @ index-DpS8Bbnm.js:28
+th @ index-DpS8Bbnm.js:28
+Jc @ index-DpS8Bbnm.js:28
+Xd @ index-DpS8Bbnm.js:28
+ff @ index-DpS8Bbnm.js:28
+ds @ index-DpS8Bbnm.js:28
+lh @ index-DpS8Bbnm.js:28
+(anonymous) @ index-DpS8Bbnm.js:28
+386b32918697c892.js:1  POST https://mutualism.geoart.studio/api/tokenize 500 (Internal Server Error)
+r @ 386b32918697c892.js:1
+t.retries @ 386b32918697c892.js:1
+t @ 386b32918697c892.js:1
+  POST https://mutualism.geoart.studio/api/tokenize 500 (Internal Server Error)
+r @ mutualism.geoart.stu…6b32918697c892.js:1
+t.retries @ mutualism.geoart.stu…6b32918697c892.js:1
+t @ mutualism.geoart.stu…6b32918697c892.js:1
+452b45e8af15d233.js:1 Failed to create snapshot: Error: Authentication failed: {"error":{"reason":"NO_SCOPES_FOUND","details":"This key does not have the required scopes associated with it"}}
+    at r (386b32918697c892.js:1:938)
+    at async t (386b32918697c892.js:1:406)
+    at async h (452b45e8af15d233.js:1:30543)
+h @ 452b45e8af15d233.js:1
+386b32918697c892.js:1 Fetch failed loading: POST "https://mutualism.geoart.studio/api/tokenize".
+r @ 386b32918697c892.js:1
+t.retries @ 386b32918697c892.js:1
+t @ 386b32918697c892.js:1
 index-DpS8Bbnm.js:304 frameEvent {event: 'eip6963:announceProvider', info: {…}}
 index-DpS8Bbnm.js:304 frameEvent {event: 'eip6963:announceProvider', info: {…}}
 index-DpS8Bbnm.js:304 frameEvent {event: 'eip6963:announceProvider', info: {…}}
@@ -126,7 +59,8 @@ index-DpS8Bbnm.js:304 [miniapp-host] eth provider req:  {id: 1, method: 'eth_req
 index-DpS8Bbnm.js:304 [miniapp-host] eth provider req:  {id: 2, method: 'eth_accounts', jsonrpc: '2.0'}
 EmbeddedWalletContext.tsx:844 Embedded1193Provider.request() called with args {id: 2, method: 'eth_accounts', jsonrpc: '2.0'}
 index-DpS8Bbnm.js:304 [miniapp-host] eth provider res:  {result: Array(1), id: 2, jsonrpc: '2.0'}
-index-DpS8Bbnm.js:304 [miniapp-host] eth provider req:  {id: 3, method: 'eth_requestAccounts', jsonrpc: '2.0'}
+index-DpS8Bbnm.js:304 [miniapp-host] eth provider res:  {result: Array(1), id: 0, jsonrpc: '2.0'}
+index-DpS8Bbnm.js:304 [miniapp-host] eth provider res:  {result: Array(1), id: 1, jsonrpc: '2.0'}
 e2177aeedf651648.js:1 GSAP target .hero-tag not found. https://gsap.com
 tu @ e2177aeedf651648.js:1
 i @ e2177aeedf651648.js:1
@@ -280,10 +214,8 @@ sb @ 7b52218c954dfa8e.js:1
 sh @ 7b52218c954dfa8e.js:1
 u7 @ 7b52218c954dfa8e.js:1
 u9 @ 7b52218c954dfa8e.js:1
-sH @ 7b52218c954dfa8e.js:1
-sA @ 7b52218c954dfa8e.js:1
-sU @ 7b52218c954dfa8e.js:1
-(anonymous) @ 7b52218c954dfa8e.js:1
+sV @ 7b52218c954dfa8e.js:1
+O @ 7b52218c954dfa8e.js:1
 e2177aeedf651648.js:1 GSAP target  not found. https://gsap.com
 tu @ e2177aeedf651648.js:1
 i @ e2177aeedf651648.js:1
@@ -442,10 +374,8 @@ sb @ 7b52218c954dfa8e.js:1
 sh @ 7b52218c954dfa8e.js:1
 u7 @ 7b52218c954dfa8e.js:1
 u9 @ 7b52218c954dfa8e.js:1
-sH @ 7b52218c954dfa8e.js:1
-sA @ 7b52218c954dfa8e.js:1
-sU @ 7b52218c954dfa8e.js:1
-(anonymous) @ 7b52218c954dfa8e.js:1
+sV @ 7b52218c954dfa8e.js:1
+O @ 7b52218c954dfa8e.js:1
 e2177aeedf651648.js:1 GSAP target .hero-subtext not found. https://gsap.com
 tu @ e2177aeedf651648.js:1
 i @ e2177aeedf651648.js:1
@@ -599,10 +529,8 @@ sb @ 7b52218c954dfa8e.js:1
 sh @ 7b52218c954dfa8e.js:1
 u7 @ 7b52218c954dfa8e.js:1
 u9 @ 7b52218c954dfa8e.js:1
-sH @ 7b52218c954dfa8e.js:1
-sA @ 7b52218c954dfa8e.js:1
-sU @ 7b52218c954dfa8e.js:1
-(anonymous) @ 7b52218c954dfa8e.js:1
+sV @ 7b52218c954dfa8e.js:1
+O @ 7b52218c954dfa8e.js:1
 e2177aeedf651648.js:1 GSAP target  not found. https://gsap.com
 tu @ e2177aeedf651648.js:1
 i @ e2177aeedf651648.js:1
@@ -761,10 +689,8 @@ sb @ 7b52218c954dfa8e.js:1
 sh @ 7b52218c954dfa8e.js:1
 u7 @ 7b52218c954dfa8e.js:1
 u9 @ 7b52218c954dfa8e.js:1
-sH @ 7b52218c954dfa8e.js:1
-sA @ 7b52218c954dfa8e.js:1
-sU @ 7b52218c954dfa8e.js:1
-(anonymous) @ 7b52218c954dfa8e.js:1
+sV @ 7b52218c954dfa8e.js:1
+O @ 7b52218c954dfa8e.js:1
 e2177aeedf651648.js:1 GSAP target .hero-cta not found. https://gsap.com
 tu @ e2177aeedf651648.js:1
 i @ e2177aeedf651648.js:1
@@ -918,10 +844,8 @@ sb @ 7b52218c954dfa8e.js:1
 sh @ 7b52218c954dfa8e.js:1
 u7 @ 7b52218c954dfa8e.js:1
 u9 @ 7b52218c954dfa8e.js:1
-sH @ 7b52218c954dfa8e.js:1
-sA @ 7b52218c954dfa8e.js:1
-sU @ 7b52218c954dfa8e.js:1
-(anonymous) @ 7b52218c954dfa8e.js:1
+sV @ 7b52218c954dfa8e.js:1
+O @ 7b52218c954dfa8e.js:1
 e2177aeedf651648.js:1 GSAP target  not found. https://gsap.com
 tu @ e2177aeedf651648.js:1
 i @ e2177aeedf651648.js:1
@@ -1080,26 +1004,56 @@ sb @ 7b52218c954dfa8e.js:1
 sh @ 7b52218c954dfa8e.js:1
 u7 @ 7b52218c954dfa8e.js:1
 u9 @ 7b52218c954dfa8e.js:1
-sH @ 7b52218c954dfa8e.js:1
-sA @ 7b52218c954dfa8e.js:1
-sU @ 7b52218c954dfa8e.js:1
+sV @ 7b52218c954dfa8e.js:1
+O @ 7b52218c954dfa8e.js:1
+index-DpS8Bbnm.js:304 [miniapp-host] eth provider req:  {id: 3, method: 'eth_requestAccounts', jsonrpc: '2.0'}
+index-DpS8Bbnm.js:304 [miniapp-host] eth provider req:  {id: 4, method: 'eth_chainId', jsonrpc: '2.0'}
+index-DpS8Bbnm.js:304 [miniapp-host] eth provider req:  {id: 5, method: 'eth_chainId', jsonrpc: '2.0'}
+EmbeddedWalletContext.tsx:844 Embedded1193Provider.request() called with args {id: 4, method: 'eth_chainId', jsonrpc: '2.0'}
+EmbeddedWalletContext.tsx:844 Embedded1193Provider.request() called with args {id: 5, method: 'eth_chainId', jsonrpc: '2.0'}
+index-DpS8Bbnm.js:304 [miniapp-host] eth provider res:  {result: Array(1), id: 3, jsonrpc: '2.0'}
+index-DpS8Bbnm.js:304 [miniapp-host] eth provider res:  {result: '0x2105', id: 4, jsonrpc: '2.0'}
+index-DpS8Bbnm.js:304 [miniapp-host] eth provider res:  {result: '0x2105', id: 5, jsonrpc: '2.0'}
+index-DpS8Bbnm.js:304 [miniapp-host] eth provider req:  {id: 6, method: 'eth_chainId', jsonrpc: '2.0'}
+EmbeddedWalletContext.tsx:844 Embedded1193Provider.request() called with args {id: 6, method: 'eth_chainId', jsonrpc: '2.0'}
+index-DpS8Bbnm.js:304 [miniapp-host] eth provider res:  {result: '0x2105', id: 6, jsonrpc: '2.0'}
+9a0de06be778fc67.js:1 Fetch finished loading: GET "https://api.web3modal.org/appkit/v1/config?projectId=c10cf385fa20b73432bdfc5eb4b92f53&st=appkit&sv=html-core-1.7.8".
+o @ 9a0de06be778fc67.js:1
+get @ 9a0de06be778fc67.js:1
+fetchProjectConfig @ 9a0de06be778fc67.js:2
+fetchRemoteFeatures @ e7cb5d0e5a6b9fcb.js:10
+initialize @ e7cb5d0e5a6b9fcb.js:10
+await in initialize
+hf @ e7cb5d0e5a6b9fcb.js:10
+hm @ e7cb5d0e5a6b9fcb.js:10
+hw @ e7cb5d0e5a6b9fcb.js:10
+initialize @ 0194d4a436410713.js:10
+await in initialize
+init @ 0194d4a436410713.js:10
+o @ eb0481aa498dd176.js:1
+await in o
+getProvider @ eb0481aa498dd176.js:1
+setup @ eb0481aa498dd176.js:1
+v @ eb0481aa498dd176.js:1
+(anonymous) @ eb0481aa498dd176.js:1
+na @ eb0481aa498dd176.js:1
+no @ eb0481aa498dd176.js:1
+nA @ eb0481aa498dd176.js:1
+o$ @ eb0481aa498dd176.js:1
+module evaluation @ eb0481aa498dd176.js:1
+q @ turbopack-c49b87e8a8135adb.js:4
+B @ turbopack-c49b87e8a8135adb.js:4
+i.r @ turbopack-c49b87e8a8135adb.js:1
+f @ 1ea72d1be604ca55.js:1
+k @ 1ea72d1be604ca55.js:1
+E @ 1ea72d1be604ca55.js:1
+lC @ 7b52218c954dfa8e.js:1
+io @ 7b52218c954dfa8e.js:1
+sc @ 7b52218c954dfa8e.js:1
 (anonymous) @ 7b52218c954dfa8e.js:1
-index-DpS8Bbnm.js:9 Fetch finished loading: POST "https://farcaster.xyz/~api/v1/analytics-events".
-fetch @ index-DpS8Bbnm.js:9
-fetchWithRetry @ index-DpS8Bbnm.js:9
-post @ index-DpS8Bbnm.js:9
-recordAnalyticsEvents @ index-DpS8Bbnm.js:9
-(anonymous) @ index-DpS8Bbnm.js:10
-index-DpS8Bbnm.js:9 Fetch finished loading: PUT "https://farcaster.xyz/~api/v2/mini-app-event".
-fetch @ index-DpS8Bbnm.js:9
-fetchWithRetry @ index-DpS8Bbnm.js:9
-put @ index-DpS8Bbnm.js:9
-putMiniAppEvent @ index-DpS8Bbnm.js:9
-(anonymous) @ index-DpS8Bbnm.js:13
-(anonymous) @ index-DpS8Bbnm.js:319
-await in (anonymous)
-(anonymous) @ index-DpS8Bbnm.js:304
-n @ index-DpS8Bbnm.js:304
+u9 @ 7b52218c954dfa8e.js:1
+sV @ 7b52218c954dfa8e.js:1
+O @ 7b52218c954dfa8e.js:1
 1ea72d1be604ca55.js:1 Fetch finished loading: GET "https://mutualism.geoart.studio/graph?_rsc=vusbg".
 R @ 1ea72d1be604ca55.js:1
 b @ 1ea72d1be604ca55.js:1
@@ -1259,93 +1213,186 @@ uf @ 7b52218c954dfa8e.js:1
 uc @ 7b52218c954dfa8e.js:1
 uf @ 7b52218c954dfa8e.js:1
 sE @ 7b52218c954dfa8e.js:1
-sS @ 7b52218c954dfa8e.js:1
-sw @ 7b52218c954dfa8e.js:1
-sh @ 7b52218c954dfa8e.js:1
-u7 @ 7b52218c954dfa8e.js:1
-u9 @ 7b52218c954dfa8e.js:1
-sH @ 7b52218c954dfa8e.js:1
-sA @ 7b52218c954dfa8e.js:1
-sU @ 7b52218c954dfa8e.js:1
 (anonymous) @ 7b52218c954dfa8e.js:1
-index-DpS8Bbnm.js:90 XHR finished loading: POST "https://farcaster.xyz/~api/v2/amp/api".
-j @ index-DpS8Bbnm.js:90
-Request$1.send @ index-DpS8Bbnm.js:106
-e @ index-DpS8Bbnm.js:106
-e @ index-DpS8Bbnm.js:106
-e @ index-DpS8Bbnm.js:106
-e @ index-DpS8Bbnm.js:106
-e @ index-DpS8Bbnm.js:106
-logEvent @ index-DpS8Bbnm.js:106
-(anonymous) @ index-DpS8Bbnm.js:215
-(anonymous) @ index-DpS8Bbnm.js:215
-(anonymous) @ index-DpS8Bbnm.js:10
-(anonymous) @ index-DpS8Bbnm.js:319
-await in (anonymous)
-(anonymous) @ index-DpS8Bbnm.js:304
-n @ index-DpS8Bbnm.js:304
-VM49 fec8a31d76d1f9b4.js:1 Fetching data for fid: 22420
-AbstractFarcasterApiClient.js:235 Fetch finished loading: GET "https://client.warpcast.com/v2/user-by-fid?fid=22420".
-h @ instrumentMethod.js:67
-fetch @ AbstractFarcasterApiClient.js:235
-authedGet @ AbstractFarcasterApiClient.js:322
-getUserByFID @ FarcasterApiClient.js:4569
-(anonymous) @ buildUserByFidFetcher.js:2
-fetchFn @ query.js:204
-b @ retryer.js:87
-start @ retryer.js:129
-fetch @ query.js:290
-fetchOptimistic @ queryObserver.js:183
-e.fetchOptimistic @ suspense.js:15
-_e2.useBaseQuery @ useBaseQuery.js:66
-e.useSuspenseQuery @ useSuspenseQuery.js:13
-e.useUserByFid @ useUserByFid.js:9
-x @ WalletAuthentication.tsx:43
-Ea @ react-dom-client.production.js:3681
-fi @ react-dom-client.production.js:5637
-Ni @ react-dom-client.production.js:6666
-fc @ react-dom-client.production.js:10860
-uc @ react-dom-client.production.js:10743
-ic @ react-dom-client.production.js:10724
-Ys @ react-dom-client.production.js:10287
-Rc @ react-dom-client.production.js:11471
-E @ scheduler.production.js:143
-9a0de06be778fc67.js:1 Fetch finished loading: GET "https://api.web3modal.org/appkit/v1/config?projectId=c10cf385fa20b73432bdfc5eb4b92f53&st=appkit&sv=html-core-1.7.8".
-o @ 9a0de06be778fc67.js:1
-get @ 9a0de06be778fc67.js:1
-fetchProjectConfig @ 9a0de06be778fc67.js:2
-fetchRemoteFeatures @ e7cb5d0e5a6b9fcb.js:10
-initialize @ e7cb5d0e5a6b9fcb.js:10
-await in initialize
-hf @ e7cb5d0e5a6b9fcb.js:10
-hm @ e7cb5d0e5a6b9fcb.js:10
-hw @ e7cb5d0e5a6b9fcb.js:10
-initialize @ 0194d4a436410713.js:10
-await in initialize
-init @ 0194d4a436410713.js:10
-o @ eb0481aa498dd176.js:1
-await in o
-getProvider @ eb0481aa498dd176.js:1
-setup @ eb0481aa498dd176.js:1
-v @ eb0481aa498dd176.js:1
-(anonymous) @ eb0481aa498dd176.js:1
-na @ eb0481aa498dd176.js:1
-no @ eb0481aa498dd176.js:1
-nA @ eb0481aa498dd176.js:1
-o$ @ eb0481aa498dd176.js:1
-module evaluation @ eb0481aa498dd176.js:1
-q @ turbopack-c49b87e8a8135adb.js:4
-B @ turbopack-c49b87e8a8135adb.js:4
-i.r @ turbopack-c49b87e8a8135adb.js:1
-f @ 1ea72d1be604ca55.js:1
-k @ 1ea72d1be604ca55.js:1
-E @ 1ea72d1be604ca55.js:1
-lC @ 7b52218c954dfa8e.js:1
-io @ 7b52218c954dfa8e.js:1
-sc @ 7b52218c954dfa8e.js:1
+O @ 7b52218c954dfa8e.js:1
+VM149 452b45e8af15d233.js:1 Fetching data for fid: 22420
+VM149 452b45e8af15d233.js:1 Fetch finished loading: POST "https://mutualism.geoart.studio/api/connections".
+(anonymous) @ VM149 452b45e8af15d233.js:1
+(anonymous) @ VM149 452b45e8af15d233.js:1
+ih @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+uc @ 7b52218c954dfa8e.js:1
+uf @ 7b52218c954dfa8e.js:1
+sE @ 7b52218c954dfa8e.js:1
 (anonymous) @ 7b52218c954dfa8e.js:1
-u9 @ 7b52218c954dfa8e.js:1
-sV @ 7b52218c954dfa8e.js:1
 O @ 7b52218c954dfa8e.js:1
 9a0de06be778fc67.js:1 Fetch finished loading: POST "https://pulse.walletconnect.org/e?projectId=c10cf385fa20b73432bdfc5eb4b92f53&st=appkit&sv=html-core-1.7.8".
 o @ 9a0de06be778fc67.js:1
@@ -1385,9 +1432,10 @@ sc @ 7b52218c954dfa8e.js:1
 u9 @ 7b52218c954dfa8e.js:1
 sV @ 7b52218c954dfa8e.js:1
 O @ 7b52218c954dfa8e.js:1
-VM49 fec8a31d76d1f9b4.js:1 Fetch finished loading: POST "https://mutualism.geoart.studio/api/connections/all".
-(anonymous) @ VM49 fec8a31d76d1f9b4.js:1
-(anonymous) @ VM49 fec8a31d76d1f9b4.js:1
+VM149 452b45e8af15d233.js:1 Fetched mutuals: 100
+VM149 452b45e8af15d233.js:1 Fetch finished loading: POST "https://mutualism.geoart.studio/api/connections/all".
+(anonymous) @ VM149 452b45e8af15d233.js:1
+(anonymous) @ VM149 452b45e8af15d233.js:1
 ih @ 7b52218c954dfa8e.js:1
 uf @ 7b52218c954dfa8e.js:1
 uc @ 7b52218c954dfa8e.js:1
@@ -1563,186 +1611,72 @@ uf @ 7b52218c954dfa8e.js:1
 sE @ 7b52218c954dfa8e.js:1
 (anonymous) @ 7b52218c954dfa8e.js:1
 O @ 7b52218c954dfa8e.js:1
-VM49 fec8a31d76d1f9b4.js:1 Fetched mutuals: 100
-VM49 fec8a31d76d1f9b4.js:1 Fetch finished loading: POST "https://mutualism.geoart.studio/api/connections".
-(anonymous) @ VM49 fec8a31d76d1f9b4.js:1
-(anonymous) @ VM49 fec8a31d76d1f9b4.js:1
-ih @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-uc @ 7b52218c954dfa8e.js:1
-uf @ 7b52218c954dfa8e.js:1
-sE @ 7b52218c954dfa8e.js:1
+VM148 386b32918697c892.js:1  POST https://mutualism.geoart.studio/api/tokenize 500 (Internal Server Error)
+r @ VM148 386b32918697c892.js:1
+t.retries @ VM148 386b32918697c892.js:1
+t @ VM148 386b32918697c892.js:1
+n @ VM148 386b32918697c892.js:1
+h @ VM149 452b45e8af15d233.js:1
+await in h
+sY @ 7b52218c954dfa8e.js:1
 (anonymous) @ 7b52218c954dfa8e.js:1
-O @ 7b52218c954dfa8e.js:1
-830a02178f30a4f7.js:1 [Violation] 'requestAnimationFrame' handler took 829ms
+tD @ 7b52218c954dfa8e.js:1
+s3 @ 7b52218c954dfa8e.js:1
+fC @ 7b52218c954dfa8e.js:1
+fP @ 7b52218c954dfa8e.js:1
+VM148 386b32918697c892.js:1 Fetch failed loading: POST "https://mutualism.geoart.studio/api/tokenize".
+r @ VM148 386b32918697c892.js:1
+t.retries @ VM148 386b32918697c892.js:1
+t @ VM148 386b32918697c892.js:1
+n @ VM148 386b32918697c892.js:1
+h @ VM149 452b45e8af15d233.js:1
+await in h
+sY @ 7b52218c954dfa8e.js:1
+(anonymous) @ 7b52218c954dfa8e.js:1
+tD @ 7b52218c954dfa8e.js:1
+s3 @ 7b52218c954dfa8e.js:1
+fC @ 7b52218c954dfa8e.js:1
+fP @ 7b52218c954dfa8e.js:1
+VM148 386b32918697c892.js:1  POST https://mutualism.geoart.studio/api/tokenize 500 (Internal Server Error)
+r @ VM148 386b32918697c892.js:1
+t.retries @ VM148 386b32918697c892.js:1
+t @ VM148 386b32918697c892.js:1
+await in t
+n @ VM148 386b32918697c892.js:1
+h @ VM149 452b45e8af15d233.js:1
+await in h
+sY @ 7b52218c954dfa8e.js:1
+(anonymous) @ 7b52218c954dfa8e.js:1
+tD @ 7b52218c954dfa8e.js:1
+s3 @ 7b52218c954dfa8e.js:1
+fC @ 7b52218c954dfa8e.js:1
+fP @ 7b52218c954dfa8e.js:1
+VM149 452b45e8af15d233.js:1 Failed to create snapshot: Error: Authentication failed: {"error":{"reason":"NO_SCOPES_FOUND","details":"This key does not have the required scopes associated with it"}}
+    at r (VM148 386b32918697c892.js:1:938)
+    at async t (386b32918697c892.js:1:406)
+    at async h (452b45e8af15d233.js:1:30543)
+h @ VM149 452b45e8af15d233.js:1
+await in h
+sY @ 7b52218c954dfa8e.js:1
+(anonymous) @ 7b52218c954dfa8e.js:1
+tD @ 7b52218c954dfa8e.js:1
+s3 @ 7b52218c954dfa8e.js:1
+fC @ 7b52218c954dfa8e.js:1
+fP @ 7b52218c954dfa8e.js:1
+VM148 386b32918697c892.js:1 Fetch failed loading: POST "https://mutualism.geoart.studio/api/tokenize".
+r @ VM148 386b32918697c892.js:1
+t.retries @ VM148 386b32918697c892.js:1
+t @ VM148 386b32918697c892.js:1
+await in t
+n @ VM148 386b32918697c892.js:1
+h @ VM149 452b45e8af15d233.js:1
+await in h
+sY @ 7b52218c954dfa8e.js:1
+(anonymous) @ 7b52218c954dfa8e.js:1
+tD @ 7b52218c954dfa8e.js:1
+s3 @ 7b52218c954dfa8e.js:1
+fC @ 7b52218c954dfa8e.js:1
+fP @ 7b52218c954dfa8e.js:1
 index-DpS8Bbnm.js:9 Fetch finished loading: GET "https://farcaster.xyz/~api/v2/unseen".
 fetch @ index-DpS8Bbnm.js:9
 authedGet @ index-DpS8Bbnm.js:9
@@ -1750,67 +1684,3 @@ getUnseen @ index-DpS8Bbnm.js:9
 (anonymous) @ index-DpS8Bbnm.js:10
 (anonymous) @ index-DpS8Bbnm.js:10
 (anonymous) @ index-DpS8Bbnm.js:10
-[Violation] 'click' handler took 853ms
-VM48 0c1705688ebf6c89.js:1  POST https://mutualism.geoart.studio/api/tokenize 500 (Internal Server Error)
-r @ VM48 0c1705688ebf6c89.js:1
-t.retries @ VM48 0c1705688ebf6c89.js:1
-t @ VM48 0c1705688ebf6c89.js:1
-n @ VM48 0c1705688ebf6c89.js:1
-h @ VM49 fec8a31d76d1f9b4.js:1
-await in h
-sY @ 7b52218c954dfa8e.js:1
-(anonymous) @ 7b52218c954dfa8e.js:1
-tD @ 7b52218c954dfa8e.js:1
-s3 @ 7b52218c954dfa8e.js:1
-fC @ 7b52218c954dfa8e.js:1
-fP @ 7b52218c954dfa8e.js:1
-VM48 0c1705688ebf6c89.js:1 Fetch failed loading: POST "https://mutualism.geoart.studio/api/tokenize".
-r @ VM48 0c1705688ebf6c89.js:1
-t.retries @ VM48 0c1705688ebf6c89.js:1
-t @ VM48 0c1705688ebf6c89.js:1
-n @ VM48 0c1705688ebf6c89.js:1
-h @ VM49 fec8a31d76d1f9b4.js:1
-await in h
-sY @ 7b52218c954dfa8e.js:1
-(anonymous) @ 7b52218c954dfa8e.js:1
-tD @ 7b52218c954dfa8e.js:1
-s3 @ 7b52218c954dfa8e.js:1
-fC @ 7b52218c954dfa8e.js:1
-fP @ 7b52218c954dfa8e.js:1
-VM48 0c1705688ebf6c89.js:1  POST https://mutualism.geoart.studio/api/tokenize 500 (Internal Server Error)
-r @ VM48 0c1705688ebf6c89.js:1
-t.retries @ VM48 0c1705688ebf6c89.js:1
-t @ VM48 0c1705688ebf6c89.js:1
-await in t
-n @ VM48 0c1705688ebf6c89.js:1
-h @ VM49 fec8a31d76d1f9b4.js:1
-await in h
-sY @ 7b52218c954dfa8e.js:1
-(anonymous) @ 7b52218c954dfa8e.js:1
-tD @ 7b52218c954dfa8e.js:1
-s3 @ 7b52218c954dfa8e.js:1
-fC @ 7b52218c954dfa8e.js:1
-fP @ 7b52218c954dfa8e.js:1
-VM49 fec8a31d76d1f9b4.js:1 Failed to create snapshot: SyntaxError: Unexpected end of JSON input
-h @ VM49 fec8a31d76d1f9b4.js:1
-await in h
-sY @ 7b52218c954dfa8e.js:1
-(anonymous) @ 7b52218c954dfa8e.js:1
-tD @ 7b52218c954dfa8e.js:1
-s3 @ 7b52218c954dfa8e.js:1
-fC @ 7b52218c954dfa8e.js:1
-fP @ 7b52218c954dfa8e.js:1
-VM48 0c1705688ebf6c89.js:1 Fetch failed loading: POST "https://mutualism.geoart.studio/api/tokenize".
-r @ VM48 0c1705688ebf6c89.js:1
-t.retries @ VM48 0c1705688ebf6c89.js:1
-t @ VM48 0c1705688ebf6c89.js:1
-await in t
-n @ VM48 0c1705688ebf6c89.js:1
-h @ VM49 fec8a31d76d1f9b4.js:1
-await in h
-sY @ 7b52218c954dfa8e.js:1
-(anonymous) @ 7b52218c954dfa8e.js:1
-tD @ 7b52218c954dfa8e.js:1
-s3 @ 7b52218c954dfa8e.js:1
-fC @ 7b52218c954dfa8e.js:1
-fP @ 7b52218c954dfa8e.js:1

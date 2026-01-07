@@ -14,7 +14,7 @@ export async function GET() {
     miniapp: {
       version: "1",
       name: "MUTUALISM",
-      homeUrl: domain,
+      homeUrl: `${domain}/graph`,
       iconUrl: `${domain}/icon-1024.png`,
       splashImageUrl: `${domain}/splash-200.png`,
       splashBackgroundColor: "#ffffff",

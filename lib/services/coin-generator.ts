@@ -15,11 +15,15 @@ export function mapGraphTypeToView(graphType: string): SnapshotView {
 }
 
 /**
- * Generate folder name for Pinata snapshot
+ * Generate base name for Pinata snapshot files
  * Format: {view}_fid{FID}_{timeWindow}_{ISO-datetime}
  * Example: mutual-circle_fid22420_last30d_2026-01-05T18-42
+ *
+ * Used for both image and metadata files:
+ * - {baseName}.png
+ * - {baseName}.json
  */
-export function generateFolderName(
+export function generateSnapshotBaseName(
   view: SnapshotView,
   fid: number,
   timeWindow: TimeWindow
@@ -29,6 +33,17 @@ export function generateFolderName(
   const now = new Date();
   const isoDate = now.toISOString().slice(0, 16).replace(":", "-"); // 2026-01-05T18-42
   return `${viewSlug}_fid${fid}_${timeSlug}_${isoDate}`;
+}
+
+/**
+ * @deprecated Use generateSnapshotBaseName instead
+ */
+export function generateFolderName(
+  view: SnapshotView,
+  fid: number,
+  timeWindow: TimeWindow
+): string {
+  return generateSnapshotBaseName(view, fid, timeWindow);
 }
 
 /**
@@ -66,7 +81,7 @@ export function generateSnapshotMetadata(
 }
 
 /**
- * Generate filename for share image (no folder, image only)
+ * Generate filename for share image
  * Format: {view}_fid{FID}_{timeWindow}_{ISO-datetime}.png
  */
 export function generateShareFilename(
@@ -74,7 +89,7 @@ export function generateShareFilename(
   fid: number,
   timeWindow: TimeWindow
 ): string {
-  return `${generateFolderName(view, fid, timeWindow)}.png`;
+  return `${generateSnapshotBaseName(view, fid, timeWindow)}.png`;
 }
 
 // ============================================

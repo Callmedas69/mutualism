@@ -32,7 +32,7 @@ const miniAppEmbed = {
     action: {
       type: "launch_miniapp",
       name: "MUTUALISM",
-      url: domain,
+      url: `${domain}/graph`,
       splashImageUrl: `${domain}/splash-200.png`,
       splashBackgroundColor: "#ffffff",
     },
