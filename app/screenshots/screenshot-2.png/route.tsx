@@ -67,11 +67,11 @@ export async function GET() {
 
           {/* Connection Items */}
           {[
-            { name: "alice.eth", score: "98%" },
-            { name: "bob.base", score: "94%" },
-            { name: "charlie.fc", score: "87%" },
-            { name: "diana.eth", score: "82%" },
-            { name: "evan.base", score: "76%" },
+            { name: "alice.eth" },
+            { name: "bob.base" },
+            { name: "charlie.fc" },
+            { name: "diana.eth" },
+            { name: "evan.base" },
           ].map((user, i) => (
             <div
               key={i}
@@ -90,7 +90,7 @@ export async function GET() {
                   width: "64px",
                   height: "64px",
                   borderRadius: "50%",
-                  backgroundColor: "#f25b28",
+                  backgroundColor: "#3b82f6",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -111,16 +111,6 @@ export async function GET() {
                 }}
               >
                 {user.name}
-              </div>
-              {/* Score */}
-              <div
-                style={{
-                  fontSize: "24px",
-                  fontWeight: 700,
-                  color: "#22c55e",
-                }}
-              >
-                {user.score}
               </div>
             </div>
           ))}

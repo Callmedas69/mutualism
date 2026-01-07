@@ -31,9 +31,15 @@ function isMutualUser(user: MutualUser | ConnectionUser): user is MutualUser {
 
 function getScoreColor(score: number, maxScore: number): string {
   const ratio = score / maxScore;
-  if (ratio > 0.7) return "#22c55e"; // green
-  if (ratio > 0.4) return "#eab308"; // yellow
-  return "#71717a"; // gray
+  // Blue heatmap: light (#93c5fd) → dark (#1e40af)
+  const lightBlue = { r: 147, g: 197, b: 253 }; // #93c5fd (blue-300)
+  const darkBlue = { r: 30, g: 64, b: 175 };    // #1e40af (blue-800)
+
+  const r = Math.round(lightBlue.r + (darkBlue.r - lightBlue.r) * ratio);
+  const g = Math.round(lightBlue.g + (darkBlue.g - lightBlue.g) * ratio);
+  const b = Math.round(lightBlue.b + (darkBlue.b - lightBlue.b) * ratio);
+
+  return `rgb(${r}, ${g}, ${b})`;
 }
 
 interface UseGraphDataParams {

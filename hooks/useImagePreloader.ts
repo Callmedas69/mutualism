@@ -28,6 +28,18 @@ export function loadImage(url: string): Promise<HTMLImageElement> {
   });
 }
 
+// Load items in batches to avoid overwhelming browser connection limits
+async function loadInBatches<T>(
+  items: T[],
+  batchSize: number,
+  loader: (item: T) => Promise<void>
+): Promise<void> {
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize);
+    await Promise.all(batch.map(loader));
+  }
+}
+
 // Pre-render clipped circular avatar to offscreen canvas (called once per avatar)
 // Uses 4x resolution for crisp export quality
 export function getAvatarCanvas(img: HTMLImageElement, size: number): HTMLCanvasElement {
@@ -93,6 +105,8 @@ export function useImagePreloader({
     });
 
     const loadAllImages = async () => {
+      const BATCH_SIZE = 15;
+
       // Preserve existing loaded images from ref
       const currentImages = loadedImagesRef.current;
       const newImages = new Map<string, HTMLImageElement>(currentImages);
@@ -106,16 +120,27 @@ export function useImagePreloader({
         return;
       }
 
-      await Promise.all(
-        urlsToFetch.map(async (url) => {
-          try {
-            const img = await loadImage(url);
-            newImages.set(url, img);
-          } catch {
-            // Failed to load image, will show fallback
-          }
-        })
-      );
+      // Priority: load center user first for immediate visual feedback
+      if (centerUserPfp && !currentImages.has(centerUserPfp)) {
+        try {
+          const img = await loadImage(centerUserPfp);
+          newImages.set(centerUserPfp, img);
+          loadedImagesRef.current = new Map(newImages);
+        } catch {
+          // Failed, will show fallback
+        }
+      }
+
+      // Remaining connections in batches to avoid overwhelming browser
+      const remainingUrls = urlsToFetch.filter(url => url !== centerUserPfp);
+      await loadInBatches(remainingUrls, BATCH_SIZE, async (url) => {
+        try {
+          const img = await loadImage(url);
+          newImages.set(url, img);
+        } catch {
+          // Failed to load image, will show fallback
+        }
+      });
 
       // Update ref (stable for callbacks) and trigger re-render
       loadedImagesRef.current = newImages;

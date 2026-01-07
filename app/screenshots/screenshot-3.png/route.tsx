@@ -126,7 +126,7 @@ export async function GET() {
                 style={{
                   fontSize: "48px",
                   fontWeight: 700,
-                  color: "#22c55e",
+                  color: "#3b82f6",
                 }}
               >
                 247

@@ -93,7 +93,7 @@ export async function GET() {
               width: "60px",
               height: "60px",
               borderRadius: "50%",
-              backgroundColor: "#22c55e",
+              backgroundColor: "#1e40af",
             }}
           />
           <div
@@ -104,7 +104,7 @@ export async function GET() {
               width: "45px",
               height: "45px",
               borderRadius: "50%",
-              backgroundColor: "#a855f7",
+              backgroundColor: "#60a5fa",
             }}
           />
           <div
@@ -115,7 +115,7 @@ export async function GET() {
               width: "55px",
               height: "55px",
               borderRadius: "50%",
-              backgroundColor: "#eab308",
+              backgroundColor: "#93c5fd",
             }}
           />
         </div>

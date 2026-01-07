@@ -135,13 +135,13 @@ function renderGraphToCanvas(options: RenderToCanvasOptions): void {
 
       ctx.beginPath();
       ctx.arc(x, y, nodeSize, 0, Math.PI * 2);
-      ctx.strokeStyle = node.isCenter ? "#3b82f6" : (node.color || "#71717a");
+      ctx.strokeStyle = node.isCenter ? "#3b82f6" : (node.color || "#93c5fd");
       ctx.lineWidth = (node.isCenter ? 4 : 2.5) * uiScale;
       ctx.stroke();
     } else {
       ctx.beginPath();
       ctx.arc(x, y, nodeSize, 0, Math.PI * 2);
-      ctx.fillStyle = node.color || "#71717a";
+      ctx.fillStyle = node.color || "#93c5fd";
       ctx.fill();
 
       ctx.font = `bold ${nodeSize * 0.9}px Inter, system-ui, sans-serif`;
@@ -618,21 +618,13 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
 
       {/* Top Bar */}
       <div className="absolute left-2 right-2 top-2 flex items-center justify-between gap-2 sm:left-4 sm:right-4 sm:top-4">
-        {/* Score Legend */}
-        <div className="flex items-center gap-1.5 border border-zinc-200 bg-white/95 px-2 py-1.5 text-[9px] uppercase tracking-[0.05em] sm:gap-4 sm:px-4 sm:py-2 sm:text-xs dark:border-zinc-700 dark:bg-zinc-900/95">
-          <span className="font-medium text-zinc-500">Score</span>
-          <div className="flex items-center gap-1">
-            <span className="h-2 w-2 bg-[#22c55e] sm:h-3 sm:w-3" />
-            <span className="hidden text-zinc-600 dark:text-zinc-400 sm:inline">High</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="h-2 w-2 bg-[#eab308] sm:h-3 sm:w-3" />
-            <span className="hidden text-zinc-600 dark:text-zinc-400 sm:inline">Med</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="h-2 w-2 bg-[#71717a] sm:h-3 sm:w-3" />
-            <span className="hidden text-zinc-600 dark:text-zinc-400 sm:inline">Low</span>
-          </div>
+        {/* Mutuality Legend */}
+        <div className="flex items-center gap-2 border border-zinc-200 bg-white/95 px-3 py-1.5 text-[9px] uppercase tracking-[0.05em] sm:px-4 sm:py-2 sm:text-xs dark:border-zinc-700 dark:bg-zinc-900/95">
+          <span className="font-medium text-zinc-500">Mutuality</span>
+          <div
+            className="h-2 w-16 rounded-sm sm:h-3 sm:w-24"
+            style={{ background: "linear-gradient(to right, #93c5fd, #1e40af)" }}
+          />
         </div>
 
         {/* Action Buttons */}
