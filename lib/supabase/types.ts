@@ -32,6 +32,82 @@ export interface SnapshotIndexInsert {
 }
 
 // ============================================
+// Notification System Types
+// ============================================
+
+/**
+ * Notification token row - stores Farcaster push notification tokens
+ */
+export interface NotificationTokenRow {
+  id: string; // UUID
+  fid: number;
+  token: string;
+  url: string;
+  enabled: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface NotificationTokenInsert {
+  fid: number;
+  token: string;
+  url: string;
+  enabled?: boolean;
+}
+
+export interface NotificationTokenUpdate {
+  token?: string;
+  url?: string;
+  enabled?: boolean;
+  updated_at?: string;
+}
+
+/**
+ * Notification history row - audit trail for sent notifications
+ */
+export interface NotificationHistoryRow {
+  id: string; // UUID
+  fid: number;
+  notification_type: string;
+  title: string;
+  body: string;
+  sent_at: string;
+  success: boolean;
+}
+
+export interface NotificationHistoryInsert {
+  fid: number;
+  notification_type: string;
+  title: string;
+  body: string;
+  success?: boolean;
+}
+
+/**
+ * User graph state row - tracks user's graph state for change detection
+ */
+export interface UserGraphStateRow {
+  id: string; // UUID
+  fid: number;
+  mutual_count: number;
+  last_checked_at: string;
+  last_notified_at: string | null;
+  updated_at: string;
+}
+
+export interface UserGraphStateInsert {
+  fid: number;
+  mutual_count?: number;
+}
+
+export interface UserGraphStateUpdate {
+  mutual_count?: number;
+  last_checked_at?: string;
+  last_notified_at?: string;
+  updated_at?: string;
+}
+
+// ============================================
 // Database Schema (Supabase generated type format)
 // ============================================
 
@@ -73,6 +149,93 @@ export interface Database {
           cid?: string;
           generated_at?: string;
           graph_version?: string;
+        };
+        Relationships: [];
+      };
+      notification_tokens: {
+        Row: {
+          id: string;
+          fid: number;
+          token: string;
+          url: string;
+          enabled: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          fid: number;
+          token: string;
+          url: string;
+          enabled?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          fid?: number;
+          token?: string;
+          url?: string;
+          enabled?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      notification_history: {
+        Row: {
+          id: string;
+          fid: number;
+          notification_type: string;
+          title: string;
+          body: string;
+          sent_at: string;
+          success: boolean;
+        };
+        Insert: {
+          id?: string;
+          fid: number;
+          notification_type: string;
+          title: string;
+          body: string;
+          sent_at?: string;
+          success?: boolean;
+        };
+        Update: {
+          id?: string;
+          fid?: number;
+          notification_type?: string;
+          title?: string;
+          body?: string;
+          sent_at?: string;
+          success?: boolean;
+        };
+        Relationships: [];
+      };
+      user_graph_state: {
+        Row: {
+          id: string;
+          fid: number;
+          mutual_count: number;
+          last_checked_at: string;
+          last_notified_at: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          fid: number;
+          mutual_count?: number;
+          last_checked_at?: string;
+          last_notified_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          fid?: number;
+          mutual_count?: number;
+          last_checked_at?: string;
+          last_notified_at?: string;
+          updated_at?: string;
         };
         Relationships: [];
       };

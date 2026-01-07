@@ -115,7 +115,7 @@ export default function NodeInfoCard({
           onClick={onViewProfile}
           className="w-full min-h-[44px] border-t border-zinc-200 px-4 py-3 text-[10px] uppercase tracking-[0.15em] font-medium text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
         >
-          View on Warpcast
+          Visit Profile
         </button>
       </div>
     </div>

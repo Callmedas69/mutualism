@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  upsertToken,
+  disableToken,
+  deleteToken,
+} from "@/lib/repositories/notification-tokens";
 
-// Webhook event types from Farcaster
+/**
+ * Farcaster MiniApp Webhook Handler
+ *
+ * Receives lifecycle events from Farcaster:
+ * - miniapp_added: User installed the app
+ * - miniapp_removed: User uninstalled the app
+ * - notifications_enabled: User enabled push notifications
+ * - notifications_disabled: User disabled push notifications
+ *
+ * Per CLAUDE.md: API route validates input and delegates to repository.
+ */
+
 type WebhookEventType =
   | "miniapp_added"
   | "miniapp_removed"
@@ -11,13 +27,11 @@ interface WebhookEvent {
   event: WebhookEventType;
   data: {
     fid: number;
+    // Present on notifications_enabled and miniapp_added (if notifications enabled)
     notificationToken?: string;
+    url?: string;
   };
 }
-
-// In production, store tokens in a database
-// For now, we'll just log them
-const notificationTokens = new Map<number, string>();
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,6 +40,7 @@ export async function POST(request: NextRequest) {
     if (webhookSecret) {
       const authHeader = request.headers.get("authorization");
       if (authHeader !== `Bearer ${webhookSecret}`) {
+        console.warn("[MiniApp Webhook] Unauthorized request");
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
     }
@@ -38,27 +53,33 @@ export async function POST(request: NextRequest) {
     switch (event) {
       case "miniapp_added":
         console.log(`[MiniApp] User ${data.fid} added the app`);
+        // If notifications are enabled on add, store the token
+        if (data.notificationToken && data.url) {
+          await upsertToken(data.fid, data.notificationToken, data.url);
+          console.log(`[MiniApp] Stored notification token for FID ${data.fid}`);
+        }
         break;
 
       case "miniapp_removed":
         console.log(`[MiniApp] User ${data.fid} removed the app`);
-        // Remove notification token
-        notificationTokens.delete(data.fid);
+        // Hard delete - user uninstalled
+        await deleteToken(data.fid);
         break;
 
       case "notifications_enabled":
         console.log(`[MiniApp] User ${data.fid} enabled notifications`);
-        if (data.notificationToken) {
-          // Store the notification token
-          notificationTokens.set(data.fid, data.notificationToken);
+        if (data.notificationToken && data.url) {
+          await upsertToken(data.fid, data.notificationToken, data.url);
           console.log(`[MiniApp] Stored notification token for FID ${data.fid}`);
+        } else {
+          console.warn(`[MiniApp] Missing token or url for FID ${data.fid}`);
         }
         break;
 
       case "notifications_disabled":
         console.log(`[MiniApp] User ${data.fid} disabled notifications`);
-        // Remove notification token
-        notificationTokens.delete(data.fid);
+        // Soft disable - user might re-enable
+        await disableToken(data.fid);
         break;
 
       default:
@@ -73,13 +94,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-// Export for use by notification sender
-export function getNotificationToken(fid: number): string | undefined {
-  return notificationTokens.get(fid);
-}
-
-export function getAllNotificationTokens(): Map<number, string> {
-  return new Map(notificationTokens);
 }

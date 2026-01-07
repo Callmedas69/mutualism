@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { useFarcasterUser } from "@/context/FarcasterProvider";
 import { useMiniAppContext } from "@/context/MiniAppProvider";
 import { useConnectionData, type ErrorType } from "@/hooks/useConnectionData";
+import { useTrackVisit } from "@/hooks/useTrackVisit";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import ConnectionList from "./ConnectionList";
 import ConnectionGraph from "./ConnectionGraph";
@@ -21,6 +22,9 @@ export default function ConnectionTabs() {
   const [viewType, setViewType] = useState<ViewType>("list");
 
   const { mutuals, attention, influence, loading, error, retry } = useConnectionData(user?.fid);
+
+  // Track visit for reminder notifications (only when data loaded)
+  useTrackVisit(loading ? undefined : user?.fid, mutuals.length);
 
   const allTabs: { key: TabType; label: string; count: number | null; description: string }[] = [
     { key: "mutuals", label: "Mutuals", count: mutuals.length, description: "People who engage with you and you engage back" },
