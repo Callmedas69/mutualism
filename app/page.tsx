@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { TransitionLink } from "@/components/TransitionLink";
@@ -9,7 +10,15 @@ import { useMiniAppContext } from "@/context/MiniAppProvider";
 
 export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
   const { isMiniApp } = useMiniAppContext();
+
+  // Mini App Simplification: Redirect to graph (only destination)
+  useEffect(() => {
+    if (isMiniApp) {
+      router.replace("/graph");
+    }
+  }, [isMiniApp, router]);
 
   useGSAP(
     () => {

@@ -515,12 +515,12 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
   }, [centerUser.username, type, graphData]);
 
   // Tokenize graph data
+  // Note: nodeCount removed per PINATA_RESTRUCTURING.md (forbidden field)
   const tokenizeData: TokenizeGraphData = useMemo(() => ({
     username: centerUser.username,
     fid: centerUser.fid,
-    nodeCount: graphData.nodes.length - 1,
     graphType: type === "mutuals" ? "All Mutuals" : type === "attention" ? "Attention" : "Influence",
-  }), [centerUser, graphData.nodes.length, type]);
+  }), [centerUser, type]);
 
   // Configure forces
   const configureForces = useCallback(() => {
@@ -642,6 +642,7 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
               <ShareGraphButton
                 graphType={type === "mutuals" ? "Mutuals" : type === "attention" ? "Attention" : "Influence"}
                 username={centerUser.username}
+                fid={centerUser.fid}
                 getGraphBlob={getGraphBlob}
                 composeCast={composeCast}
                 disabled={isEngineRunning}

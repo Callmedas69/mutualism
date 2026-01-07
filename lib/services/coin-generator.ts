@@ -1,4 +1,85 @@
-import type { CoinMetadata } from "@/types/tokenize";
+import type { CoinMetadata, SnapshotMetadata, SnapshotView, TimeWindow } from "@/types/tokenize";
+
+// ============================================
+// Snapshot Functions (v1 - per PINATA_RESTRUCTURING.md)
+// ============================================
+
+/**
+ * Map graph type string to SnapshotView
+ */
+export function mapGraphTypeToView(graphType: string): SnapshotView {
+  const lower = graphType.toLowerCase();
+  if (lower.includes("attention")) return "attention_circle";
+  if (lower.includes("influence")) return "influence_circle";
+  return "mutual_circle";
+}
+
+/**
+ * Generate folder name for Pinata snapshot
+ * Format: {view}_fid{FID}_{timeWindow}_{ISO-datetime}
+ * Example: mutual-circle_fid22420_last30d_2026-01-05T18-42
+ */
+export function generateFolderName(
+  view: SnapshotView,
+  fid: number,
+  timeWindow: TimeWindow
+): string {
+  const viewSlug = view.replace(/_/g, "-"); // mutual_circle -> mutual-circle
+  const timeSlug = timeWindow.replace(/_/g, ""); // last_30d -> last30d
+  const now = new Date();
+  const isoDate = now.toISOString().slice(0, 16).replace(":", "-"); // 2026-01-05T18-42
+  return `${viewSlug}_fid${fid}_${timeSlug}_${isoDate}`;
+}
+
+/**
+ * Generate v1 compliant snapshot metadata
+ * Rules:
+ * - A snapshot is immutable
+ * - The PNG is the truth
+ * - No analytics/metrics (nodeCount, scores, rankings FORBIDDEN)
+ */
+export function generateSnapshotMetadata(
+  username: string,
+  fid: number,
+  view: SnapshotView,
+  timeWindow: TimeWindow,
+  imageCid: string
+): SnapshotMetadata {
+  const viewLabel = view === "mutual_circle" ? "Mutual Circle"
+    : view === "attention_circle" ? "Attention Circle"
+    : "Influence Circle";
+
+  return {
+    name: `${viewLabel} of @${username}`,
+    description: `A snapshot of real interactions on Farcaster, showing the people @${username} actually interacts with.`,
+    image: `ipfs://${imageCid}`,
+    properties: {
+      category: "mutualism",
+      fid,
+      view,
+      timeWindow,
+      generatedAt: new Date().toISOString(),
+      graphVersion: "v1",
+      source: "Quotient API",
+    },
+  };
+}
+
+/**
+ * Generate filename for share image (no folder, image only)
+ * Format: {view}_fid{FID}_{timeWindow}_{ISO-datetime}.png
+ */
+export function generateShareFilename(
+  view: SnapshotView,
+  fid: number,
+  timeWindow: TimeWindow
+): string {
+  return `${generateFolderName(view, fid, timeWindow)}.png`;
+}
+
+// ============================================
+// Legacy Functions (for backward compatibility)
+// ============================================
 
 // Graph type to symbol suffix mapping
 const GRAPH_TYPE_SUFFIXES: Record<string, string> = {
@@ -44,13 +125,13 @@ export function generateSymbol(username: string, graphType: string): string {
 }
 
 /**
- * Generate metadata object for a graph coin
+ * @deprecated Use generateSnapshotMetadata instead
+ * Generate metadata object for a graph coin (legacy, nodeCount removed)
  */
 export function generateMetadata(
   username: string,
   fid: number,
   graphType: string,
-  nodeCount: number,
   imageUri: string
 ): CoinMetadata {
   return {
@@ -61,7 +142,6 @@ export function generateMetadata(
       category: "social",
       fid,
       graphType,
-      nodeCount,
       generatedAt: new Date().toISOString().slice(0, 10),
       source: "Quotient API",
     },

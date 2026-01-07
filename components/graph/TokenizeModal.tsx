@@ -11,7 +11,7 @@ import { parseEther, type Address } from "viem";
 import Link from "next/link";
 import { X, Check, Loader2, ExternalLink, Copy, AlertCircle } from "lucide-react";
 import type { TokenizeGraphData, TokenizeStep } from "@/types/tokenize";
-import { uploadImageToIPFS, uploadMetadataToIPFS, generateMetadata } from "@/lib/pinata";
+import { uploadSnapshot, mapGraphTypeToView } from "@/lib/pinata";
 import {
   prepareCoinCreation,
   generateSymbol,
@@ -146,30 +146,25 @@ export default function TokenizeModal({
         throw new Error("Failed to capture graph image");
       }
 
-      // 2. Upload image to IPFS
-      const { ipfsUri: imageUri } = await uploadImageToIPFS(
-        blob,
-        `${graphData.username}-graph.png`
-      );
+      // 2. Upload snapshot folder (image.png + metadata.json)
+      // Per PINATA_RESTRUCTURING.md: folder-per-snapshot structure
+      const view = mapGraphTypeToView(graphData.graphType);
+      const snapshotResult = await uploadSnapshot({
+        imageBlob: blob,
+        fid: graphData.fid,
+        username: graphData.username,
+        view,
+        timeWindow: "all_time", // Current data = all time
+      });
 
-      // 3. Generate and upload metadata
-      const metadata = generateMetadata(
-        graphData.username,
-        graphData.fid,
-        graphData.graphType,
-        graphData.nodeCount,
-        imageUri
-      );
-      const metadataUri = await uploadMetadataToIPFS(metadata);
-
-      // 4. Create coin on Zora
+      // 3. Create coin on Zora using metadata URI from folder
       setStep("creating");
 
       // Zora SDK returns raw tx params: { to, data, value }
       const txParams = await prepareCoinCreation({
         name: coinName,
         symbol: coinSymbol,
-        uri: metadataUri,
+        uri: snapshotResult.metadataUri,
         payoutRecipient: address,
       });
 

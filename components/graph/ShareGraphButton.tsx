@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Share2 } from "lucide-react";
-import { uploadImageToIPFS } from "@/lib/pinata";
+import { uploadSnapshot, mapGraphTypeToView } from "@/lib/pinata";
 
 // App URL for embed (allows users to click through to the app)
 const APP_URL = process.env.NEXT_PUBLIC_DOMAIN_URL || "https://mutualism.geoart.studio";
@@ -12,6 +12,7 @@ type ShareState = "idle" | "uploading" | "sharing" | "success" | "error";
 interface ShareGraphButtonProps {
   graphType: string;
   username: string;
+  fid: number;
   getGraphBlob: () => Promise<Blob | null>;
   composeCast: (text?: string, embeds?: string[]) => Promise<void>;
   disabled?: boolean;
@@ -20,6 +21,7 @@ interface ShareGraphButtonProps {
 export default function ShareGraphButton({
   graphType,
   username,
+  fid,
   getGraphBlob,
   composeCast,
   disabled = false,
@@ -46,20 +48,27 @@ export default function ShareGraphButton({
       return;
     }
 
-    // Step 2: Upload to Pinata
-    let gatewayUrl: string;
+    // Step 2: Create snapshot (folder + DB record)
+    let imageUrl: string;
     try {
-      const timestamp = new Date().toISOString().slice(0, 10);
-      const filename = `${username}-${graphType.toLowerCase()}-${timestamp}.png`;
-      const result = await uploadImageToIPFS(blob, filename);
-      gatewayUrl = result.gatewayUrl;
+      const view = mapGraphTypeToView(graphType);
+      const result = await uploadSnapshot({
+        imageBlob: blob,
+        fid,
+        username,
+        view,
+        timeWindow: "all_time",
+      });
 
-      if (!gatewayUrl) {
+      // Use folder gateway URL + image.png for Farcaster embed
+      imageUrl = `${result.gatewayUrl}/image.png`;
+
+      if (!result.gatewayUrl) {
         throw new Error("No gateway URL returned");
       }
     } catch (err) {
-      console.error("Failed to upload to IPFS:", err);
-      setError("Failed to upload image");
+      console.error("Failed to create snapshot:", err);
+      setError("Failed to save snapshot");
       setState("error");
       return;
     }
@@ -69,7 +78,7 @@ export default function ShareGraphButton({
     try {
       await composeCast(
         `My ${graphType} graph on MUTUALISM`,
-        [gatewayUrl, APP_URL]
+        [imageUrl, APP_URL]
       );
       // Show success feedback before returning to idle
       setState("success");
@@ -101,7 +110,7 @@ export default function ShareGraphButton({
 
   const buttonText = {
     idle: "Share",
-    uploading: "Nodeing...",
+    uploading: "Saving...",
     sharing: "Opening...",
     success: "Shared!",
     error: "Error",

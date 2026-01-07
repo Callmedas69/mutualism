@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ExternalLink, Coins, Loader2, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { useAccount } from "wagmi";
@@ -15,9 +16,17 @@ import { useMiniApp } from "@/hooks/useMiniApp";
 const PAGE_SIZE = 10;
 
 export default function GalleryPage() {
+  const router = useRouter();
   const { signalReady, isMiniApp } = useMiniApp();
   const { address: connectedAddress } = useAccount();
   const [page, setPage] = useState(0);
+
+  // Mini App Simplification: Redirect to graph (only destination)
+  useEffect(() => {
+    if (isMiniApp) {
+      router.replace("/graph");
+    }
+  }, [isMiniApp, router]);
 
   // Query all coins from on-chain registry with pagination
   const { coins, total, totalPages, isLoading: isRegistryLoading, error: registryError } = useAllCoins(page, PAGE_SIZE);

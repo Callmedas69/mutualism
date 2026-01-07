@@ -1,5 +1,63 @@
-import type { CoinMetadata, IPFSUploadResponse } from "@/types/tokenize";
+import type { CoinMetadata, IPFSUploadResponse, SnapshotView, TimeWindow, SnapshotUploadResponse } from "@/types/tokenize";
 import { withRetry } from "@/lib/utils/with-retry";
+
+// ============================================
+// Snapshot Upload (v1 - per PINATA_RESTRUCTURING.md)
+// ============================================
+
+/**
+ * Parameters for snapshot upload
+ */
+export interface SnapshotUploadParams {
+  imageBlob: Blob;
+  fid: number;
+  username: string;
+  view: SnapshotView;
+  timeWindow: TimeWindow;
+}
+
+/**
+ * Upload a snapshot to IPFS as a folder (image.png + metadata.json)
+ * Returns folder CID and metadata URI for tokenization
+ */
+async function uploadSnapshotInternal(
+  params: SnapshotUploadParams
+): Promise<SnapshotUploadResponse> {
+  const formData = new FormData();
+  formData.append("image", params.imageBlob, "image.png");
+  formData.append("fid", String(params.fid));
+  formData.append("username", params.username);
+  formData.append("view", params.view);
+  formData.append("timeWindow", params.timeWindow);
+
+  const response = await fetch("/api/tokenize", {
+    method: "POST",
+    body: formData,
+    headers: {
+      "x-farcaster-fid": String(params.fid),
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to upload snapshot");
+  }
+
+  return response.json();
+}
+
+/**
+ * Upload a snapshot with retry logic
+ */
+export async function uploadSnapshot(
+  params: SnapshotUploadParams
+): Promise<SnapshotUploadResponse> {
+  return withRetry(() => uploadSnapshotInternal(params), { retries: 1, delayMs: 1000 });
+}
+
+// ============================================
+// Legacy Functions (for backward compatibility)
+// ============================================
 
 /**
  * Upload result with both IPFS URI and gateway URL
@@ -35,6 +93,7 @@ async function uploadImage(blob: Blob, filename: string): Promise<UploadResult> 
 
 /**
  * Upload metadata JSON to IPFS via server API (single attempt)
+ * @deprecated The new snapshot upload includes metadata automatically
  */
 async function uploadMetadata(metadata: CoinMetadata): Promise<string> {
   const response = await fetch("/api/tokenize", {
@@ -56,6 +115,7 @@ async function uploadMetadata(metadata: CoinMetadata): Promise<string> {
 
 /**
  * Upload an image blob to IPFS with retry
+ * Still used by ShareGraphButton for simple image uploads
  */
 export async function uploadImageToIPFS(
   blob: Blob,
@@ -65,6 +125,7 @@ export async function uploadImageToIPFS(
 }
 
 /**
+ * @deprecated Use uploadSnapshot instead
  * Upload metadata JSON to IPFS with retry
  */
 export async function uploadMetadataToIPFS(

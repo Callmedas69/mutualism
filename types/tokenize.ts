@@ -1,6 +1,57 @@
 import type { Address } from "viem";
 
+// ============================================
+// Snapshot Types (v1 - per PINATA_RESTRUCTURING.md)
+// ============================================
+
 /**
+ * Allowed snapshot view types
+ */
+export type SnapshotView = "mutual_circle" | "attention_circle" | "influence_circle";
+
+/**
+ * Allowed time windows for snapshots
+ */
+export type TimeWindow = "last_7d" | "last_30d" | "last_90d" | "all_time";
+
+/**
+ * Metadata schema for Mutualism snapshots (v1)
+ * - A snapshot is immutable
+ * - If anything changes, it is a new snapshot
+ * - The PNG is the truth
+ * - No analytics/metrics allowed
+ */
+export interface SnapshotMetadata {
+  name: string;
+  description: string;
+  image: string; // ipfs://<PNG_CID>
+  properties: {
+    category: "mutualism";
+    fid: number;
+    view: SnapshotView;
+    timeWindow: TimeWindow;
+    generatedAt: string; // ISO 8601
+    graphVersion: "v1";
+    source: "Quotient API";
+  };
+}
+
+/**
+ * Response from snapshot folder upload
+ */
+export interface SnapshotUploadResponse {
+  folderCid: string;
+  imageCid: string;
+  metadataUri: string; // ipfs://{folderCid}/metadata.json
+  gatewayUrl: string;
+}
+
+// ============================================
+// Legacy Types (for backward compatibility)
+// ============================================
+
+/**
+ * @deprecated Use SnapshotMetadata instead
  * Metadata schema for Zora Coin (EIP-7572 compliant)
  */
 export interface CoinMetadata {
@@ -11,7 +62,6 @@ export interface CoinMetadata {
     category: "social";
     fid: number;
     graphType: string;
-    nodeCount: number;
     generatedAt: string;
     source: "Quotient API";
   };
@@ -30,11 +80,11 @@ export interface CreateCoinParams {
 
 /**
  * Graph data needed for tokenization
+ * Note: nodeCount removed per PINATA_RESTRUCTURING.md (forbidden field)
  */
 export interface TokenizeGraphData {
   username: string;
   fid: number;
-  nodeCount: number;
   graphType: string;
 }
 

@@ -10,7 +10,7 @@ import {
 import { parseEther, type Address } from "viem";
 import { X, Check, Loader2, ExternalLink, AlertCircle } from "lucide-react";
 import type { TokenizeGraphData, TokenizeStep } from "@/types/tokenize";
-import { uploadImageToIPFS, uploadMetadataToIPFS, generateMetadata } from "@/lib/pinata";
+import { uploadSnapshot, mapGraphTypeToView } from "@/lib/pinata";
 import {
   prepareCoinCreation,
   generateSymbol,
@@ -135,26 +135,23 @@ export default function MiniAppTokenizeModal({
         throw new Error("Failed to capture graph");
       }
 
-      const { ipfsUri: imageUri } = await uploadImageToIPFS(
-        blob,
-        `${graphData.username}-graph.png`
-      );
-
-      const metadata = generateMetadata(
-        graphData.username,
-        graphData.fid,
-        graphData.graphType,
-        graphData.nodeCount,
-        imageUri
-      );
-      const metadataUri = await uploadMetadataToIPFS(metadata);
+      // Upload snapshot folder (image.png + metadata.json)
+      // Per PINATA_RESTRUCTURING.md: folder-per-snapshot structure
+      const view = mapGraphTypeToView(graphData.graphType);
+      const snapshotResult = await uploadSnapshot({
+        imageBlob: blob,
+        fid: graphData.fid,
+        username: graphData.username,
+        view,
+        timeWindow: "all_time", // Current data = all time
+      });
 
       setStep("creating");
 
       const txParams = await prepareCoinCreation({
         name: coinName,
         symbol: coinSymbol,
-        uri: metadataUri,
+        uri: snapshotResult.metadataUri,
         payoutRecipient: address,
       });
 
