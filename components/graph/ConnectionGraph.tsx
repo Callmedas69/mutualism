@@ -303,7 +303,7 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
 
     const updateDimensions = () => {
       const width = container.clientWidth;
-      const height = Math.max(600, window.innerHeight - 250);
+      const height = Math.max(450, window.innerHeight - 180);
       // Only update if we have valid dimensions (not hidden)
       if (width > 0) {
         setDimensions({ width, height });
@@ -619,7 +619,7 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
       {/* Top Bar */}
       <div className="absolute left-2 right-2 top-2 flex items-center justify-between gap-2 sm:left-4 sm:right-4 sm:top-4">
         {/* Mutuality Legend */}
-        <div className="flex items-center gap-2 border border-zinc-200 bg-white/95 px-3 py-1.5 text-[9px] uppercase tracking-[0.05em] sm:px-4 sm:py-2 sm:text-xs dark:border-zinc-700 dark:bg-zinc-900/95">
+        <div className="flex items-center gap-2 border border-zinc-200 bg-white/95 px-3 py-2 text-[11px] uppercase tracking-[0.05em] sm:px-4 sm:text-xs dark:border-zinc-700 dark:bg-zinc-900/95">
           <span className="font-medium text-zinc-500">Mutuality</span>
           <div
             className="h-2 w-16 rounded-sm sm:h-3 sm:w-24"

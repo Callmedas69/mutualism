@@ -102,3 +102,21 @@ export async function viewProfile(fid: number) {
     console.error("Failed to view profile:", error);
   }
 }
+
+/**
+ * Prompt user to add the Mini App to their Farcaster client
+ * This enables notifications and quick access
+ * Note: Only works on production domain, not dev/tunnel URLs
+ * @returns true if added successfully, false if rejected or error
+ */
+export async function addMiniApp(): Promise<boolean> {
+  try {
+    await sdk.actions.addMiniApp();
+    return true;
+  } catch (error) {
+    // RejectedByUser - user declined
+    // InvalidDomainManifestJson - domain mismatch or invalid manifest
+    console.error("Failed to add miniapp:", error);
+    return false;
+  }
+}

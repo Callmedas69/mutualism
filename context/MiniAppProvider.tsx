@@ -18,6 +18,7 @@ type MiniAppPlatform = "farcaster" | "base" | "web";
 interface MiniAppContextType {
   isMiniApp: boolean;
   isReady: boolean;
+  isAppAdded: boolean;
   platform: MiniAppPlatform;
   user: MiniAppUser | null;
   signalReady: () => Promise<void>;
@@ -25,6 +26,7 @@ interface MiniAppContextType {
   closeMiniApp: () => Promise<void>;
   openUrl: (url: string) => Promise<void>;
   viewProfile: (fid: number) => Promise<void>;
+  addMiniApp: () => Promise<boolean>;
 }
 
 const MiniAppContext = createContext<MiniAppContextType | null>(null);
@@ -44,6 +46,7 @@ interface MiniAppProviderProps {
 export default function MiniAppProvider({ children }: MiniAppProviderProps) {
   const [isMiniApp, setIsMiniApp] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  const [isAppAdded, setIsAppAdded] = useState(false);
   const [platform, setPlatform] = useState<MiniAppPlatform>("web");
   const [user, setUser] = useState<MiniAppUser | null>(null);
 
@@ -70,6 +73,11 @@ export default function MiniAppProvider({ children }: MiniAppProviderProps) {
               displayName: context.user.displayName,
               pfpUrl: context.user.pfpUrl,
             });
+          }
+
+          // Check if app is already added (client.added is true when app is in user's favorites)
+          if (context.client?.added) {
+            setIsAppAdded(true);
           }
         } else {
           // Not Farcaster - check if we're in an iframe (could be Base miniapp)
@@ -179,9 +187,25 @@ export default function MiniAppProvider({ children }: MiniAppProviderProps) {
     }
   }, [isMiniApp]);
 
+  const addMiniApp = useCallback(async (): Promise<boolean> => {
+    if (!isMiniApp || platform !== "farcaster") {
+      // Only available in Farcaster miniapp
+      return false;
+    }
+    try {
+      await sdk.actions.addMiniApp();
+      setIsAppAdded(true);
+      return true;
+    } catch (error) {
+      console.error("Failed to add miniapp:", error);
+      return false;
+    }
+  }, [isMiniApp, platform]);
+
   const value: MiniAppContextType = {
     isMiniApp,
     isReady,
+    isAppAdded,
     platform,
     user,
     signalReady,
@@ -189,6 +213,7 @@ export default function MiniAppProvider({ children }: MiniAppProviderProps) {
     closeMiniApp,
     openUrl,
     viewProfile,
+    addMiniApp,
   };
 
   // Don't render until ready (prevents flash)

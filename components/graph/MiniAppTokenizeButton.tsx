@@ -38,9 +38,9 @@ export default function MiniAppTokenizeButton({
         onClick={() => setIsModalOpen(true)}
         disabled={disabled}
         title="Tokenize your graph on Zora"
-        className="flex items-center gap-1.5 border border-purple-400 bg-purple-50 px-2 py-1.5 text-[9px] font-medium uppercase tracking-[0.1em] text-purple-700 transition-all duration-200 hover:border-purple-600 hover:bg-purple-100 hover:text-purple-900 disabled:cursor-not-allowed disabled:opacity-40 sm:gap-2 sm:px-3 sm:py-2 sm:text-[10px] dark:border-purple-600 dark:bg-purple-950/50 dark:text-purple-300 dark:hover:border-purple-400 dark:hover:text-purple-100"
+        className="flex items-center gap-2 border border-purple-400 bg-purple-50 px-3 py-2.5 min-h-[44px] text-[10px] font-medium uppercase tracking-[0.1em] text-purple-700 transition-all duration-200 hover:border-purple-600 hover:bg-purple-100 hover:text-purple-900 disabled:cursor-not-allowed disabled:opacity-40 dark:border-purple-600 dark:bg-purple-950/50 dark:text-purple-300 dark:hover:border-purple-400 dark:hover:text-purple-100"
       >
-        <Sparkles size={12} />
+        <Sparkles size={14} />
         Tokenize
       </button>
 

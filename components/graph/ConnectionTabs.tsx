@@ -11,6 +11,7 @@ import ConnectionList from "./ConnectionList";
 import ConnectionGraph from "./ConnectionGraph";
 import ConnectionSkeleton from "./ConnectionSkeleton";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import AddAppModal from "@/components/AddAppModal";
 
 type TabType = "mutuals" | "attention" | "influence";
 type ViewType = "list" | "graph";
@@ -113,11 +114,13 @@ export default function ConnectionTabs() {
   }
 
   return (
-    <Tabs
-      value={activeTab}
-      onValueChange={(value) => setActiveTab(value as TabType)}
-      className="space-y-6"
-    >
+    <>
+      <AddAppModal />
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(value as TabType)}
+        className="space-y-6"
+      >
       {/* Header with tabs and view toggle */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Tabs - Underline style with shadcn */}
@@ -126,11 +129,11 @@ export default function ConnectionTabs() {
             <TabsTrigger
               key={tab.key}
               value={tab.key}
-              className="relative shrink-0 rounded-none border-none bg-transparent px-2 py-2.5 text-[10px] uppercase tracking-[0.05em] font-medium shadow-none transition-colors duration-200 sm:px-4 sm:py-3 sm:text-xs sm:tracking-[0.1em] data-[state=active]:bg-transparent data-[state=active]:text-zinc-900 data-[state=active]:shadow-none data-[state=inactive]:text-zinc-500 hover:text-zinc-700 dark:data-[state=active]:text-white dark:data-[state=inactive]:text-zinc-500 dark:hover:text-zinc-300 data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:right-0 data-[state=active]:after:h-0.5 data-[state=active]:after:bg-zinc-900 dark:data-[state=active]:after:bg-white"
+              className="relative shrink-0 rounded-none border-none bg-transparent px-3 py-2.5 text-xs uppercase tracking-[0.08em] font-medium shadow-none transition-colors duration-200 sm:px-4 sm:py-3 sm:tracking-[0.1em] data-[state=active]:bg-transparent data-[state=active]:text-zinc-900 data-[state=active]:shadow-none data-[state=inactive]:text-zinc-500 hover:text-zinc-700 dark:data-[state=active]:text-white dark:data-[state=inactive]:text-zinc-500 dark:hover:text-zinc-300 data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:right-0 data-[state=active]:after:h-0.5 data-[state=active]:after:bg-zinc-900 dark:data-[state=active]:after:bg-white"
             >
               {tab.label}
               {tab.count !== null && (
-                <span className="ml-1 text-[9px] text-zinc-400 sm:ml-2 sm:text-[10px]">{tab.count}</span>
+                <span className="ml-1.5 text-[10px] text-zinc-400 sm:ml-2">{tab.count}</span>
               )}
             </TabsTrigger>
           ))}
@@ -201,5 +204,6 @@ export default function ConnectionTabs() {
         </TabsContent>
       ))}
     </Tabs>
+    </>
   );
 }

@@ -36,7 +36,7 @@ export async function GET() {
       ogDescription:
         "Explore your mutual connections, whom you pay attention to, and whom pay attention to you",
       ogImageUrl: `${domain}/og-miniapp.png`,
-      noindex: true,
+      noindex: false,
     },
   };
 
