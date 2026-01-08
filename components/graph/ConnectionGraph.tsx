@@ -16,6 +16,7 @@ import ExportButton from "./ExportButton";
 import ShareGraphButton from "./ShareGraphButton";
 import TokenizeButton from "./TokenizeButton";
 import MiniAppTokenizeButton from "./MiniAppTokenizeButton";
+import MintNFTButton from "./MintNFTButton";
 import { useMiniAppContext } from "@/context/MiniAppProvider";
 
 const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
@@ -659,6 +660,12 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
                 disabled={!canSnapshot || isEngineRunning}
                 isUploading={isSnapshotUploading}
               />
+              <MintNFTButton
+                ensureSnapshot={ensureSnapshot}
+                graphData={tokenizeData}
+                disabled={!canSnapshot || isEngineRunning}
+                isUploading={isSnapshotUploading}
+              />
             </>
           ) : (
             <>
@@ -667,6 +674,12 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
                 disabled={isEngineRunning}
               />
               <TokenizeButton
+                ensureSnapshot={ensureSnapshot}
+                graphData={tokenizeData}
+                disabled={!canSnapshot || isEngineRunning}
+                isUploading={isSnapshotUploading}
+              />
+              <MintNFTButton
                 ensureSnapshot={ensureSnapshot}
                 graphData={tokenizeData}
                 disabled={!canSnapshot || isEngineRunning}

@@ -42,9 +42,9 @@ export default function ConnectionTabs() {
   useTrackVisit(loading ? undefined : user?.fid, mutuals.length);
 
   const allTabs: { key: TabType; label: string; count: number | null; description: string }[] = [
-    { key: "mutuals", label: "Mutuals", count: mutuals.length, description: "Your strongest connections — people you engage with who also engage with you" },
-    { key: "attention", label: "Attention", count: attention.length, description: "People you give attention to — accounts you like, reply to, and recast the most" },
-    { key: "influence", label: "Influence", count: influence.length, description: "Your biggest fans — people who like, reply to, and recast your content the most" },
+    { key: "mutuals", label: "Mutuals", count: mutuals.length, description: "Your strongest connections ; people you engage with who also engage with you" },
+    { key: "attention", label: "Attention", count: attention.length, description: "People you give attention to, accounts you like, reply to, and recast the most" },
+    { key: "influence", label: "Influence", count: influence.length, description: "Your biggest fans ; people who like, reply to, and recast your content the most" },
   ];
 
   // Mini App Simplification: Show only Mutuals and Influence tabs
@@ -71,6 +71,23 @@ export default function ConnectionTabs() {
   if (loading) {
     // Graph view: spinner style (consistent with image loading overlay)
     if (effectiveViewType === "graph") {
+      // MiniApp: Clean borderless loading (light theme, no box)
+      if (isMiniApp) {
+        return (
+          <div
+            className="flex h-[60vh] min-h-[300px] items-center justify-center"
+            role="status"
+            aria-live="polite"
+            aria-label="Loading graph"
+          >
+            <div className="flex flex-col items-center gap-3">
+              <Loader2 className="h-8 w-8 animate-spin text-zinc-400" aria-hidden="true" />
+              <span className="text-xs uppercase tracking-wider text-zinc-400">Finding your people...</span>
+            </div>
+          </div>
+        );
+      }
+      // Web: Bordered container style
       return (
         <div
           className="relative h-[calc(100vh-200px)] min-h-[400px] max-h-[700px] border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
@@ -81,7 +98,7 @@ export default function ConnectionTabs() {
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="flex flex-col items-center gap-2 bg-white/80 dark:bg-zinc-900/80 px-6 py-4 rounded-lg">
               <Loader2 className="h-8 w-8 animate-spin text-zinc-400" aria-hidden="true" />
-              <span className="text-xs uppercase tracking-wider text-zinc-500">Fetching connections...</span>
+              <span className="text-xs uppercase tracking-wider text-zinc-500">Finding your people...</span>
             </div>
           </div>
         </div>
@@ -191,7 +208,7 @@ export default function ConnectionTabs() {
 
       {/* Tab description with freshness indicator */}
       {activeTabData && (
-        <div className="flex flex-col gap-1 -mt-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 -mt-2 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-zinc-500 dark:text-zinc-400">
             {activeTabData.description}
           </p>

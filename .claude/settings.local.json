@@ -47,7 +47,8 @@
       "WebFetch(domain:docs.airstack.xyz)",
       "WebFetch(domain:docs.pinata.cloud)",
       "WebFetch(domain:hub.pinata.cloud)",
-      "Bash(del \"D:\\\\Harry\\\\BasedNouns\\\\CodeProject\\\\quotientmutual\\\\.docs\\\\SMARTSEARCH.md\")"
+      "Bash(del \"D:\\\\Harry\\\\BasedNouns\\\\CodeProject\\\\quotientmutual\\\\.docs\\\\SMARTSEARCH.md\")",
+      "Bash(npx tsc:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
