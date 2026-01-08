@@ -13,9 +13,9 @@ const MintNFTModal = dynamic(() => import("./MintNFTModal"), {
   ssr: false,
   loading: () => (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="flex items-center gap-2 rounded bg-white px-4 py-3 dark:bg-zinc-800">
+      <div className="flex items-center gap-2 border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800">
         <Loader2 className="h-4 w-4 animate-spin" />
-        <span className="text-sm">Loading...</span>
+        <span className="text-xs uppercase tracking-wide">Loading...</span>
       </div>
     </div>
   ),

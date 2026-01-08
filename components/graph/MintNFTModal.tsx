@@ -312,12 +312,12 @@ export default function MintNFTModal({
         {/* Preview Step */}
         {step === "preview" && (
           <div className="space-y-4">
-            <p id="mint-modal-title" className="py-3 text-lg font-bold">
-              Mint your graph as an NFT
+            <p id="mint-modal-title" className="py-3 text-lg font-bold uppercase tracking-tight">
+              Make it an NFT
             </p>
 
             {/* NFT Name */}
-            <div className="rounded-lg bg-zinc-50 p-3 dark:bg-zinc-800">
+            <div className="border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-700 dark:bg-zinc-800">
               <p className="text-xs text-zinc-500 dark:text-zinc-400">NFT Name</p>
               <p className="font-medium text-zinc-900 dark:text-white">
                 {getViewDisplayName(viewType)} - @{graphData.username}
@@ -325,7 +325,7 @@ export default function MintNFTModal({
             </div>
 
             {/* Details */}
-            <div className="rounded-lg bg-zinc-50 p-4 dark:bg-zinc-800">
+            <div className="border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800">
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-zinc-500">Graph Type</span>
@@ -369,10 +369,10 @@ export default function MintNFTModal({
               className="mx-auto h-12 w-12 animate-spin text-emerald-500"
               aria-hidden="true"
             />
-            <h2 id="mint-modal-title" className="text-xl font-bold">
-              Saving your graph...
+            <h2 id="mint-modal-title" className="text-xl font-bold uppercase tracking-tight">
+              Saving...
             </h2>
-            <p className="text-sm text-zinc-500">Uploading to IPFS...</p>
+            <p className="text-sm text-zinc-500">Almost ready...</p>
           </div>
         )}
 
@@ -383,8 +383,8 @@ export default function MintNFTModal({
               className="mx-auto h-12 w-12 animate-spin text-emerald-500"
               aria-hidden="true"
             />
-            <h2 id="mint-modal-title" className="text-xl font-bold">
-              {isMintPending ? "Approve in your wallet" : "Minting..."}
+            <h2 id="mint-modal-title" className="text-xl font-bold uppercase tracking-tight">
+              {isMintPending ? "Confirm in wallet" : "Minting..."}
             </h2>
             <p className="text-sm text-zinc-500">
               {isMintPending
@@ -405,15 +405,15 @@ export default function MintNFTModal({
             <div className="mx-auto flex h-16 w-16 items-center justify-center border-2 border-green-500 bg-green-50 dark:bg-green-900/30">
               <Check className="h-8 w-8 text-green-600" aria-hidden="true" />
             </div>
-            <h2 id="mint-modal-title" className="text-xl font-bold">
-              NFT Minted!
+            <h2 id="mint-modal-title" className="text-xl font-bold uppercase tracking-tight">
+              You got it!
             </h2>
             <p className="text-sm text-zinc-500">
-              Your snapshot is now an NFT on Base.
+              Your NFT is ready on Base.
             </p>
 
             {/* NFT Details */}
-            <div className="rounded-lg bg-zinc-50 p-4 text-left dark:bg-zinc-800">
+            <div className="border border-zinc-200 bg-zinc-50 p-4 text-left dark:border-zinc-700 dark:bg-zinc-800">
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-zinc-500">Name</span>
@@ -494,8 +494,8 @@ export default function MintNFTModal({
             <div className="mx-auto flex h-16 w-16 items-center justify-center border-2 border-red-500 bg-red-50 dark:bg-red-900/30">
               <AlertCircle className="h-8 w-8 text-red-600" aria-hidden="true" />
             </div>
-            <h2 id="mint-modal-title" className="text-xl font-bold">
-              Something went wrong
+            <h2 id="mint-modal-title" className="text-xl font-bold uppercase tracking-tight">
+              Oops, that didn't work
             </h2>
             <p className="text-sm text-red-500">{error}</p>
 
