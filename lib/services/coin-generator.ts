@@ -167,5 +167,5 @@ export function generateMetadata(
  * Generate share text for social media
  */
 export function getShareText(username: string, coinUrl: string): string {
-  return `Just tokenized my Farcaster social graph! Check out my connections:\n\n${coinUrl}`;
+  return `Just posted my Farcaster social graph to Zora! Check out my connections:\n\n${coinUrl}`;
 }

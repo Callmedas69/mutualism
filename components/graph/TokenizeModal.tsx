@@ -11,7 +11,7 @@ import { parseEther, type Address } from "viem";
 import Link from "next/link";
 import { X, Check, Loader2, ExternalLink, Copy, AlertCircle } from "lucide-react";
 import type { TokenizeGraphData, TokenizeStep } from "@/types/tokenize";
-import { uploadSnapshot, mapGraphTypeToView } from "@/lib/pinata";
+import type { SnapshotCache } from "@/hooks/useSnapshotCache";
 import {
   prepareCoinCreation,
   generateSymbol,
@@ -28,7 +28,7 @@ import { formatTransactionError } from "@/lib/errors";
 interface TokenizeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  getGraphBlob: () => Promise<Blob | null>;
+  ensureSnapshot: () => Promise<SnapshotCache>;
   graphData: TokenizeGraphData;
 }
 
@@ -44,7 +44,7 @@ const STEPS: { id: TokenizeStep; label: string }[] = [
 export default function TokenizeModal({
   isOpen,
   onClose,
-  getGraphBlob,
+  ensureSnapshot,
   graphData,
 }: TokenizeModalProps) {
   const [step, setStep] = useState<TokenizeStep>("preview");
@@ -140,24 +140,10 @@ export default function TokenizeModal({
     try {
       setStep("uploading");
 
-      // 1. Capture graph as blob
-      const blob = await getGraphBlob();
-      if (!blob) {
-        throw new Error("Failed to capture graph image");
-      }
+      // Use cached snapshot or upload new one
+      const snapshotResult = await ensureSnapshot();
 
-      // 2. Upload snapshot folder (image.png + metadata.json)
-      // Per PINATA_RESTRUCTURING.md: folder-per-snapshot structure
-      const view = mapGraphTypeToView(graphData.graphType);
-      const snapshotResult = await uploadSnapshot({
-        imageBlob: blob,
-        fid: graphData.fid,
-        username: graphData.username,
-        view,
-        timeWindow: "all_time", // Current data = all time
-      });
-
-      // 3. Create coin on Zora using metadata URI from folder
+      // Create coin on Zora using metadata URI from folder
       setStep("creating");
 
       // Zora SDK returns raw tx params: { to, data, value }
@@ -179,7 +165,7 @@ export default function TokenizeModal({
       setError(formatTransactionError(err instanceof Error ? err : String(err)));
       setStep("error");
     }
-  }, [address, getGraphBlob, graphData, coinName, coinSymbol, sendCoinTx]);
+  }, [address, ensureSnapshot, coinName, coinSymbol, sendCoinTx]);
 
   // Trigger upload after fee confirmed
   useEffect(() => {
@@ -344,7 +330,7 @@ export default function TokenizeModal({
         ref={modalRef}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="tokenize-modal-title"
+        aria-labelledby="post-modal-title"
         className="relative w-full max-w-md border border-zinc-200 bg-white p-6 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900"
       >
         {/* Close button (disabled during processing) */}
@@ -396,8 +382,8 @@ export default function TokenizeModal({
         {/* Preview Step */}
         {step === "preview" && (
           <div className="space-y-4">
-            <p id="tokenize-modal-title" className="text-lg font-bold py-3">
-              Turn your social graph into a tradeable coin.
+            <p id="post-modal-title" className="text-lg font-bold py-3">
+              Post your graph to Zora as a tradeable coin.
             </p>
 
             {/* Token Name */}
@@ -439,7 +425,7 @@ export default function TokenizeModal({
                 onClick={handlePayFee}
                 className="flex-1 border border-[#f25b28] bg-[#f25b28] px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-white transition-colors hover:border-[#d94f22] hover:bg-[#d94f22] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f25b28] focus-visible:ring-offset-2"
               >
-                Tokenize
+                Post to Zora
               </button>
             </div>
           </div>
@@ -449,7 +435,7 @@ export default function TokenizeModal({
         {step === "payment" && (
           <div className="space-y-4 text-center">
             <Loader2 className="mx-auto h-12 w-12 animate-spin text-[#f25b28]" aria-hidden="true" />
-            <h2 id="tokenize-modal-title" className="text-xl font-bold">
+            <h2 id="post-modal-title" className="text-xl font-bold">
               {isFeePending ? "Approve in your wallet" : "Sending..."}
             </h2>
             <p className="text-sm text-zinc-500">
@@ -469,7 +455,7 @@ export default function TokenizeModal({
         {step === "uploading" && (
           <div className="space-y-4 text-center">
             <Loader2 className="mx-auto h-12 w-12 animate-spin text-[#f25b28]" aria-hidden="true" />
-            <h2 id="tokenize-modal-title" className="text-xl font-bold">Saving your graph...</h2>
+            <h2 id="post-modal-title" className="text-xl font-bold">Saving your graph...</h2>
             <p className="text-sm text-zinc-500">
               Almost ready...
             </p>
@@ -480,7 +466,7 @@ export default function TokenizeModal({
         {step === "creating" && (
           <div className="space-y-4 text-center">
             <Loader2 className="mx-auto h-12 w-12 animate-spin text-[#f25b28]" aria-hidden="true" />
-            <h2 id="tokenize-modal-title" className="text-xl font-bold">
+            <h2 id="post-modal-title" className="text-xl font-bold">
               {isCoinPending ? "One more approval" : "Minting..."}
             </h2>
             <p className="text-sm text-zinc-500">
@@ -500,7 +486,7 @@ export default function TokenizeModal({
         {step === "registering" && (
           <div className="space-y-4 text-center">
             <Loader2 className="mx-auto h-12 w-12 animate-spin text-[#f25b28]" aria-hidden="true" />
-            <h2 id="tokenize-modal-title" className="text-xl font-bold">
+            <h2 id="post-modal-title" className="text-xl font-bold">
               {isRegistryPending ? "Last one, promise!" : "Finishing up..."}
             </h2>
             <p className="text-sm text-zinc-500">
@@ -517,7 +503,7 @@ export default function TokenizeModal({
             <div className="mx-auto flex h-16 w-16 items-center justify-center border-2 border-green-500 bg-green-50 dark:bg-green-900/30">
               <Check className="h-8 w-8 text-green-600" aria-hidden="true" />
             </div>
-            <h2 id="tokenize-modal-title" className="text-xl font-bold">You&apos;re live!</h2>
+            <h2 id="post-modal-title" className="text-xl font-bold">You&apos;re live!</h2>
             <p className="text-sm text-zinc-500">
               Your coin is ready to trade on Zora.
             </p>
@@ -604,7 +590,7 @@ export default function TokenizeModal({
             <div className="mx-auto flex h-16 w-16 items-center justify-center border-2 border-red-500 bg-red-50 dark:bg-red-900/30">
               <AlertCircle className="h-8 w-8 text-red-600" aria-hidden="true" />
             </div>
-            <h2 id="tokenize-modal-title" className="text-xl font-bold">{getErrorTitle()}</h2>
+            <h2 id="post-modal-title" className="text-xl font-bold">{getErrorTitle()}</h2>
             <p className="text-sm text-red-500">{error}</p>
 
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:gap-3">

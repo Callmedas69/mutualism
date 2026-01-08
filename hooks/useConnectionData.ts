@@ -39,11 +39,13 @@ interface UseConnectionDataResult {
   loading: boolean;
   error: ConnectionError | null;
   retry: () => void;
+  lastUpdated: Date | null;
 }
 
 export function useConnectionData(fid: number | undefined): UseConnectionDataResult {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<ConnectionError | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const [mutuals, setMutuals] = useState<MutualUser[]>([]);
   const [attention, setAttention] = useState<ConnectionUser[]>([]);
@@ -127,6 +129,7 @@ export function useConnectionData(fid: number | undefined): UseConnectionDataRes
         setMutuals(mutualsData.mutuals || []);
         setAttention(connectionsData.attention || []);
         setInfluence(connectionsData.influence || []);
+        setLastUpdated(new Date());
       } catch (err) {
         // Ignore abort errors
         if (err instanceof Error && err.name === "AbortError") {
@@ -161,5 +164,6 @@ export function useConnectionData(fid: number | undefined): UseConnectionDataRes
     loading,
     error,
     retry,
+    lastUpdated,
   };
 }

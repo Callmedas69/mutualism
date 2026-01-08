@@ -65,7 +65,7 @@ export default function GalleryPage() {
       {/* Header */}
       <div className={isMiniApp ? "mb-4" : "mb-8 sm:mb-10"}>
         <p className="text-xs uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
-          Tokenized Social Graphs
+          Social Graphs on Zora
         </p>
         <div className="flex items-baseline gap-3 mt-1">
           <h1 className="text-2xl sm:text-3xl font-bold uppercase tracking-tight text-zinc-900 dark:text-white">
@@ -96,7 +96,7 @@ export default function GalleryPage() {
             No tokens created
           </h3>
           <p className="mt-3 text-sm uppercase tracking-[0.05em] text-zinc-500 dark:text-zinc-400">
-            Be the first to tokenize your social graph
+            Be the first to post your social graph
           </p>
           <TransitionLink
             href="/graph"

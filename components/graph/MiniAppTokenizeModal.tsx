@@ -10,7 +10,7 @@ import {
 import { parseEther, type Address } from "viem";
 import { X, Check, Loader2, ExternalLink, AlertCircle } from "lucide-react";
 import type { TokenizeGraphData, TokenizeStep } from "@/types/tokenize";
-import { uploadSnapshot, mapGraphTypeToView } from "@/lib/pinata";
+import type { SnapshotCache } from "@/hooks/useSnapshotCache";
 import {
   prepareCoinCreation,
   generateSymbol,
@@ -27,7 +27,7 @@ import { formatTransactionErrorShort } from "@/lib/errors";
 interface MiniAppTokenizeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  getGraphBlob: () => Promise<Blob | null>;
+  ensureSnapshot: () => Promise<SnapshotCache>;
   graphData: TokenizeGraphData;
 }
 
@@ -42,7 +42,7 @@ const STEPS: { id: TokenizeStep; label: string }[] = [
 export default function MiniAppTokenizeModal({
   isOpen,
   onClose,
-  getGraphBlob,
+  ensureSnapshot,
   graphData,
 }: MiniAppTokenizeModalProps) {
   const [step, setStep] = useState<TokenizeStep>("preview");
@@ -130,21 +130,8 @@ export default function MiniAppTokenizeModal({
     try {
       setStep("uploading");
 
-      const blob = await getGraphBlob();
-      if (!blob) {
-        throw new Error("Failed to capture graph");
-      }
-
-      // Upload snapshot folder (image.png + metadata.json)
-      // Per PINATA_RESTRUCTURING.md: folder-per-snapshot structure
-      const view = mapGraphTypeToView(graphData.graphType);
-      const snapshotResult = await uploadSnapshot({
-        imageBlob: blob,
-        fid: graphData.fid,
-        username: graphData.username,
-        view,
-        timeWindow: "all_time", // Current data = all time
-      });
+      // Use cached snapshot or upload new one
+      const snapshotResult = await ensureSnapshot();
 
       setStep("creating");
 
@@ -165,7 +152,7 @@ export default function MiniAppTokenizeModal({
       setError(formatTransactionErrorShort(err instanceof Error ? err : String(err)));
       setStep("error");
     }
-  }, [address, getGraphBlob, graphData, coinName, coinSymbol, sendCoinTx]);
+  }, [address, ensureSnapshot, coinName, coinSymbol, sendCoinTx]);
 
   // Trigger upload after fee confirmed
   useEffect(() => {
@@ -237,7 +224,7 @@ export default function MiniAppTokenizeModal({
   const handleShare = useCallback(() => {
     if (coinUrl) {
       composeCast(
-        `I just tokenized my ${graphData.graphType} graph on @mutualism`,
+        `I just posted my ${graphData.graphType} graph to Zora via @mutualism`,
         [coinUrl]
       );
     }
@@ -334,14 +321,14 @@ export default function MiniAppTokenizeModal({
         ref={modalRef}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="tokenize-modal-title"
+        aria-labelledby="post-modal-title"
         className="relative w-full max-w-sm border border-zinc-200 bg-white p-5 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900"
       >
         {/* Close button */}
         {!isProcessing && (
           <button
             onClick={handleClose}
-            aria-label="Close tokenize modal"
+            aria-label="Close modal"
             className="absolute right-3 top-3 z-10 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
           >
             <X size={18} aria-hidden="true" />
@@ -382,7 +369,7 @@ export default function MiniAppTokenizeModal({
         {/* Preview Step */}
         {step === "preview" && (
           <div className="space-y-4">
-            <h2 id="tokenize-modal-title" className="text-center text-base font-bold">Tokenize Graph</h2>
+            <h2 id="post-modal-title" className="text-center text-base font-bold">Post to Zora</h2>
 
             <div className="space-y-2">
               <div className="flex justify-between bg-zinc-50 p-2 text-sm dark:bg-zinc-800">
@@ -410,7 +397,7 @@ export default function MiniAppTokenizeModal({
                 onClick={handlePayFee}
                 className="flex-1 bg-[#f25b28] py-2.5 text-xs font-medium uppercase tracking-wide text-white"
               >
-                Tokenize
+                Post to Zora
               </button>
             </div>
           </div>
@@ -418,9 +405,9 @@ export default function MiniAppTokenizeModal({
 
         {/* Processing Steps */}
         {isProcessing && (
-          <div className="space-y-4 py-4 text-center">
+          <div className="space-y-4 py-4 text-center" role="status" aria-live="polite">
             <Loader2 className="mx-auto h-10 w-10 animate-spin text-[#f25b28]" aria-hidden="true" />
-            <h2 id="tokenize-modal-title" className="text-base font-bold">
+            <h2 id="post-modal-title" className="text-base font-bold">
               {step === "payment" && (isFeePending ? "Approve in your wallet" : "Sending...")}
               {step === "uploading" && "Saving your graph..."}
               {step === "creating" && (isCoinPending ? "One more approval" : "Minting...")}
@@ -448,13 +435,18 @@ export default function MiniAppTokenizeModal({
 
         {/* Success Step */}
         {step === "success" && (
-          <div className="space-y-4 text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center bg-green-500">
-              <Check className="h-6 w-6 text-white" aria-hidden="true" />
+          <div className="space-y-4 text-center" role="status" aria-live="polite">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-500 animate-in zoom-in-50 duration-300">
+              <Check className="h-7 w-7 text-white" aria-hidden="true" />
             </div>
-            <h2 id="tokenize-modal-title" className="text-base font-bold">
-              {registryFailed ? "Coin Created" : "Live on Zora!"}
-            </h2>
+            <div>
+              <h2 id="post-modal-title" className="text-lg font-bold">
+                {registryFailed ? "Coin Created!" : "You did it!"}
+              </h2>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                {registryFailed ? "Your coin is live on Zora" : "Your graph is live on Zora!"}
+              </p>
+            </div>
 
             {coinAddress && (
               <p className="font-mono text-xs text-zinc-500">
@@ -498,11 +490,11 @@ export default function MiniAppTokenizeModal({
 
         {/* Error Step */}
         {step === "error" && (
-          <div className="space-y-4 text-center">
+          <div className="space-y-4 text-center" role="alert" aria-live="assertive">
             <div className="mx-auto flex h-12 w-12 items-center justify-center bg-red-500">
               <AlertCircle className="h-6 w-6 text-white" aria-hidden="true" />
             </div>
-            <h2 id="tokenize-modal-title" className="text-base font-bold">{getErrorTitle()}</h2>
+            <h2 id="post-modal-title" className="text-base font-bold">{getErrorTitle()}</h2>
             <p className="text-sm text-red-500">{error}</p>
 
             <div className="flex gap-2">

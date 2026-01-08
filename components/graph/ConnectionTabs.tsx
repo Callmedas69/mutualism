@@ -22,15 +22,29 @@ export default function ConnectionTabs() {
   const [activeTab, setActiveTab] = useState<TabType>("mutuals");
   const [viewType, setViewType] = useState<ViewType>("list");
 
-  const { mutuals, attention, influence, loading, error, retry } = useConnectionData(user?.fid);
+  const { mutuals, attention, influence, loading, error, retry, lastUpdated } = useConnectionData(user?.fid);
+
+  // Format relative time for data freshness
+  const getRelativeTime = (date: Date | null): string => {
+    if (!date) return "";
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return "just now";
+    if (diffMins === 1) return "1 min ago";
+    if (diffMins < 60) return `${diffMins} mins ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours === 1) return "1 hour ago";
+    return `${diffHours} hours ago`;
+  };
 
   // Track visit for reminder notifications (only when data loaded)
   useTrackVisit(loading ? undefined : user?.fid, mutuals.length);
 
   const allTabs: { key: TabType; label: string; count: number | null; description: string }[] = [
-    { key: "mutuals", label: "Mutuals", count: mutuals.length, description: "People who engage with you and you engage back" },
-    { key: "attention", label: "Attention", count: attention.length, description: "People you engage with the most" },
-    { key: "influence", label: "Influence", count: influence.length, description: "People who engage with you the most" },
+    { key: "mutuals", label: "Mutuals", count: mutuals.length, description: "Your strongest connections — people you engage with who also engage with you" },
+    { key: "attention", label: "Attention", count: attention.length, description: "People you give attention to — accounts you like, reply to, and recast the most" },
+    { key: "influence", label: "Influence", count: influence.length, description: "Your biggest fans — people who like, reply to, and recast your content the most" },
   ];
 
   // Mini App Simplification: Show only Mutuals and Influence tabs
@@ -58,11 +72,16 @@ export default function ConnectionTabs() {
     // Graph view: spinner style (consistent with image loading overlay)
     if (effectiveViewType === "graph") {
       return (
-        <div className="relative h-[600px] border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+        <div
+          className="relative h-[calc(100vh-200px)] min-h-[400px] max-h-[700px] border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
+          role="status"
+          aria-live="polite"
+          aria-label="Loading graph"
+        >
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="flex flex-col items-center gap-2 bg-white/80 dark:bg-zinc-900/80 px-6 py-4 rounded-lg">
-              <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
-              <span className="text-xs uppercase tracking-wider text-zinc-500">Loading...</span>
+              <Loader2 className="h-8 w-8 animate-spin text-zinc-400" aria-hidden="true" />
+              <span className="text-xs uppercase tracking-wider text-zinc-500">Fetching connections...</span>
             </div>
           </div>
         </div>
@@ -81,7 +100,11 @@ export default function ConnectionTabs() {
     };
 
     return (
-      <div className="flex min-h-[40vh] flex-col items-center justify-center gap-6">
+      <div
+        className="flex min-h-[40vh] flex-col items-center justify-center gap-6"
+        role="alert"
+        aria-live="assertive"
+      >
         <div className="text-center">
           <p className="text-xs uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
             {errorTitles[error.type]}
@@ -166,11 +189,18 @@ export default function ConnectionTabs() {
         )}
       </div>
 
-      {/* Tab description */}
+      {/* Tab description with freshness indicator */}
       {activeTabData && (
-        <p className="text-xs text-zinc-500 dark:text-zinc-400 -mt-2">
-          {activeTabData.description}
-        </p>
+        <div className="flex flex-col gap-1 -mt-2 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            {activeTabData.description}
+          </p>
+          {lastUpdated && (
+            <p className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+              Updated {getRelativeTime(lastUpdated)}
+            </p>
+          )}
+        </div>
       )}
 
       {/* Content with fade transition - both views rendered, one hidden */}

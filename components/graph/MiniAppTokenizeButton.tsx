@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { Sparkles, Loader2 } from "lucide-react";
 import { useState } from "react";
 import type { TokenizeGraphData } from "@/types/tokenize";
+import type { SnapshotCache } from "@/hooks/useSnapshotCache";
 
 // Lazy load MiniAppTokenizeModal
 const MiniAppTokenizeModal = dynamic(() => import("./MiniAppTokenizeModal"), {
@@ -19,15 +20,17 @@ const MiniAppTokenizeModal = dynamic(() => import("./MiniAppTokenizeModal"), {
 });
 
 interface MiniAppTokenizeButtonProps {
-  getGraphBlob: () => Promise<Blob | null>;
+  ensureSnapshot: () => Promise<SnapshotCache>;
   graphData: TokenizeGraphData;
   disabled?: boolean;
+  isUploading?: boolean;
 }
 
 export default function MiniAppTokenizeButton({
-  getGraphBlob,
+  ensureSnapshot,
   graphData,
   disabled = false,
+  isUploading = false,
 }: MiniAppTokenizeButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -36,19 +39,20 @@ export default function MiniAppTokenizeButton({
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        disabled={disabled}
-        title="Tokenize your graph on Zora"
-        className="flex items-center gap-2 border border-purple-400 bg-purple-50 px-3 py-2.5 min-h-[44px] text-[10px] font-medium uppercase tracking-[0.1em] text-purple-700 transition-all duration-200 hover:border-purple-600 hover:bg-purple-100 hover:text-purple-900 disabled:cursor-not-allowed disabled:opacity-40 dark:border-purple-600 dark:bg-purple-950/50 dark:text-purple-300 dark:hover:border-purple-400 dark:hover:text-purple-100"
+        disabled={disabled || isUploading}
+        aria-busy={isUploading}
+        title="Post your graph to Zora"
+        className="flex items-center gap-2 border border-purple-400 bg-purple-50 px-3 py-2.5 min-h-[44px] text-[10px] font-medium uppercase tracking-[0.1em] text-purple-700 transition-all duration-200 hover:border-purple-600 hover:bg-purple-100 hover:text-purple-900 disabled:cursor-not-allowed disabled:border-zinc-300 disabled:bg-zinc-100 disabled:text-zinc-400 dark:border-purple-600 dark:bg-purple-950/50 dark:text-purple-300 dark:hover:border-purple-400 dark:hover:text-purple-100 dark:disabled:border-zinc-700 dark:disabled:bg-zinc-800 dark:disabled:text-zinc-500"
       >
         <Sparkles size={14} />
-        Tokenize
+        Post to Zora
       </button>
 
       {isModalOpen && (
         <MiniAppTokenizeModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          getGraphBlob={getGraphBlob}
+          ensureSnapshot={ensureSnapshot}
           graphData={graphData}
         />
       )}

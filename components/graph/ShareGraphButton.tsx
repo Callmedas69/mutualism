@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Share2 } from "lucide-react";
-import { uploadSnapshot, mapGraphTypeToView } from "@/lib/pinata";
+import type { SnapshotCache } from "@/hooks/useSnapshotCache";
 
 // App URL for embed (allows users to click through to the app)
 const APP_URL = process.env.NEXT_PUBLIC_DOMAIN_URL || "https://mutualism.geoart.studio";
@@ -11,54 +11,31 @@ type ShareState = "idle" | "uploading" | "sharing" | "success" | "error";
 
 interface ShareGraphButtonProps {
   graphType: string;
-  username: string;
-  fid: number;
-  getGraphBlob: () => Promise<Blob | null>;
+  ensureSnapshot: () => Promise<SnapshotCache>;
   composeCast: (text?: string, embeds?: string[]) => Promise<void>;
   disabled?: boolean;
+  isUploading?: boolean;
 }
 
 export default function ShareGraphButton({
   graphType,
-  username,
-  fid,
-  getGraphBlob,
+  ensureSnapshot,
   composeCast,
   disabled = false,
+  isUploading = false,
 }: ShareGraphButtonProps) {
   const [state, setState] = useState<ShareState>("idle");
   const [error, setError] = useState<string | null>(null);
 
   const handleShare = async () => {
-    if (state !== "idle") return;
+    if (state !== "idle" || isUploading) return;
     setError(null);
 
-    // Step 1: Generate PNG
+    // Step 1: Ensure snapshot exists (uses cache if available)
     setState("uploading");
-    let blob: Blob | null = null;
-    try {
-      blob = await getGraphBlob();
-      if (!blob) {
-        throw new Error("Failed to generate graph image");
-      }
-    } catch (err) {
-      console.error("Failed to generate PNG:", err);
-      setError("Failed to generate image");
-      setState("error");
-      return;
-    }
-
-    // Step 2: Create snapshot (folder + DB record)
     let imageUrl: string;
     try {
-      const view = mapGraphTypeToView(graphType);
-      const result = await uploadSnapshot({
-        imageBlob: blob,
-        fid,
-        username,
-        view,
-        timeWindow: "all_time",
-      });
+      const result = await ensureSnapshot();
 
       // Use folder gateway URL + image.png for Farcaster embed
       imageUrl = `${result.gatewayUrl}/image.png`;
@@ -68,12 +45,12 @@ export default function ShareGraphButton({
       }
     } catch (err) {
       console.error("Failed to create snapshot:", err);
-      setError("Failed to save snapshot");
+      setError(err instanceof Error ? err.message : "Failed to save snapshot");
       setState("error");
       return;
     }
 
-    // Step 3: Open composeCast with image + app URL embeds
+    // Step 2: Open composeCast with image + app URL embeds
     setState("sharing");
     try {
       await composeCast(
@@ -121,7 +98,8 @@ export default function ShareGraphButton({
   return (
     <button
       onClick={handleShare}
-      disabled={disabled || state !== "idle"}
+      disabled={disabled || state !== "idle" || isUploading}
+      aria-busy={state === "uploading" || isUploading}
       className={`flex items-center gap-2 border px-3 py-2.5 min-h-[44px] text-[10px] uppercase tracking-[0.1em] font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40 ${
         isSuccess
           ? "border-green-500 bg-green-50 text-green-600 dark:border-green-600 dark:bg-green-950 dark:text-green-400"
