@@ -57,7 +57,7 @@ export default function AddAppModal() {
           <button
             onClick={handleAddApp}
             disabled={isAdding}
-            className="w-full px-6 py-3 text-xs font-medium uppercase tracking-wide border border-zinc-900 bg-zinc-900 text-white transition-all duration-200 hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed dark:border-white dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 flex items-center justify-center gap-2"
+            className="w-full px-6 py-3 text-xs font-medium uppercase tracking-wide border border-zinc-900 bg-zinc-900 text-white transition-all duration-200 hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed dark:border-white dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
           >
             {isAdding ? (
               <>
@@ -71,7 +71,7 @@ export default function AddAppModal() {
           <button
             onClick={handleMaybeLater}
             disabled={isAdding}
-            className="w-full py-2 text-xs font-medium uppercase tracking-wide text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+            className="w-full py-2 text-xs font-medium uppercase tracking-wide text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
           >
             Maybe Later
           </button>

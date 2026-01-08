@@ -42,9 +42,9 @@ export default function ConnectionTabs() {
   useTrackVisit(loading ? undefined : user?.fid, mutuals.length);
 
   const allTabs: { key: TabType; label: string; count: number | null; description: string }[] = [
-    { key: "mutuals", label: "Mutuals", count: mutuals.length, description: "Your strongest connections ; people you engage with who also engage with you" },
+    { key: "mutuals", label: "Mutuals", count: mutuals.length, description: "Your strongest connections. People you engage with who also engage with you" },
     { key: "attention", label: "Attention", count: attention.length, description: "People you give attention to, accounts you like, reply to, and recast the most" },
-    { key: "influence", label: "Influence", count: influence.length, description: "Your biggest fans ; people who like, reply to, and recast your content the most" },
+    { key: "influence", label: "Influence", count: influence.length, description: "Your biggest fans. People who like, reply to, and recast your content the most" },
   ];
 
   // Mini App Simplification: Show only Mutuals and Influence tabs
@@ -209,7 +209,7 @@ export default function ConnectionTabs() {
       {/* Tab description with freshness indicator */}
       {activeTabData && (
         <div className="flex flex-col gap-3 -mt-2 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 italic">
             {activeTabData.description}
           </p>
           {lastUpdated && (

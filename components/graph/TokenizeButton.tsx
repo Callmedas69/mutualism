@@ -1,7 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { Sparkles, Loader2 } from "lucide-react";
+import Image from "next/image";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import type { TokenizeGraphData } from "@/types/tokenize";
@@ -43,9 +44,9 @@ export default function TokenizeButton({
         disabled={disabled || !isConnected || isUploading}
         aria-busy={isUploading}
         title={!isConnected ? "Connect wallet to post" : "Post your graph to Zora"}
-        className="flex items-center gap-1.5 border border-purple-400 bg-purple-50 px-2 py-1.5 text-[9px] font-medium uppercase tracking-[0.1em] text-purple-700 transition-all duration-200 hover:border-purple-600 hover:bg-purple-100 hover:text-purple-900 disabled:cursor-not-allowed disabled:opacity-40 sm:gap-2 sm:px-3 sm:py-2 sm:text-[10px] dark:border-purple-600 dark:bg-purple-950/50 dark:text-purple-300 dark:hover:border-purple-400 dark:hover:text-purple-100"
+        className="flex items-center gap-2 border border-[#f25b28] bg-orange-50 px-3 py-2.5 min-h-[44px] text-[10px] font-medium uppercase tracking-[0.1em] text-[#f25b28] transition-all duration-200 hover:border-[#d94d1f] hover:bg-orange-100 hover:text-[#d94d1f] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f25b28] dark:border-[#f25b28] dark:bg-orange-950/50 dark:text-orange-300 dark:hover:border-orange-400 dark:hover:text-orange-100"
       >
-        <Sparkles size={12} />
+        <Image src="/zora_icon.svg" alt="" width={14} height={14} className="rounded-full" />
         Post to Zora
       </button>
 

@@ -29,7 +29,7 @@ export default function ExportButton({
     <button
       onClick={handleExport}
       disabled={disabled || isExporting}
-      className="flex items-center gap-2 border border-zinc-300 bg-white px-3 py-2.5 min-h-[44px] text-[10px] uppercase tracking-[0.1em] font-medium text-zinc-600 transition-all duration-200 hover:border-zinc-900 hover:text-zinc-900 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-white dark:hover:text-white"
+      className="flex items-center gap-2 border border-zinc-300 bg-white px-3 py-2.5 min-h-[44px] text-[10px] uppercase tracking-[0.1em] font-medium text-zinc-600 transition-all duration-200 hover:border-zinc-900 hover:text-zinc-900 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-white dark:hover:text-white"
     >
       <Download size={14} />
       {isExporting ? "Exporting..." : "Export PNG"}

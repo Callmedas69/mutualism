@@ -7,9 +7,8 @@ import {
   useWriteContract,
   useReadContract,
 } from "wagmi";
-import { parseEther, type Address } from "viem";
-import Link from "next/link";
-import { X, Check, Loader2, ExternalLink, Copy, AlertCircle } from "lucide-react";
+import { parseEther } from "viem";
+import { X, Check, Loader2, ExternalLink, AlertCircle } from "lucide-react";
 import type { TokenizeGraphData } from "@/types/tokenize";
 import type { SnapshotView } from "@/types/tokenize";
 import type { SnapshotCache } from "@/hooks/useSnapshotCache";
@@ -51,7 +50,6 @@ export default function MintNFTModal({
   const [step, setStep] = useState<MintStep>("preview");
   const [error, setError] = useState<string | null>(null);
   const [tokenId, setTokenId] = useState<bigint | null>(null);
-  const [copied, setCopied] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
   const { address } = useAccount();
@@ -76,7 +74,6 @@ export default function MintNFTModal({
 
   // Wait for mint transaction
   const {
-    isLoading: isMintConfirming,
     isSuccess: isMintConfirmed,
     data: mintReceipt,
   } = useWaitForTransactionReceipt({
@@ -148,8 +145,6 @@ export default function MintNFTModal({
   // Handle mint success - parse token ID from logs
   useEffect(() => {
     if (isMintConfirmed && mintReceipt && step === "minting") {
-      // Find SnapshotMinted event in logs
-      const snapshotMintedTopic = "0x"; // Will match by event structure
       const transferLog = mintReceipt.logs.find(
         (log) =>
           log.address.toLowerCase() === MUTUALISM_NFT_ADDRESS.toLowerCase() &&
@@ -157,8 +152,6 @@ export default function MintNFTModal({
       );
 
       if (transferLog && transferLog.topics[3]) {
-        // Token ID is the 4th topic in Transfer event (indexed)
-        // Or parse from SnapshotMinted which has tokenId as first indexed param
         const parsedTokenId = BigInt(transferLog.topics[3]);
         setTokenId(parsedTokenId);
       }
@@ -174,16 +167,6 @@ export default function MintNFTModal({
       setStep("error");
     }
   }, [mintError]);
-
-  // Copy URL to clipboard
-  const handleCopy = useCallback(() => {
-    if (tokenId !== null) {
-      const url = getOpenSeaUrl(tokenId);
-      navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  }, [tokenId]);
 
   // Reset state on close
   const handleClose = useCallback(() => {
@@ -249,10 +232,11 @@ export default function MintNFTModal({
   // Progress indicator
   const currentStepIndex = STEPS.findIndex((s) => s.id === step);
   const viewType = getViewType();
+  const isProcessing = ["uploading", "minting"].includes(step);
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
       role="presentation"
     >
       <div
@@ -260,48 +244,43 @@ export default function MintNFTModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="mint-modal-title"
-        className="relative w-full max-w-md border border-zinc-200 bg-white p-6 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900"
+        className="relative w-full max-w-sm border border-zinc-200 bg-white p-5 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900"
       >
         {/* Close button */}
-        {step !== "uploading" && step !== "minting" && (
+        {!isProcessing && (
           <button
             onClick={handleClose}
-            aria-label="Close"
+            aria-label="Close modal"
             className="absolute right-3 top-3 z-10 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
           >
-            <X size={20} aria-hidden="true" />
+            <X size={18} aria-hidden="true" />
           </button>
         )}
 
-        {/* Progress Steps */}
+        {/* Progress Steps - Centered like MiniAppTokenizeModal */}
         <div
-          className="mb-6 flex items-center justify-between pr-8"
+          className="mb-5 flex items-center justify-center gap-2"
           role="group"
           aria-label={`Step ${currentStepIndex + 1} of ${STEPS.length - 1}`}
         >
           {STEPS.slice(0, -1).map((s, i) => (
-            <div key={s.id} className="flex items-center">
+            <div key={s.id} className="flex items-center gap-2">
               <div
                 aria-current={i === currentStepIndex ? "step" : undefined}
-                className={`flex h-6 w-6 items-center justify-center border text-[10px] font-medium sm:h-8 sm:w-8 sm:text-xs ${
+                aria-label={`${s.label}: ${i < currentStepIndex ? "completed" : i === currentStepIndex ? "current" : "pending"}`}
+                className={`flex h-6 w-6 items-center justify-center text-[10px] font-bold ${
                   i < currentStepIndex
-                    ? "border-green-500 bg-green-500 text-white"
+                    ? "bg-green-500 text-white"
                     : i === currentStepIndex
-                    ? "border-emerald-500 bg-emerald-500 text-white"
-                    : "border-zinc-300 bg-zinc-100 text-zinc-500 dark:border-zinc-600 dark:bg-zinc-800"
+                    ? "bg-emerald-500 text-white"
+                    : "bg-zinc-200 text-zinc-500 dark:bg-zinc-700"
                 }`}
               >
-                {i < currentStepIndex ? (
-                  <Check size={12} className="sm:h-3.5 sm:w-3.5" aria-hidden="true" />
-                ) : (
-                  i + 1
-                )}
+                {i < currentStepIndex ? <Check size={12} aria-hidden="true" /> : i + 1}
               </div>
               {i < STEPS.length - 2 && (
                 <div
-                  className={`hidden h-px w-4 sm:block sm:w-8 ${
-                    i < currentStepIndex ? "bg-green-500" : "bg-zinc-300 dark:bg-zinc-600"
-                  }`}
+                  className={`h-px w-6 ${i < currentStepIndex ? "bg-green-500" : "bg-zinc-300 dark:bg-zinc-600"}`}
                   aria-hidden="true"
                 />
               )}
@@ -312,49 +291,37 @@ export default function MintNFTModal({
         {/* Preview Step */}
         {step === "preview" && (
           <div className="space-y-4">
-            <p id="mint-modal-title" className="py-3 text-lg font-bold uppercase tracking-tight">
-              Make it an NFT
-            </p>
+            <h2 id="mint-modal-title" className="text-center text-base font-bold">
+              Mint as NFT
+            </h2>
 
-            {/* NFT Name */}
-            <div className="border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-700 dark:bg-zinc-800">
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">NFT Name</p>
-              <p className="font-medium text-zinc-900 dark:text-white">
-                {getViewDisplayName(viewType)} - @{graphData.username}
-              </p>
-            </div>
-
-            {/* Details */}
-            <div className="border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800">
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-zinc-500">Graph Type</span>
-                  <span className="font-medium">{getViewDisplayName(viewType)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-zinc-500">Collection</span>
-                  <span className="font-medium">Mutualism Snapshot</span>
-                </div>
-                <div className="flex justify-between border-t border-zinc-200 pt-2 dark:border-zinc-700">
-                  <span className="text-zinc-500">Mint Price</span>
-                  <span className="font-medium">
-                    {MUTUALISM_NFT_MINT_PRICE} ETH
-                    {priceInUsd && ` (~$${priceInUsd})`}
-                  </span>
-                </div>
+            <div className="space-y-2">
+              <div className="flex justify-between bg-zinc-50 p-2 text-sm dark:bg-zinc-800">
+                <span className="text-zinc-500">Name</span>
+                <span className="font-medium">{getViewDisplayName(viewType)} - @{graphData.username}</span>
+              </div>
+              <div className="flex justify-between bg-zinc-50 p-2 text-sm dark:bg-zinc-800">
+                <span className="text-zinc-500">Collection</span>
+                <span className="font-medium">Mutualism Snapshot</span>
+              </div>
+              <div className="flex justify-between bg-zinc-50 p-2 text-sm dark:bg-zinc-800">
+                <span className="text-zinc-500">Price</span>
+                <span className="font-medium">
+                  {MUTUALISM_NFT_MINT_PRICE} ETH{priceInUsd && ` (~$${priceInUsd})`}
+                </span>
               </div>
             </div>
 
-            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:gap-3">
+            <div className="flex gap-2">
               <button
                 onClick={handleClose}
-                className="flex-1 border border-zinc-300 bg-white px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-zinc-700 transition-colors hover:border-zinc-500 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-400"
+                className="flex-1 border border-zinc-300 bg-white py-2.5 text-xs font-medium uppercase tracking-wide text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
               >
                 Cancel
               </button>
               <button
                 onClick={handleMint}
-                className="flex-1 border border-emerald-500 bg-emerald-500 px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-white transition-colors hover:border-emerald-600 hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                className="flex-1 bg-emerald-500 py-2.5 text-xs font-medium uppercase tracking-wide text-white"
               >
                 Mint NFT
               </button>
@@ -362,36 +329,22 @@ export default function MintNFTModal({
           </div>
         )}
 
-        {/* Uploading Step */}
-        {step === "uploading" && (
-          <div className="space-y-4 text-center">
-            <Loader2
-              className="mx-auto h-12 w-12 animate-spin text-emerald-500"
-              aria-hidden="true"
-            />
-            <h2 id="mint-modal-title" className="text-xl font-bold uppercase tracking-tight">
-              Saving...
+        {/* Processing Steps */}
+        {isProcessing && (
+          <div className="space-y-4 py-4 text-center" role="status" aria-live="polite">
+            <Loader2 className="mx-auto h-10 w-10 animate-spin text-emerald-500" aria-hidden="true" />
+            <h2 id="mint-modal-title" className="text-base font-bold">
+              {step === "uploading" && "Saving your graph..."}
+              {step === "minting" && (isMintPending ? "Confirm in wallet" : "Minting...")}
             </h2>
-            <p className="text-sm text-zinc-500">Almost ready...</p>
-          </div>
-        )}
-
-        {/* Minting Step */}
-        {step === "minting" && (
-          <div className="space-y-4 text-center">
-            <Loader2
-              className="mx-auto h-12 w-12 animate-spin text-emerald-500"
-              aria-hidden="true"
-            />
-            <h2 id="mint-modal-title" className="text-xl font-bold uppercase tracking-tight">
-              {isMintPending ? "Confirm in wallet" : "Minting..."}
-            </h2>
-            <p className="text-sm text-zinc-500">
-              {isMintPending
+            <p className="text-xs text-zinc-500">
+              {step === "uploading" && "Almost ready..."}
+              {step === "minting" && (isMintPending
                 ? `${MUTUALISM_NFT_MINT_PRICE} ETH${priceInUsd ? ` (~$${priceInUsd})` : ""}`
-                : "Almost there..."}
+                : "Making it official..."
+              )}
             </p>
-            {mintHash && !isMintPending && (
+            {mintHash && step === "minting" && !isMintPending && (
               <p className="font-mono text-xs text-zinc-400">
                 Tx: {mintHash.slice(0, 8)}...{mintHash.slice(-6)}
               </p>
@@ -401,108 +354,69 @@ export default function MintNFTModal({
 
         {/* Success Step */}
         {step === "success" && (
-          <div className="space-y-4 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center border-2 border-green-500 bg-green-50 dark:bg-green-900/30">
-              <Check className="h-8 w-8 text-green-600" aria-hidden="true" />
+          <div className="space-y-4 text-center" role="status" aria-live="polite">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-500 animate-in zoom-in-50 duration-300">
+              <Check className="h-7 w-7 text-white" aria-hidden="true" />
             </div>
-            <h2 id="mint-modal-title" className="text-xl font-bold uppercase tracking-tight">
-              You got it!
-            </h2>
-            <p className="text-sm text-zinc-500">
-              Your NFT is ready on Base.
-            </p>
-
-            {/* NFT Details */}
-            <div className="border border-zinc-200 bg-zinc-50 p-4 text-left dark:border-zinc-700 dark:bg-zinc-800">
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-zinc-500">Name</span>
-                  <span className="font-medium">
-                    {getViewDisplayName(viewType)} - @{graphData.username}
-                  </span>
-                </div>
-                {tokenId !== null && (
-                  <div className="flex justify-between">
-                    <span className="text-zinc-500">Token ID</span>
-                    <span className="font-mono font-medium">#{tokenId.toString()}</span>
-                  </div>
-                )}
-              </div>
+            <div>
+              <h2 id="mint-modal-title" className="text-lg font-bold">You got it!</h2>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                Your NFT is live on Base
+              </p>
             </div>
 
-            {/* Links */}
             {tokenId !== null && (
-              <div className="flex items-center gap-2 border border-zinc-300 bg-zinc-50 p-3 dark:border-zinc-600 dark:bg-zinc-800">
-                <input
-                  type="text"
-                  value={getOpenSeaUrl(tokenId)}
-                  readOnly
-                  className="flex-1 truncate bg-transparent font-mono text-xs"
-                />
-                <button
-                  onClick={handleCopy}
-                  aria-label={copied ? "Link copied" : "Copy link"}
-                  className="border border-zinc-300 p-1.5 transition-colors hover:border-zinc-500 hover:bg-zinc-100 dark:border-zinc-600 dark:hover:border-zinc-400 dark:hover:bg-zinc-700"
-                >
-                  {copied ? (
-                    <Check size={14} className="text-green-500" aria-hidden="true" />
-                  ) : (
-                    <Copy size={14} aria-hidden="true" />
-                  )}
-                </button>
-              </div>
+              <p className="font-mono text-xs text-zinc-500">
+                Token #{tokenId.toString()}
+              </p>
             )}
 
-            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:gap-3">
-              <button
-                onClick={handleClose}
-                className="flex flex-1 items-center justify-center border border-zinc-300 bg-white px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-zinc-700 transition-colors hover:border-zinc-500 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-400"
-              >
-                Close
-              </button>
+            <div className="flex flex-col gap-2">
               {tokenId !== null && (
                 <a
                   href={getOpenSeaUrl(tokenId)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-1 items-center justify-center gap-2 border border-emerald-500 bg-emerald-500 px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-white transition-colors hover:border-emerald-600 hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                  className="flex w-full items-center justify-center gap-1 bg-emerald-500 py-2.5 text-xs font-medium uppercase tracking-wide text-white"
                 >
                   View on OpenSea
                   <ExternalLink size={12} aria-hidden="true" />
                 </a>
               )}
-            </div>
-
-            {/* BaseScan link */}
-            {mintHash && (
-              <a
-                href={getBaseScanTxUrl(mintHash)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+              {mintHash && (
+                <a
+                  href={getBaseScanTxUrl(mintHash)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex w-full items-center justify-center gap-1 border border-zinc-300 bg-white py-2.5 text-xs font-medium uppercase tracking-wide text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+                >
+                  View on BaseScan
+                  <ExternalLink size={12} aria-hidden="true" />
+                </a>
+              )}
+              <button
+                onClick={handleClose}
+                className="w-full border border-zinc-300 bg-white py-2.5 text-xs font-medium uppercase tracking-wide text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
               >
-                View transaction on BaseScan
-                <ExternalLink size={10} aria-hidden="true" />
-              </a>
-            )}
+                Done
+              </button>
+            </div>
           </div>
         )}
 
         {/* Error Step */}
         {step === "error" && (
-          <div className="space-y-4 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center border-2 border-red-500 bg-red-50 dark:bg-red-900/30">
-              <AlertCircle className="h-8 w-8 text-red-600" aria-hidden="true" />
+          <div className="space-y-4 text-center" role="alert" aria-live="assertive">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center bg-red-500">
+              <AlertCircle className="h-6 w-6 text-white" aria-hidden="true" />
             </div>
-            <h2 id="mint-modal-title" className="text-xl font-bold uppercase tracking-tight">
-              Oops, that didn't work
-            </h2>
+            <h2 id="mint-modal-title" className="text-base font-bold">That didn&apos;t work</h2>
             <p className="text-sm text-red-500">{error}</p>
 
-            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:gap-3">
+            <div className="flex gap-2">
               <button
                 onClick={handleClose}
-                className="flex-1 border border-zinc-300 bg-white px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-zinc-700 transition-colors hover:border-zinc-500 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-400"
+                className="flex-1 border border-zinc-300 bg-white py-2.5 text-xs font-medium uppercase tracking-wide text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
               >
                 Close
               </button>
@@ -512,7 +426,7 @@ export default function MintNFTModal({
                   resetMint();
                   setStep("preview");
                 }}
-                className="flex-1 border border-emerald-500 bg-emerald-500 px-4 py-2.5 text-xs font-medium uppercase tracking-wide text-white transition-colors hover:border-emerald-600 hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                className="flex-1 bg-emerald-500 py-2.5 text-xs font-medium uppercase tracking-wide text-white"
               >
                 Try again
               </button>

@@ -630,21 +630,17 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
         </div>
       </div>
 
-      {/* Top Bar */}
-      <div className="absolute left-2 right-2 top-2 flex items-center justify-between gap-2 sm:left-4 sm:right-4 sm:top-4">
-        {/* Mutuality Legend - hidden in miniapp to prevent overflow */}
-        {!isMiniApp && (
-          <div className="flex items-center gap-2 border border-zinc-200 bg-white/95 px-3 py-2 text-[11px] uppercase tracking-[0.05em] sm:px-4 sm:text-xs dark:border-zinc-700 dark:bg-zinc-900/95">
-            <span className="font-medium text-zinc-500">Mutuality</span>
-            <div
-              className="h-2 w-16 rounded-sm sm:h-3 sm:w-24"
-              style={{ background: "linear-gradient(to right, #93c5fd, #1e40af)" }}
-            />
-          </div>
-        )}
+      {/* Mutuality Legend - bottom-left */}
+      <div className="absolute left-2 bottom-2 z-20 flex items-center gap-2 border border-zinc-200 bg-white/95 px-3 py-1.5 text-[10px] uppercase tracking-[0.05em] dark:border-zinc-700 dark:bg-zinc-900/95 sm:left-4 sm:bottom-4 sm:px-4 sm:py-2 sm:text-xs">
+        <span className="font-medium text-zinc-500">Mutuality</span>
+        <div
+          className="h-2 w-16 sm:h-3 sm:w-24"
+          style={{ background: "linear-gradient(to right, #93c5fd, #1e40af)" }}
+        />
+      </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
+      {/* Top Bar - Action Buttons */}
+      <div className="absolute right-2 top-2 flex items-center gap-1.5 sm:right-4 sm:top-4 sm:gap-2">
           {isMiniApp ? (
             <>
               <ShareGraphButton
@@ -687,7 +683,6 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
               />
             </>
           )}
-        </div>
       </div>
 
       {/* Node Info Card */}
