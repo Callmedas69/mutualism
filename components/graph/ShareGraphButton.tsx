@@ -124,7 +124,7 @@ export default function ShareGraphButton({
     return (
       <button
         onClick={handleRetry}
-        className={`flex items-center justify-center gap-2 border border-red-400 bg-red-50 px-3 py-2.5 min-h-[44px] text-[10px] uppercase tracking-[0.1em] font-medium text-red-600 transition-all duration-200 hover:border-red-600 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 dark:border-red-700 dark:bg-red-950 dark:text-red-400 dark:hover:border-red-500 ${fullWidth ? "w-full" : "min-w-[100px]"}`}
+        className={`flex items-center justify-center gap-2 border border-red-400 bg-red-50 px-3 py-2 min-h-[36px] text-[10px] uppercase tracking-[0.1em] font-medium text-red-600 whitespace-nowrap transition-all duration-200 hover:border-red-600 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 dark:border-red-700 dark:bg-red-950 dark:text-red-400 dark:hover:border-red-500 ${fullWidth ? "w-full" : "min-w-[100px]"}`}
       >
         <Share2 size={14} />
         {state === "timeout" ? "Try Again" : error || "Error"}
@@ -150,7 +150,7 @@ export default function ShareGraphButton({
       onClick={handleShare}
       disabled={disabled || state !== "idle" || isUploading}
       aria-busy={state === "uploading" || state === "verifying" || isUploading}
-      className={`flex items-center justify-center gap-2 border px-3 py-2.5 min-h-[44px] text-[10px] uppercase tracking-[0.1em] font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 ${fullWidth ? "w-full" : "min-w-[100px]"} ${
+      className={`flex items-center justify-center gap-2 border px-3 py-2 min-h-[36px] text-[10px] uppercase tracking-[0.1em] font-medium whitespace-nowrap transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 ${fullWidth ? "w-full" : "min-w-[100px]"} ${
         isSuccess
           ? "border-green-500 bg-green-50 text-green-600 dark:border-green-600 dark:bg-green-950 dark:text-green-400"
           : isVerifying
