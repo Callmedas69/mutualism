@@ -131,7 +131,7 @@ export default function MintNFTModal({
           mintParams.view,
           mintParams.fid,
           mintParams.graphVersion,
-          mintParams.metadataUri,
+          mintParams.animationUrl,
         ],
         value: mintValue,
       });

@@ -10,18 +10,21 @@ import type { SnapshotView as SnapshotViewType } from "@/types/tokenize";
 import {
   MUTUALISM_NFT_ADDRESS,
   MUTUALISM_NFT_ABI,
-  MUTUALISM_NFT_MINT_PRICE,
-  SnapshotViewEnum,
-  type SnapshotViewEnumType,
+  SnapshotView as SnapshotViewEnum,
 } from "@/abi/MutualismNFT";
+
+// Fallback mint price (actual price is read from contract)
+export const MUTUALISM_NFT_MINT_PRICE = "0.0001";
 
 // Re-export for convenience
 export {
   MUTUALISM_NFT_ADDRESS,
   MUTUALISM_NFT_ABI,
-  MUTUALISM_NFT_MINT_PRICE,
   SnapshotViewEnum,
 };
+
+// Type for the enum values
+export type SnapshotViewEnumType = SnapshotViewEnum;
 
 // ============================================
 // Constants
@@ -124,7 +127,7 @@ export interface MintParams {
   view: SnapshotViewEnumType;
   fid: bigint;
   graphVersion: bigint;
-  metadataUri: string;
+  animationUrl: string;
 }
 
 /**
@@ -133,13 +136,13 @@ export interface MintParams {
 export function prepareMintParams(
   view: SnapshotViewType,
   fid: number,
-  metadataUri: string
+  animationUrl: string
 ): MintParams {
   return {
     view: mapViewToEnum(view),
     fid: BigInt(fid),
     graphVersion: BigInt(1), // Current graph version
-    metadataUri,
+    animationUrl,
   };
 }
 

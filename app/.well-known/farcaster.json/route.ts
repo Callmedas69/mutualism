@@ -15,7 +15,7 @@ export async function GET() {
       version: "1",
       name: "MUTUALISM",
       homeUrl: `${domain}/graph`,
-      iconUrl: `${domain}/icon-1024.png`,
+      iconUrl: `${domain}/icon-1024.svg`,
       splashImageUrl: `${domain}/splash-200.png`,
       splashBackgroundColor: "#ffffff",
       webhookUrl: `${domain}/api/miniapp/webhook`,

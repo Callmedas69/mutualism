@@ -270,8 +270,34 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
   const [isEngineRunning, setIsEngineRunning] = useState(true);
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [cardPosition, setCardPosition] = useState({ x: 0, y: 0 });
+  const [shareVerified, setShareVerified] = useState(false);
 
   const { isMiniApp, composeCast } = useMiniAppContext();
+
+  // Callback when share is verified via Neynar
+  const handleShareVerified = useCallback((castHash: string) => {
+    setShareVerified(true);
+    console.log("Share verified, cast hash:", castHash);
+  }, []);
+
+  // Check for existing share verification on mount (persisted in Supabase)
+  useEffect(() => {
+    if (!centerUser?.fid || !isMiniApp) return;
+
+    const checkVerification = async () => {
+      try {
+        const res = await fetch(`/api/farcaster/share-status?fid=${centerUser.fid}`);
+        const data = await res.json();
+        if (data.verified) {
+          setShareVerified(true);
+        }
+      } catch (err) {
+        console.error("Failed to check share status:", err);
+      }
+    };
+
+    checkVerification();
+  }, [centerUser?.fid, isMiniApp]);
 
   // Limit nodes based on count
   const maxNodes = connections.length > 100 ? 50 : connections.length > 50 ? 75 : 100;
@@ -631,7 +657,7 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
       </div>
 
       {/* Score Legend - bottom-left */}
-      <div className="absolute left-2 bottom-2 z-20 flex items-center gap-2 border border-zinc-200 bg-white/95 px-3 py-1.5 text-[10px] uppercase tracking-[0.05em] dark:border-zinc-700 dark:bg-zinc-900/95 sm:left-4 sm:bottom-4 sm:px-4 sm:py-2 sm:text-xs">
+      <div className="absolute left-3 bottom-3 z-20 flex items-center gap-2 border border-zinc-200 bg-white/95 px-3 py-1.5 text-[10px] uppercase tracking-[0.05em] dark:border-zinc-700 dark:bg-zinc-900/95 sm:left-4 sm:bottom-4 sm:px-4 sm:py-2 sm:text-xs">
         <span className="font-medium text-zinc-500">
           {type === "mutuals" ? "Mutuality" : type === "attention" ? "Attention" : "Influence"}
         </span>
@@ -642,7 +668,7 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
       </div>
 
       {/* Top Bar - Action Buttons */}
-      <div className="absolute right-2 top-2 flex items-center gap-1.5 sm:right-4 sm:top-4 sm:gap-2">
+      <div className="absolute right-3 top-3 flex items-center gap-1.5 sm:right-4 sm:top-4 sm:gap-2">
           {isMiniApp ? (
             <>
               <ShareGraphButton
@@ -651,18 +677,24 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
                 composeCast={composeCast}
                 disabled={!canSnapshot || isEngineRunning}
                 isUploading={isSnapshotUploading}
+                userFid={centerUser.fid}
+                onShareVerified={handleShareVerified}
               />
               <MiniAppTokenizeButton
                 ensureSnapshot={ensureSnapshot}
                 graphData={tokenizeData}
                 disabled={!canSnapshot || isEngineRunning}
                 isUploading={isSnapshotUploading}
+                requiresShare={true}
+                hasShared={shareVerified}
               />
               <MintNFTButton
                 ensureSnapshot={ensureSnapshot}
                 graphData={tokenizeData}
                 disabled={!canSnapshot || isEngineRunning}
                 isUploading={isSnapshotUploading}
+                requiresShare={true}
+                hasShared={shareVerified}
               />
             </>
           ) : (

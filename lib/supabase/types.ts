@@ -108,6 +108,32 @@ export interface UserGraphStateUpdate {
 }
 
 // ============================================
+// Share Verification Types
+// ============================================
+
+/**
+ * Share verification row - tracks users who have shared their graph
+ */
+export interface ShareVerificationRow {
+  id: string; // UUID
+  fid: number;
+  cast_hash: string;
+  cast_url: string | null;
+  verified_at: string;
+}
+
+export interface ShareVerificationInsert {
+  fid: number;
+  cast_hash: string;
+  cast_url?: string | null;
+}
+
+export interface ShareVerificationUpdate {
+  cast_hash?: string;
+  cast_url?: string | null;
+}
+
+// ============================================
 // Database Schema (Supabase generated type format)
 // ============================================
 
@@ -236,6 +262,30 @@ export interface Database {
           last_checked_at?: string;
           last_notified_at?: string;
           updated_at?: string;
+        };
+        Relationships: [];
+      };
+      share_verification: {
+        Row: {
+          id: string;
+          fid: number;
+          cast_hash: string;
+          cast_url: string | null;
+          verified_at: string;
+        };
+        Insert: {
+          id?: string;
+          fid: number;
+          cast_hash: string;
+          cast_url?: string | null;
+          verified_at?: string;
+        };
+        Update: {
+          id?: string;
+          fid?: number;
+          cast_hash?: string;
+          cast_url?: string | null;
+          verified_at?: string;
         };
         Relationships: [];
       };

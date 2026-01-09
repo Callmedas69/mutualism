@@ -1,6 +1,6 @@
-export const MUTUALISM_NFT_ADDRESS = "0xc85394aBa2a3FA7a6FC41c60f73Ccc450a795263" as const;
 
-export const MUTUALISM_NFT_MINT_PRICE = "0.0005";
+// V1 CONTRACT 0xc85394aBa2a3FA7a6FC41c60f73Ccc450a795263
+export const MUTUALISM_NFT_ADDRESS = "0xBF6D419A087b1D3d50A91C3A01518F9bA626adf7" as const;
 
 export const MUTUALISM_NFT_ABI = [
   {
@@ -38,7 +38,7 @@ export const MUTUALISM_NFT_ABI = [
     outputs: [
       { name: "", type: "string", internalType: "string" }
     ],
-    stateMutability: "view"
+    stateMutability: "pure"
   },
   {
     type: "function",
@@ -67,7 +67,7 @@ export const MUTUALISM_NFT_ABI = [
           { name: "fid", type: "uint256", internalType: "uint256" },
           { name: "graphVersion", type: "uint256", internalType: "uint256" },
           { name: "mintedAt", type: "uint256", internalType: "uint256" },
-          { name: "metadataUri", type: "string", internalType: "string" }
+          { name: "animationUrl", type: "string", internalType: "string" }
         ]
       }
     ],
@@ -101,7 +101,7 @@ export const MUTUALISM_NFT_ABI = [
       { name: "viewType", type: "uint8", internalType: "enum MutualismNFT.SnapshotView" },
       { name: "fid", type: "uint256", internalType: "uint256" },
       { name: "graphVersion", type: "uint256", internalType: "uint256" },
-      { name: "metadataUri", type: "string", internalType: "string" }
+      { name: "animationUrl", type: "string", internalType: "string" }
     ],
     outputs: [
       { name: "", type: "uint256", internalType: "uint256" }
@@ -198,15 +198,6 @@ export const MUTUALISM_NFT_ABI = [
     inputs: [
       { name: "operator", type: "address", internalType: "address" },
       { name: "approved", type: "bool", internalType: "bool" }
-    ],
-    outputs: [],
-    stateMutability: "nonpayable"
-  },
-  {
-    type: "function",
-    name: "setContractURI",
-    inputs: [
-      { name: "newUri", type: "string", internalType: "string" }
     ],
     outputs: [],
     stateMutability: "nonpayable"
@@ -320,14 +311,6 @@ export const MUTUALISM_NFT_ABI = [
       { name: "owner", type: "address", indexed: true, internalType: "address" },
       { name: "operator", type: "address", indexed: true, internalType: "address" },
       { name: "approved", type: "bool", indexed: false, internalType: "bool" }
-    ],
-    anonymous: false
-  },
-  {
-    type: "event",
-    name: "ContractURIUpdated",
-    inputs: [
-      { name: "newUri", type: "string", indexed: false, internalType: "string" }
     ],
     anonymous: false
   },
@@ -501,15 +484,11 @@ export enum SnapshotView {
   INFLUENCE_CIRCLE = 2
 }
 
-// Aliases for lib/nft.ts compatibility
-export const SnapshotViewEnum = SnapshotView;
-export type SnapshotViewEnumType = SnapshotView;
-
 // Type for SnapshotData struct
 export type SnapshotData = {
   viewType: SnapshotView;
   fid: bigint;
   graphVersion: bigint;
   mintedAt: bigint;
-  metadataUri: string;
+  animationUrl: string;
 };
