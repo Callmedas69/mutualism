@@ -47,9 +47,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ verified: false });
   } catch (error) {
-    console.error("Cast verification error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error("Cast verification error:", errorMessage, error);
     return NextResponse.json(
-      { error: "Verification failed" },
+      { error: "Verification failed", details: errorMessage },
       { status: 500 }
     );
   }

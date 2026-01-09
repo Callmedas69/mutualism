@@ -24,23 +24,30 @@ export async function getUserRecentCasts(
 ): Promise<NeynarCast[]> {
   const apiKey = process.env.NEYNAR_API_KEY;
   if (!apiKey) {
+    console.error("NEYNAR_API_KEY not configured in environment");
     throw new Error("NEYNAR_API_KEY not configured");
   }
 
-  const res = await fetch(
-    `${NEYNAR_API_URL}/feed/user/casts?fid=${fid}&limit=${limit}`,
-    {
+  const url = `${NEYNAR_API_URL}/feed/user/casts?fid=${fid}&limit=${limit}`;
+
+  try {
+    const res = await fetch(url, {
       headers: { "x-api-key": apiKey },
       next: { revalidate: 0 }, // Don't cache
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text().catch(() => "No error body");
+      console.error(`Neynar API error: ${res.status}`, errorText);
+      throw new Error(`Neynar API error: ${res.status}`);
     }
-  );
 
-  if (!res.ok) {
-    throw new Error(`Neynar API error: ${res.status}`);
+    const data = await res.json();
+    return data.casts || [];
+  } catch (err) {
+    console.error("Neynar fetch failed:", err);
+    throw err;
   }
-
-  const data = await res.json();
-  return data.casts || [];
 }
 
 /**
