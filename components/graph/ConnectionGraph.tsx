@@ -668,7 +668,7 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
       </div>
 
       {/* Top Bar - Action Buttons */}
-      <div className="absolute right-3 top-3 flex items-center gap-1.5 sm:right-4 sm:top-4 sm:gap-2">
+      <div className={`absolute right-3 top-3 sm:right-4 sm:top-4 ${isMiniApp ? "flex flex-col items-stretch gap-1.5 w-28" : "flex items-center gap-1.5 sm:gap-2"}`}>
           {isMiniApp ? (
             <>
               <ShareGraphButton
@@ -679,6 +679,7 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
                 isUploading={isSnapshotUploading}
                 userFid={centerUser.fid}
                 onShareVerified={handleShareVerified}
+                fullWidth
               />
               <MiniAppTokenizeButton
                 ensureSnapshot={ensureSnapshot}
@@ -687,6 +688,7 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
                 isUploading={isSnapshotUploading}
                 requiresShare={true}
                 hasShared={shareVerified}
+                fullWidth
               />
               <MintNFTButton
                 ensureSnapshot={ensureSnapshot}
@@ -695,6 +697,7 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
                 isUploading={isSnapshotUploading}
                 requiresShare={true}
                 hasShared={shareVerified}
+                fullWidth
               />
             </>
           ) : (

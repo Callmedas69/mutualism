@@ -28,7 +28,7 @@ export async function getUserRecentCasts(
     throw new Error("NEYNAR_API_KEY not configured");
   }
 
-  const url = `${NEYNAR_API_URL}/feed/user/casts?fid=${fid}&limit=${limit}`;
+  const url = `${NEYNAR_API_URL}/feed/user/casts/?fid=${fid}&limit=${limit}`;
 
   try {
     const res = await fetch(url, {
