@@ -31,15 +31,17 @@ export async function POST(request: NextRequest) {
     if (matchingCast) {
       const castUrl = `https://warpcast.com/${matchingCast.author.username}/${matchingCast.hash.slice(0, 10)}`;
 
-      // Persist verification to Supabase (fire and forget, don't block response)
-      upsertShareVerification(fid, matchingCast.hash, castUrl).catch((err) =>
-        console.error("Failed to persist share verification:", err)
-      );
+      // Persist verification to Supabase (await to ensure it completes)
+      const persisted = await upsertShareVerification(fid, matchingCast.hash, castUrl);
+      if (!persisted) {
+        console.error(`Failed to persist share verification for fid ${fid}`);
+      }
 
       return NextResponse.json({
         verified: true,
         castHash: matchingCast.hash,
         castUrl,
+        persisted, // Include persistence status in response
       });
     }
 

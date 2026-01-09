@@ -40,7 +40,7 @@ export interface UseSnapshotCacheReturn {
 // ============================================
 
 const LOG_PREFIX = "[Snapshot]";
-const UPLOAD_TIMEOUT_MS = 30_000;
+const UPLOAD_TIMEOUT_MS = 60_000; // 60s timeout for slow connections
 
 // ============================================
 // Validation
@@ -219,7 +219,7 @@ export function useSnapshotCache({
       const message = err instanceof Error ? err.message : "Upload failed";
 
       if (message.includes("timed out")) {
-        console.warn(`${LOG_PREFIX} Upload timed out after 30s`);
+        console.warn(`${LOG_PREFIX} Upload timed out after 60s`);
       } else {
         console.error(`${LOG_PREFIX} Upload failed:`, err);
       }
