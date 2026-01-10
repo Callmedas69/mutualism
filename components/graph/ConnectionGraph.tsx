@@ -668,59 +668,62 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
       </div>
 
       {/* Top Bar - Action Buttons */}
-      <div className={`absolute right-3 top-3 sm:right-4 sm:top-4 ${isMiniApp ? "flex flex-col items-stretch gap-1.5 w-28" : "flex items-center gap-1.5 sm:gap-2"}`}>
-          {isMiniApp ? (
-            <>
-              <ShareGraphButton
-                graphType={type === "mutuals" ? "Mutuals" : type === "attention" ? "Attention" : "Influence"}
-                ensureSnapshot={ensureSnapshot}
-                composeCast={composeCast}
-                disabled={!canSnapshot || isEngineRunning}
-                isUploading={isSnapshotUploading}
-                userFid={centerUser.fid}
-                onShareVerified={handleShareVerified}
-                fullWidth
-              />
-              <MiniAppTokenizeButton
-                ensureSnapshot={ensureSnapshot}
-                graphData={tokenizeData}
-                disabled={!canSnapshot || isEngineRunning}
-                isUploading={isSnapshotUploading}
-                requiresShare={true}
-                hasShared={shareVerified}
-                fullWidth
-              />
-              <MintNFTButton
-                ensureSnapshot={ensureSnapshot}
-                graphData={tokenizeData}
-                disabled={!canSnapshot || isEngineRunning}
-                isUploading={isSnapshotUploading}
-                requiresShare={true}
-                hasShared={shareVerified}
-                fullWidth
-              />
-            </>
-          ) : (
-            <>
-              <ExportButton
-                onExport={handleExportPNG}
-                disabled={isEngineRunning}
-              />
-              <TokenizeButton
-                ensureSnapshot={ensureSnapshot}
-                graphData={tokenizeData}
-                disabled={!canSnapshot || isEngineRunning}
-                isUploading={isSnapshotUploading}
-              />
-              <MintNFTButton
-                ensureSnapshot={ensureSnapshot}
-                graphData={tokenizeData}
-                disabled={!canSnapshot || isEngineRunning}
-                isUploading={isSnapshotUploading}
-              />
-            </>
-          )}
-      </div>
+      {isMiniApp ? (
+        <>
+          {/* Share Button - Top Left */}
+          <div className="absolute left-3 top-3 sm:left-4 sm:top-4">
+            <ShareGraphButton
+              graphType={type === "mutuals" ? "Mutuals" : type === "attention" ? "Attention" : "Influence"}
+              ensureSnapshot={ensureSnapshot}
+              composeCast={composeCast}
+              disabled={!canSnapshot || isEngineRunning}
+              isUploading={isSnapshotUploading}
+              userFid={centerUser.fid}
+              onShareVerified={handleShareVerified}
+            />
+          </div>
+          {/* Post to Zora + Mint NFT - Top Right, Stacked */}
+          <div className="absolute right-3 top-3 sm:right-4 sm:top-4 flex flex-col items-stretch gap-1.5 w-28">
+            <MiniAppTokenizeButton
+              ensureSnapshot={ensureSnapshot}
+              graphData={tokenizeData}
+              disabled={!canSnapshot || isEngineRunning}
+              isUploading={isSnapshotUploading}
+              requiresShare={true}
+              hasShared={shareVerified}
+              fullWidth
+            />
+            <MintNFTButton
+              ensureSnapshot={ensureSnapshot}
+              graphData={tokenizeData}
+              disabled={!canSnapshot || isEngineRunning}
+              isUploading={isSnapshotUploading}
+              requiresShare={true}
+              hasShared={shareVerified}
+              fullWidth
+            />
+          </div>
+        </>
+      ) : (
+        <div className="absolute right-3 top-3 sm:right-4 sm:top-4 flex items-center gap-1.5 sm:gap-2">
+          <ExportButton
+            onExport={handleExportPNG}
+            disabled={isEngineRunning}
+          />
+          <TokenizeButton
+            ensureSnapshot={ensureSnapshot}
+            graphData={tokenizeData}
+            disabled={!canSnapshot || isEngineRunning}
+            isUploading={isSnapshotUploading}
+          />
+          <MintNFTButton
+            ensureSnapshot={ensureSnapshot}
+            graphData={tokenizeData}
+            disabled={!canSnapshot || isEngineRunning}
+            isUploading={isSnapshotUploading}
+          />
+        </div>
+      )}
 
       {/* Node Info Card */}
       {selectedNode && (
