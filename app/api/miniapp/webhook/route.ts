@@ -8,29 +8,56 @@ import {
 /**
  * Farcaster MiniApp Webhook Handler
  *
- * Receives lifecycle events from Farcaster:
- * - miniapp_added: User installed the app
- * - miniapp_removed: User uninstalled the app
+ * Receives lifecycle events from Farcaster (Base64-encoded):
+ * - frame_added: User installed the app
+ * - frame_removed: User uninstalled the app
  * - notifications_enabled: User enabled push notifications
  * - notifications_disabled: User disabled push notifications
+ *
+ * Payload format:
+ * {
+ *   header: Base64<{ fid, type, key }>,
+ *   payload: Base64<{ event, notificationDetails? }>,
+ *   signature: string
+ * }
  *
  * Per CLAUDE.md: API route validates input and delegates to repository.
  */
 
 type WebhookEventType =
-  | "miniapp_added"
-  | "miniapp_removed"
+  | "frame_added"
+  | "frame_removed"
   | "notifications_enabled"
   | "notifications_disabled";
 
-interface WebhookEvent {
+interface DecodedHeader {
+  fid: number;
+  type: string;
+  key: string;
+}
+
+interface DecodedPayload {
   event: WebhookEventType;
-  data: {
-    fid: number;
-    // Present on notifications_enabled and miniapp_added (if notifications enabled)
-    notificationToken?: string;
-    url?: string;
+  notificationDetails?: {
+    token: string;
+    url: string;
   };
+}
+
+interface FarcasterWebhookBody {
+  header: string;
+  payload: string;
+  signature: string;
+}
+
+function decodeBase64Json<T>(base64String: string): T | null {
+  try {
+    const decoded = Buffer.from(base64String, "base64").toString("utf-8");
+    return JSON.parse(decoded) as T;
+  } catch (error) {
+    console.error("[MiniApp Webhook] Failed to decode Base64 JSON:", error);
+    return null;
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -45,56 +72,66 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const body = await request.json();
+    const body: FarcasterWebhookBody = await request.json();
 
-    // Debug: Log raw payload to understand Farcaster's actual format
+    // Debug: Log raw payload
     console.log("[MiniApp Webhook] Raw payload:", JSON.stringify(body));
 
-    const { event, data } = body as WebhookEvent;
-
     // Validate required fields
-    if (!event) {
-      console.error("[MiniApp Webhook] Missing event field");
-      return NextResponse.json({ error: "Missing event field" }, { status: 400 });
+    if (!body.header || !body.payload) {
+      console.error("[MiniApp Webhook] Missing header or payload");
+      return NextResponse.json({ error: "Missing header or payload" }, { status: 400 });
     }
 
-    if (!data || typeof data.fid !== "number") {
-      console.error("[MiniApp Webhook] Missing or invalid data.fid");
-      return NextResponse.json({ error: "Missing or invalid data.fid" }, { status: 400 });
+    // Decode Base64-encoded header and payload
+    const header = decodeBase64Json<DecodedHeader>(body.header);
+    const payload = decodeBase64Json<DecodedPayload>(body.payload);
+
+    if (!header || typeof header.fid !== "number") {
+      console.error("[MiniApp Webhook] Invalid header or missing fid");
+      return NextResponse.json({ error: "Invalid header" }, { status: 400 });
     }
 
-    console.log(`[MiniApp Webhook] Event: ${event}, FID: ${data.fid}`);
+    if (!payload || !payload.event) {
+      console.error("[MiniApp Webhook] Invalid payload or missing event");
+      return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+    }
+
+    const { fid } = header;
+    const { event, notificationDetails } = payload;
+
+    console.log(`[MiniApp Webhook] Event: ${event}, FID: ${fid}`);
 
     switch (event) {
-      case "miniapp_added":
-        console.log(`[MiniApp] User ${data.fid} added the app`);
+      case "frame_added":
+        console.log(`[MiniApp] User ${fid} added the app`);
         // If notifications are enabled on add, store the token
-        if (data.notificationToken && data.url) {
-          await upsertToken(data.fid, data.notificationToken, data.url);
-          console.log(`[MiniApp] Stored notification token for FID ${data.fid}`);
+        if (notificationDetails?.token && notificationDetails?.url) {
+          await upsertToken(fid, notificationDetails.token, notificationDetails.url);
+          console.log(`[MiniApp] Stored notification token for FID ${fid}`);
         }
         break;
 
-      case "miniapp_removed":
-        console.log(`[MiniApp] User ${data.fid} removed the app`);
+      case "frame_removed":
+        console.log(`[MiniApp] User ${fid} removed the app`);
         // Hard delete - user uninstalled
-        await deleteToken(data.fid);
+        await deleteToken(fid);
         break;
 
       case "notifications_enabled":
-        console.log(`[MiniApp] User ${data.fid} enabled notifications`);
-        if (data.notificationToken && data.url) {
-          await upsertToken(data.fid, data.notificationToken, data.url);
-          console.log(`[MiniApp] Stored notification token for FID ${data.fid}`);
+        console.log(`[MiniApp] User ${fid} enabled notifications`);
+        if (notificationDetails?.token && notificationDetails?.url) {
+          await upsertToken(fid, notificationDetails.token, notificationDetails.url);
+          console.log(`[MiniApp] Stored notification token for FID ${fid}`);
         } else {
-          console.warn(`[MiniApp] Missing token or url for FID ${data.fid}`);
+          console.warn(`[MiniApp] Missing token or url for FID ${fid}`);
         }
         break;
 
       case "notifications_disabled":
-        console.log(`[MiniApp] User ${data.fid} disabled notifications`);
+        console.log(`[MiniApp] User ${fid} disabled notifications`);
         // Soft disable - user might re-enable
-        await disableToken(data.fid);
+        await disableToken(fid);
         break;
 
       default:
