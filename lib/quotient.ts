@@ -27,8 +27,9 @@ export async function fetchAllMutuals(
 
   const data: ConnectionsAllResponse = await res.json();
 
-  // Sort by combined_score (highest first) and limit results
+  // Filter out low-score users, sort by combined_score (highest first), and limit results
   const topMutuals = data.mutuals
+    .filter((m) => m.combined_score >= 10)
     .sort((a, b) => b.combined_score - a.combined_score)
     .slice(0, limit);
 

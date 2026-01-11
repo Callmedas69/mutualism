@@ -41,8 +41,9 @@ export default function ConnectionTabs() {
     return `${diffHours} hours ago`;
   };
 
-  // Track visit for reminder notifications (only when data loaded)
-  useTrackVisit(loading ? undefined : user?.fid, mutuals.length);
+  // Track visit for reminder notifications (only when we have actual mutuals data)
+  const shouldTrack = !loading && mutuals.length > 0;
+  useTrackVisit(shouldTrack ? user?.fid : undefined, mutuals.length);
 
   const allTabs: { key: TabType; label: string; count: number | null; description: string }[] = [
     { key: "mutuals", label: "Mutuals", count: mutuals.length, description: "Your strongest connections. People you engage with who also engage with you" },

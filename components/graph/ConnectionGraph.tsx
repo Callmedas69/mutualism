@@ -550,6 +550,12 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
     graphType: type === "mutuals" ? "All Mutuals" : type === "attention" ? "Attention" : "Influence",
   }), [centerUser, type]);
 
+  // Top 5 usernames for viral sharing
+  const topUsernames = useMemo(
+    () => connections.slice(0, 5).map(c => c.username),
+    [connections]
+  );
+
   // Snapshot cache for Share and Post to Zora (reusable upload)
   const {
     ensureSnapshot,
@@ -680,6 +686,7 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
               isUploading={isSnapshotUploading}
               userFid={centerUser.fid}
               onShareVerified={handleShareVerified}
+              topUsernames={topUsernames}
             />
           </div>
           {/* Post to Zora + Mint NFT - Top Right, Stacked */}
@@ -705,24 +712,54 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
           </div>
         </>
       ) : (
-        <div className="absolute right-3 top-3 sm:right-4 sm:top-4 flex items-center gap-1.5 sm:gap-2">
-          <ExportButton
-            onExport={handleExportPNG}
-            disabled={isEngineRunning}
-          />
-          <TokenizeButton
-            ensureSnapshot={ensureSnapshot}
-            graphData={tokenizeData}
-            disabled={!canSnapshot || isEngineRunning}
-            isUploading={isSnapshotUploading}
-          />
-          <MintNFTButton
-            ensureSnapshot={ensureSnapshot}
-            graphData={tokenizeData}
-            disabled={!canSnapshot || isEngineRunning}
-            isUploading={isSnapshotUploading}
-          />
-        </div>
+        <>
+          {/* Mobile: Split layout like MiniApp */}
+          <div className="sm:hidden">
+            {/* Export - Top Left */}
+            <div className="absolute left-3 top-3">
+              <ExportButton
+                onExport={handleExportPNG}
+                disabled={isEngineRunning}
+              />
+            </div>
+            {/* Zora + NFT - Top Right, Stacked */}
+            <div className="absolute right-3 top-3 flex flex-col items-stretch gap-1.5 w-28">
+              <TokenizeButton
+                ensureSnapshot={ensureSnapshot}
+                graphData={tokenizeData}
+                disabled={!canSnapshot || isEngineRunning}
+                isUploading={isSnapshotUploading}
+                fullWidth
+              />
+              <MintNFTButton
+                ensureSnapshot={ensureSnapshot}
+                graphData={tokenizeData}
+                disabled={!canSnapshot || isEngineRunning}
+                isUploading={isSnapshotUploading}
+                fullWidth
+              />
+            </div>
+          </div>
+          {/* Desktop: Row layout */}
+          <div className="hidden sm:flex absolute right-4 top-4 items-center gap-2">
+            <ExportButton
+              onExport={handleExportPNG}
+              disabled={isEngineRunning}
+            />
+            <TokenizeButton
+              ensureSnapshot={ensureSnapshot}
+              graphData={tokenizeData}
+              disabled={!canSnapshot || isEngineRunning}
+              isUploading={isSnapshotUploading}
+            />
+            <MintNFTButton
+              ensureSnapshot={ensureSnapshot}
+              graphData={tokenizeData}
+              disabled={!canSnapshot || isEngineRunning}
+              isUploading={isSnapshotUploading}
+            />
+          </div>
+        </>
       )}
 
       {/* Node Info Card */}

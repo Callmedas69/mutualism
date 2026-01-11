@@ -18,6 +18,7 @@ interface ShareGraphButtonProps {
   userFid?: number;
   onShareVerified?: (castHash: string) => void;
   fullWidth?: boolean;
+  topUsernames?: string[];
 }
 
 export default function ShareGraphButton({
@@ -29,6 +30,7 @@ export default function ShareGraphButton({
   userFid,
   onShareVerified,
   fullWidth = false,
+  topUsernames = [],
 }: ShareGraphButtonProps) {
   const [state, setState] = useState<ShareState>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -59,10 +61,13 @@ export default function ShareGraphButton({
     // Step 2: Open composeCast with image + app URL embeds
     setState("sharing");
     try {
-      await composeCast(
-        `My ${graphType} graph on MUTUALISM`,
-        [imageUrl, APP_URL]
-      );
+      // Viral share text: mentions first (triggers notifications), then CTA
+      const mentions = topUsernames.slice(0, 5).map(u => `@${u}`).join(' ');
+      const shareText = mentions
+        ? `${mentions}\n\nMy social graph. Who's in yours?`
+        : `My social graph. Who's in yours?`;
+
+      await composeCast(shareText, [imageUrl, APP_URL]);
     } catch (err) {
       console.error("Failed to compose cast:", err);
       setError("Failed to open share");
