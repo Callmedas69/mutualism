@@ -45,8 +45,23 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const body: WebhookEvent = await request.json();
-    const { event, data } = body;
+    const body = await request.json();
+
+    // Debug: Log raw payload to understand Farcaster's actual format
+    console.log("[MiniApp Webhook] Raw payload:", JSON.stringify(body));
+
+    const { event, data } = body as WebhookEvent;
+
+    // Validate required fields
+    if (!event) {
+      console.error("[MiniApp Webhook] Missing event field");
+      return NextResponse.json({ error: "Missing event field" }, { status: 400 });
+    }
+
+    if (!data || typeof data.fid !== "number") {
+      console.error("[MiniApp Webhook] Missing or invalid data.fid");
+      return NextResponse.json({ error: "Missing or invalid data.fid" }, { status: 400 });
+    }
 
     console.log(`[MiniApp Webhook] Event: ${event}, FID: ${data.fid}`);
 

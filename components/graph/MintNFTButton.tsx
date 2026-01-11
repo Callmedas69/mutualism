@@ -66,7 +66,7 @@ export default function MintNFTButton({
         disabled={disabled || !isConnected || isUploading || isGated}
         aria-busy={isUploading}
         title={getTitle()}
-        className={`flex items-center justify-center gap-2 border border-emerald-400 bg-emerald-50 px-5 py-2 min-h-[36px] text-[10px] font-medium uppercase tracking-[0.1em] text-emerald-700 whitespace-nowrap transition-all duration-200 hover:border-emerald-600 hover:bg-emerald-100 hover:text-emerald-900 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:border-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-300 dark:hover:border-emerald-400 dark:hover:text-emerald-100 ${fullWidth ? "w-full" : "min-w-[100px]"}`}
+        className={`flex items-center justify-center gap-2 border border-emerald-400 bg-emerald-50 px-5 py-2 min-h-[48px] text-[10px] font-medium uppercase tracking-[0.1em] text-emerald-700 whitespace-nowrap transition-all duration-200 hover:border-emerald-600 hover:bg-emerald-100 hover:text-emerald-900 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:border-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-300 dark:hover:border-emerald-400 dark:hover:text-emerald-100 ${fullWidth ? "w-full" : "min-w-[100px]"}`}
       >
         <Image src="/icon-1024.svg" alt="" width={14} height={14} className="rounded-sm" />
         {isGated ? "Share First" : "Mint NFT"}
