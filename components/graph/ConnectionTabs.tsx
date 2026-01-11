@@ -255,23 +255,27 @@ export default function ConnectionTabs() {
       ))}
     </Tabs>
 
-    {/* MiniApp: Compact lists below graph */}
+    {/* MiniApp: Compact list below graph - matches active tab */}
     {isMiniApp && !loading && !error && (
-      <div className="mt-4 space-y-2 px-1">
-        <CompactConnectionList
-          connections={mutuals}
-          type="mutual"
-          title="Top Mutuals"
-          isExpanded={expandedMutuals}
-          onToggle={() => setExpandedMutuals((prev) => !prev)}
-        />
-        <CompactConnectionList
-          connections={influence}
-          type="influence"
-          title="Top Influence"
-          isExpanded={expandedInfluence}
-          onToggle={() => setExpandedInfluence((prev) => !prev)}
-        />
+      <div className="mt-4 px-1">
+        {activeTab === "mutuals" && (
+          <CompactConnectionList
+            connections={mutuals}
+            type="mutual"
+            title="Top Mutuals"
+            isExpanded={expandedMutuals}
+            onToggle={() => setExpandedMutuals((prev) => !prev)}
+          />
+        )}
+        {activeTab === "influence" && (
+          <CompactConnectionList
+            connections={influence}
+            type="influence"
+            title="Top Influence"
+            isExpanded={expandedInfluence}
+            onToggle={() => setExpandedInfluence((prev) => !prev)}
+          />
+        )}
       </div>
     )}
     </>
