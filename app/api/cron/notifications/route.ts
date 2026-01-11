@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getUsersNeedingReminder, updateLastNotified, getActiveUsers } from "@/lib/repositories/user-graph-state";
 import { getToken } from "@/lib/repositories/notification-tokens";
 import { sendReminder, sendNotificationToUser } from "@/lib/services/notification-service";
+import { verifyCronSecret } from "@/lib/utils/auth";
 
 /**
  * Cron Job: Notification Scheduler
@@ -18,14 +19,9 @@ import { sendReminder, sendNotificationToUser } from "@/lib/services/notificatio
  */
 
 export async function GET(request: NextRequest) {
-  // Verify cron secret to prevent unauthorized access
-  const authHeader = request.headers.get("authorization");
-  const cronSecret = process.env.CRON_SECRET;
-
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    console.warn("[Cron] Unauthorized request");
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  // Verify cron secret with timing-safe comparison
+  const authError = verifyCronSecret(request.headers.get("authorization"));
+  if (authError) return authError;
 
   console.log("[Cron] Starting notification job");
 

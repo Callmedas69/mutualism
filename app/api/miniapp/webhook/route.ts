@@ -4,6 +4,7 @@ import {
   disableToken,
   deleteToken,
 } from "@/lib/repositories/notification-tokens";
+import { safeCompare } from "@/lib/utils/auth";
 
 /**
  * Farcaster MiniApp Webhook Handler
@@ -62,11 +63,12 @@ function decodeBase64Json<T>(base64String: string): T | null {
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify webhook secret if configured
+    // Verify webhook secret if configured (timing-safe comparison)
     const webhookSecret = process.env.MINIAPP_WEBHOOK_SECRET;
     if (webhookSecret) {
-      const authHeader = request.headers.get("authorization");
-      if (authHeader !== `Bearer ${webhookSecret}`) {
+      const authHeader = request.headers.get("authorization") || "";
+      const expected = `Bearer ${webhookSecret}`;
+      if (!safeCompare(authHeader, expected)) {
         console.warn("[MiniApp Webhook] Unauthorized request");
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
@@ -87,9 +89,15 @@ export async function POST(request: NextRequest) {
     const header = decodeBase64Json<DecodedHeader>(body.header);
     const payload = decodeBase64Json<DecodedPayload>(body.payload);
 
-    if (!header || typeof header.fid !== "number") {
-      console.error("[MiniApp Webhook] Invalid header or missing fid");
-      return NextResponse.json({ error: "Invalid header" }, { status: 400 });
+    // Validate FID is positive integer in valid Farcaster range
+    if (
+      !header ||
+      typeof header.fid !== "number" ||
+      header.fid < 1 ||
+      !Number.isInteger(header.fid)
+    ) {
+      console.error("[MiniApp Webhook] Invalid FID:", header?.fid);
+      return NextResponse.json({ error: "Invalid FID" }, { status: 400 });
     }
 
     if (!payload || !payload.event) {
@@ -99,6 +107,12 @@ export async function POST(request: NextRequest) {
 
     const { fid } = header;
     const { event, notificationDetails } = payload;
+
+    // Validate notification URL is HTTPS (when present)
+    if (notificationDetails?.url && !notificationDetails.url.startsWith("https://")) {
+      console.error("[MiniApp Webhook] Invalid URL scheme:", notificationDetails.url);
+      return NextResponse.json({ error: "Invalid notification URL" }, { status: 400 });
+    }
 
     console.log(`[MiniApp Webhook] Event: ${event}, FID: ${fid}`);
 

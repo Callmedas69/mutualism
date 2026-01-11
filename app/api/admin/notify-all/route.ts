@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllEnabledTokens } from "@/lib/repositories/notification-tokens";
 import { sendNotificationToUsers } from "@/lib/services/notification-service";
+import { verifyAdminSecret } from "@/lib/utils/auth";
 
 /**
  * Admin Notification Endpoint
  *
  * Send notifications to all users with enabled notifications.
- * Protected by ADMIN_SECRET header.
+ * Protected by ADMIN_SECRET header with timing-safe comparison.
  *
  * Usage:
  * curl -X POST https://mutualism.geoart.studio/api/admin/notify-all \
@@ -17,12 +18,9 @@ import { sendNotificationToUsers } from "@/lib/services/notification-service";
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify admin secret
-    const secret = request.headers.get("x-admin-secret");
-    if (!process.env.ADMIN_SECRET || secret !== process.env.ADMIN_SECRET) {
-      console.warn("[Admin Notify] Unauthorized request");
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    // Verify admin secret with timing-safe comparison
+    const authError = verifyAdminSecret(request.headers.get("x-admin-secret"));
+    if (authError) return authError;
 
     const { title, body, targetPath = "/graph" } = await request.json();
 
