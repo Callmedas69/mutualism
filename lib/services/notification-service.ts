@@ -405,23 +405,38 @@ async function sendToWarpcast(
       };
     }
 
-    const data: WarpcastNotificationResponse = await response.json();
+    const data = await response.json();
+
+    // Debug: Log response to understand format
+    console.log("[Notification] Warpcast response:", JSON.stringify(data));
+
+    // Handle response with defensive checks (per Farcaster spec)
+    const result = data.result || data;
+    const successfulTokens = result.successfulTokens || [];
+    const invalidTokens = result.invalidTokens || [];
+    const rateLimitedTokens = result.rateLimitedTokens || [];
 
     // Check if our token was successful
-    if (data.successfulTokens.length > 0) {
+    if (successfulTokens.length > 0) {
       console.log("[Notification] Sent successfully");
       return { success: true };
     }
 
-    if (data.invalidTokens.length > 0) {
+    if (invalidTokens.length > 0) {
       return { success: false, error: "Token is invalid" };
     }
 
-    if (data.rateLimitedTokens.length > 0) {
+    if (rateLimitedTokens.length > 0) {
       return { success: false, error: "Rate limited by Warpcast", rateLimited: true };
     }
 
-    return { success: false, error: "Unknown response from Warpcast" };
+    // If 200 OK with no recognized fields, assume success
+    if (!data.error) {
+      console.log("[Notification] Assumed success (no error in response)");
+      return { success: true };
+    }
+
+    return { success: false, error: data.error || "Unknown response from Warpcast" };
   } catch (error) {
     console.error("[Notification] Error:", error);
     return {
