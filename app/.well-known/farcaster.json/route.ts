@@ -13,9 +13,9 @@ export async function GET() {
     },
     miniapp: {
       version: "1",
-      name: "MUTUALISM",
+      name: "Mutualism",
       homeUrl: `${domain}/graph`,
-      iconUrl: `${domain}/icon-1024.svg`,
+      iconUrl: `${domain}/icon-1024.png`,
       splashImageUrl: `${domain}/splash-200.png`,
       splashBackgroundColor: "#ffffff",
       webhookUrl: `${domain}/api/miniapp/webhook`,
@@ -32,7 +32,7 @@ export async function GET() {
       ],
       heroImageUrl: `${domain}/hero.png`,
       tagline: "Map and Tokenize Your Graph",
-      ogTitle: "MUTUALISM",
+      ogTitle: "Mutualism",
       ogDescription:
         "Explore your mutual connections, whom you pay attention to, and whom pay attention to you",
       ogImageUrl: `${domain}/og-miniapp.png`,

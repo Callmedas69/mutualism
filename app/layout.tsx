@@ -31,7 +31,7 @@ const miniAppEmbed = {
     title: "Your Graph",
     action: {
       type: "launch_miniapp",
-      name: "MUTUALISM",
+      name: "Mutualism",
       url: `${domain}/graph`,
       splashImageUrl: `${domain}/splash-200.png`,
       splashBackgroundColor: "#ffffff",
@@ -40,13 +40,13 @@ const miniAppEmbed = {
 };
 
 export const metadata: Metadata = {
-  title: "MUTUALISM",
+  title: "Mutualism",
   description: "Visualize your Farcaster network and post your social graph to Zora",
   appleWebApp: {
     title: "Mutualism",
   },
   openGraph: {
-    title: "MUTUALISM",
+    title: "Mutualism",
     description: "Visualize your Farcaster network and post your social graph to Zora",
     images: [`${domain}/og-miniapp.png`],
   },
