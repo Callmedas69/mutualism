@@ -10,6 +10,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import ConnectionList from "./ConnectionList";
 import ConnectionGraph from "./ConnectionGraph";
 import ConnectionSkeleton from "./ConnectionSkeleton";
+import CompactConnectionList from "./CompactConnectionList";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import AddAppModal from "@/components/AddAppModal";
 
@@ -21,6 +22,8 @@ export default function ConnectionTabs() {
   const { isMiniApp } = useMiniAppContext();
   const [activeTab, setActiveTab] = useState<TabType>("mutuals");
   const [viewType, setViewType] = useState<ViewType>("list");
+  const [expandedMutuals, setExpandedMutuals] = useState(false);
+  const [expandedInfluence, setExpandedInfluence] = useState(false);
 
   const { mutuals, attention, influence, loading, error, retry, lastUpdated } = useConnectionData(user?.fid);
 
@@ -251,6 +254,26 @@ export default function ConnectionTabs() {
         </TabsContent>
       ))}
     </Tabs>
+
+    {/* MiniApp: Compact lists below graph */}
+    {isMiniApp && !loading && !error && (
+      <div className="mt-4 space-y-2 px-1">
+        <CompactConnectionList
+          connections={mutuals}
+          type="mutual"
+          title="Top Mutuals"
+          isExpanded={expandedMutuals}
+          onToggle={() => setExpandedMutuals((prev) => !prev)}
+        />
+        <CompactConnectionList
+          connections={influence}
+          type="influence"
+          title="Top Influence"
+          isExpanded={expandedInfluence}
+          onToggle={() => setExpandedInfluence((prev) => !prev)}
+        />
+      </div>
+    )}
     </>
   );
 }
