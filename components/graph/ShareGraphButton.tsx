@@ -64,7 +64,7 @@ export default function ShareGraphButton({
       // Viral share text: mentions first (triggers notifications), then CTA
       const mentions = topUsernames.slice(0, 5).map(u => `@${u}`).join(' ');
       const shareText = mentions
-        ? `${mentions}\n\nMy social graph. Who's in yours?`
+        ? `These are my top 5 in the social graph\n\n${mentions}\n\nWho am i missing?`
         : `My social graph. Who's in yours?`;
 
       await composeCast(shareText, [imageUrl, APP_URL]);
