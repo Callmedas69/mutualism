@@ -108,6 +108,32 @@ export interface UserGraphStateUpdate {
 }
 
 // ============================================
+// Connection Rank History Types
+// ============================================
+
+/**
+ * Connection rank history row - tracks rank position changes over time
+ */
+export interface ConnectionRankHistoryRow {
+  id: string; // UUID
+  viewer_fid: number; // The user viewing their connections
+  connection_fid: number; // The connection being tracked
+  connection_type: string; // "mutual" | "attention" | "influence"
+  rank: number; // Rank at snapshot time
+  score: number; // Score at snapshot time
+  recorded_at: string; // ISO timestamp
+  recorded_date: string; // Date string (YYYY-MM-DD)
+}
+
+export interface ConnectionRankHistoryInsert {
+  viewer_fid: number;
+  connection_fid: number;
+  connection_type: "mutual" | "attention" | "influence";
+  rank: number;
+  score: number;
+}
+
+// ============================================
 // Share Verification Types
 // ============================================
 
@@ -286,6 +312,39 @@ export interface Database {
           cast_hash?: string;
           cast_url?: string | null;
           verified_at?: string;
+        };
+        Relationships: [];
+      };
+      connection_rank_history: {
+        Row: {
+          id: string;
+          viewer_fid: number;
+          connection_fid: number;
+          connection_type: string;
+          rank: number;
+          score: number;
+          recorded_at: string;
+          recorded_date: string;
+        };
+        Insert: {
+          id?: string;
+          viewer_fid: number;
+          connection_fid: number;
+          connection_type: string;
+          rank: number;
+          score: number;
+          recorded_at?: string;
+          recorded_date?: string;
+        };
+        Update: {
+          id?: string;
+          viewer_fid?: number;
+          connection_fid?: number;
+          connection_type?: string;
+          rank?: number;
+          score?: number;
+          recorded_at?: string;
+          recorded_date?: string;
         };
         Relationships: [];
       };

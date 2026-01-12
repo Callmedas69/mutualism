@@ -1,5 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchAllMutuals } from "@/lib/quotient";
+import {
+  getPreviousRanks,
+  saveRankSnapshot,
+} from "@/lib/repositories/connection-rank-history";
+import type { MutualUser } from "@/types/quotient";
+
+/**
+ * Calculate rank changes by comparing current ranks to previous snapshot
+ * Positive = moved up (lower rank number), Negative = moved down, 0 = same, null = new
+ */
+function calculateRankChanges(
+  mutuals: MutualUser[],
+  previousRanks: Map<number, number>
+): MutualUser[] {
+  return mutuals.map((mutual) => {
+    const previousRank = previousRanks.get(mutual.fid);
+
+    if (previousRank === undefined) {
+      // New connection - no previous data
+      return { ...mutual, rank_change: null };
+    }
+
+    // Calculate change: previous - current (positive = moved up)
+    const rankChange = previousRank - mutual.rank;
+    return { ...mutual, rank_change: rankChange };
+  });
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,7 +48,27 @@ export async function POST(request: NextRequest) {
 
     console.log("Fetching mutuals for fid:", fid);
     const data = await fetchAllMutuals(fid);
-    return NextResponse.json(data);
+
+    // Get previous ranks for comparison
+    const previousRanks = await getPreviousRanks(fid, "mutual");
+
+    // Calculate rank changes
+    const mutualsWithChanges = calculateRankChanges(data.mutuals, previousRanks);
+
+    // Save current snapshot (fire and forget - don't block response)
+    const connectionsToSave = data.mutuals.map((m) => ({
+      fid: m.fid,
+      rank: m.rank,
+      score: m.combined_score,
+    }));
+    saveRankSnapshot(fid, connectionsToSave, "mutual").catch((err) => {
+      console.error("Failed to save rank snapshot:", err);
+    });
+
+    return NextResponse.json({
+      ...data,
+      mutuals: mutualsWithChanges,
+    });
   } catch (error) {
     console.error("Error fetching all mutuals:", error);
     return NextResponse.json(

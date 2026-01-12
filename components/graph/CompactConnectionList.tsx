@@ -30,6 +30,16 @@ function getMaxScore(connections: (MutualUser | ConnectionUser)[]): number {
   return Math.max(...connections.map(getScore));
 }
 
+/**
+ * Compact rank change indicator
+ */
+function RankChangeIndicator({ change }: { change: number | null | undefined }) {
+  if (change === undefined || change === null) return null;
+  if (change === 0) return <span className="text-zinc-300">-</span>;
+  if (change > 0) return <span className="text-green-500">+{change}</span>;
+  return <span className="text-red-500">{change}</span>;
+}
+
 interface CompactItemProps {
   user: MutualUser | ConnectionUser;
   maxScore: number;
@@ -53,9 +63,10 @@ const CompactItem = memo(function CompactItem({ user, maxScore, onViewProfile }:
       onClick={handleClick}
       className="group flex w-full items-center gap-3 py-2 text-left transition-colors hover:bg-zinc-50 active:bg-zinc-100"
     >
-      {/* Rank */}
-      <span className="w-5 shrink-0 text-xs font-mono text-zinc-400">
+      {/* Rank + Change */}
+      <span className="w-8 shrink-0 text-xs font-mono text-zinc-400 flex items-center gap-0.5">
         {user.rank}
+        <RankChangeIndicator change={user.rank_change} />
       </span>
 
       {/* Avatar */}

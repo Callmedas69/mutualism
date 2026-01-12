@@ -8,6 +8,7 @@ export interface MutualUser {
   combined_score: number;
   attention_score: number;
   influence_score: number;
+  rank_change?: number | null; // positive = moved up, negative = moved down, 0 = same, null = new
 }
 
 export interface ConnectionUser {
@@ -18,6 +19,7 @@ export interface ConnectionUser {
   score: number;
   interaction_count: number;
   is_mutual?: boolean;
+  rank_change?: number | null; // positive = moved up, negative = moved down, 0 = same, null = new
 }
 
 export interface ConnectionsAllResponse {

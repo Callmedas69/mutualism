@@ -21,6 +21,39 @@ interface ConnectionItemProps {
   type: "mutual" | "attention" | "influence";
 }
 
+/**
+ * Rank change indicator component
+ * Shows up arrow (green) for improvement, down arrow (red) for decline, dash (gray) for unchanged
+ */
+function RankChangeIndicator({ change }: { change: number | null | undefined }) {
+  if (change === undefined || change === null) {
+    // New connection - no previous data
+    return null;
+  }
+
+  if (change === 0) {
+    return (
+      <span className="text-zinc-400 dark:text-zinc-500" title="Unchanged">
+        -
+      </span>
+    );
+  }
+
+  if (change > 0) {
+    return (
+      <span className="text-green-600 dark:text-green-500" title={`Up ${change} positions`}>
+        +{change}
+      </span>
+    );
+  }
+
+  return (
+    <span className="text-red-600 dark:text-red-500" title={`Down ${Math.abs(change)} positions`}>
+      {change}
+    </span>
+  );
+}
+
 const ConnectionItem = memo(function ConnectionItem({ user, type }: ConnectionItemProps) {
   return (
     <a
@@ -48,6 +81,7 @@ const ConnectionItem = memo(function ConnectionItem({ user, type }: ConnectionIt
         </p>
         <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-500">
           <span className="font-mono">#{user.rank}</span>
+          <RankChangeIndicator change={user.rank_change} />
           <span className="text-zinc-300 dark:text-zinc-700">|</span>
           {isMutualUser(user) ? (
             <span>{user.combined_score.toFixed(1)}</span>
