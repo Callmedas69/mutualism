@@ -39,18 +39,18 @@ export async function saveRankSnapshot(
     score: conn.score,
   }));
 
-  // Batch insert - Supabase will handle the unique constraint
-  // If a record exists for today, it will fail silently (which is fine)
+  // Use upsert with ignoreDuplicates to skip existing records
+  // This avoids 409 errors when some connections already have today's snapshot
   const { error } = await supabase
     .from("connection_rank_history")
-    .insert(inserts);
+    .upsert(inserts, {
+      onConflict: "viewer_fid,connection_fid,connection_type,recorded_date",
+      ignoreDuplicates: true
+    });
 
   if (error) {
-    // 23505 is unique violation - expected if already saved today
-    if (error.code !== "23505") {
-      console.error("Failed to save rank snapshot:", error);
-      return false;
-    }
+    console.error("Failed to save rank snapshot:", error);
+    return false;
   }
 
   return true;
