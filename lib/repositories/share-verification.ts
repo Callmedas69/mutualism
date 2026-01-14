@@ -22,7 +22,7 @@ export async function getShareVerification(
       .from("share_verification")
       .select("fid, cast_hash, cast_url, verified_at")
       .eq("fid", fid)
-      .single();
+      .maybeSingle();  // Use maybeSingle to avoid 406 when no row exists
 
     if (error || !data) return null;
 
