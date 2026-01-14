@@ -114,9 +114,11 @@ export default function MintNFTModal({
       setStep("minting");
 
       const viewType = getViewType();
+      const imageUri = `ipfs://${snapshotResult.imageCid}`;
       const mintParams = prepareMintParams(
         viewType,
         graphData.fid,
+        imageUri,
         snapshotResult.metadataUri
       );
 
@@ -131,6 +133,7 @@ export default function MintNFTModal({
           mintParams.view,
           mintParams.fid,
           mintParams.graphVersion,
+          mintParams.imageUri,
           mintParams.animationUrl,
         ],
         value: mintValue,

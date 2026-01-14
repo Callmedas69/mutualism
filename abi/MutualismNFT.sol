@@ -41,7 +41,8 @@ contract MutualismNFT is ERC721, Ownable, ReentrancyGuard, Pausable {
         uint256 fid;
         uint256 graphVersion;
         uint256 mintedAt;
-        string animationUrl;
+        string imageUri;      // IPFS URI of the graph image (e.g., ipfs://Qm...)
+        string animationUrl;  // IPFS URI of the full metadata JSON
     }
 
     // ============================================
@@ -103,16 +104,19 @@ contract MutualismNFT is ERC721, Ownable, ReentrancyGuard, Pausable {
     /// @param viewType The snapshot view type
     /// @param fid The Farcaster ID of the user
     /// @param graphVersion The version of the graph algorithm
-    /// @param animationUrl The IPFS URI of the final high-resolution image
+    /// @param imageUri The IPFS URI of the graph image (e.g., ipfs://Qm...)
+    /// @param animationUrl The IPFS URI of the full metadata JSON
     /// @return tokenId The ID of the minted token
     function mint(
         SnapshotView viewType,
         uint256 fid,
         uint256 graphVersion,
+        string calldata imageUri,
         string calldata animationUrl
     ) external payable nonReentrant whenNotPaused returns (uint256) {
         require(_nextTokenId <= maxSupply, "Max supply reached");
         require(msg.value >= mintPrice, "Insufficient payment");
+        require(bytes(imageUri).length > 0, "Empty image URI");
         require(bytes(animationUrl).length > 0, "Empty animation URL");
 
         uint256 tokenId = _nextTokenId++;
@@ -123,6 +127,7 @@ contract MutualismNFT is ERC721, Ownable, ReentrancyGuard, Pausable {
             fid: fid,
             graphVersion: graphVersion,
             mintedAt: block.timestamp,
+            imageUri: imageUri,
             animationUrl: animationUrl
         });
 
@@ -152,8 +157,8 @@ contract MutualismNFT is ERC721, Ownable, ReentrancyGuard, Pausable {
             abi.encodePacked(
                 '{"name":"Mutual Graph #',
                 tokenId.toString(),
-                '","description":"A Farcaster social graph snapshot.","image":"data:image/svg+xml;base64,',
-                PREVIEW_SVG_BASE64,
+                '","description":"A Farcaster social graph snapshot.","image":"',
+                data.imageUri,
                 '","animation_url":"',
                 data.animationUrl,
                 '","attributes":[{"trait_type":"FID","value":"',

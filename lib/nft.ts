@@ -127,6 +127,7 @@ export interface MintParams {
   view: SnapshotViewEnumType;
   fid: bigint;
   graphVersion: bigint;
+  imageUri: string;
   animationUrl: string;
 }
 
@@ -136,12 +137,14 @@ export interface MintParams {
 export function prepareMintParams(
   view: SnapshotViewType,
   fid: number,
+  imageUri: string,
   animationUrl: string
 ): MintParams {
   return {
     view: mapViewToEnum(view),
     fid: BigInt(fid),
     graphVersion: BigInt(1), // Current graph version
+    imageUri,
     animationUrl,
   };
 }
