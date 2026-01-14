@@ -79,7 +79,6 @@ export default function ShareGraphButton({
     if (userFid && onShareVerified) {
       setState("verifying");
 
-      const searchText = "mutualism";
       const maxAttempts = 20; // 20 attempts * 3s = 60s max
 
       for (let attempt = 0; attempt < maxAttempts; attempt++) {
@@ -91,7 +90,6 @@ export default function ShareGraphButton({
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               fid: userFid,
-              searchText,
               imageUrl,
               maxAgeSeconds: 120,
             }),

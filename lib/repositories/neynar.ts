@@ -51,12 +51,11 @@ export async function getUserRecentCasts(
 }
 
 /**
- * Finds a matching cast by text content and embed URL
+ * Finds a matching cast by embed URL (CID matching)
  * Uses CID matching for embeds since Warpcast may proxy/modify URLs
  */
 export function findMatchingCast(
   casts: NeynarCast[],
-  searchText: string,
   imageUrl: string,
   maxAgeMs: number = 120000
 ): NeynarCast | null {
@@ -67,19 +66,18 @@ export function findMatchingCast(
   const cidMatch = imageUrl.match(/\b(baf[a-z0-9]+|Qm[a-zA-Z0-9]+)\b/);
   const cid = cidMatch ? cidMatch[1] : null;
 
+  // CID is required for reliable matching
+  if (!cid) {
+    console.warn("No CID found in imageUrl, cannot match cast");
+    return null;
+  }
+
   return (
     casts.find((cast) => {
       const castAge = now - new Date(cast.timestamp).getTime();
-      const textMatch = cast.text
-        .toLowerCase()
-        .includes(searchText.toLowerCase());
+      const embedMatch = cast.embeds?.some((e) => e.url?.includes(cid));
 
-      // Match by CID if available, otherwise fall back to full URL
-      const embedMatch = cid
-        ? cast.embeds?.some((e) => e.url?.includes(cid))
-        : cast.embeds?.some((e) => e.url?.includes(imageUrl));
-
-      return castAge < maxAgeMs && textMatch && embedMatch;
+      return castAge < maxAgeMs && embedMatch;
     }) || null
   );
 }

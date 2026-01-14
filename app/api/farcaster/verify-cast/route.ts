@@ -7,12 +7,12 @@ import { upsertShareVerification } from "@/lib/repositories/share-verification";
 
 export async function POST(request: NextRequest) {
   try {
-    const { fid, searchText, imageUrl, maxAgeSeconds = 120 } = await request.json();
+    const { fid, imageUrl, maxAgeSeconds = 120 } = await request.json();
 
     // Validate required fields
-    if (!fid || !searchText) {
+    if (!fid || !imageUrl) {
       return NextResponse.json(
-        { error: "Missing required fields: fid, searchText" },
+        { error: "Missing required fields: fid, imageUrl" },
         { status: 400 }
       );
     }
@@ -20,11 +20,10 @@ export async function POST(request: NextRequest) {
     // Fetch user's recent casts from Neynar
     const casts = await getUserRecentCasts(fid, 10);
 
-    // Find matching cast by text and embed
+    // Find matching cast by embed CID
     const matchingCast = findMatchingCast(
       casts,
-      searchText,
-      imageUrl || "",
+      imageUrl,
       maxAgeSeconds * 1000
     );
 
