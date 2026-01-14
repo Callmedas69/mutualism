@@ -50,7 +50,7 @@ export async function createSnapshot(
   const baseName = generateSnapshotBaseName(view, fid, timeWindow);
 
   // Step 2: Upload image with naming convention
-  const namedImage = new File([imageFile], `${baseName}.png`, { type: "image/png" });
+  const namedImage = new File([imageFile], `${baseName}.jpg`, { type: "image/jpeg" });
   const imageResult = await uploadFileToIPFS(namedImage);
   const imageCid = imageResult.cid;
 

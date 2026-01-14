@@ -17,14 +17,14 @@ export interface SnapshotUploadParams {
 }
 
 /**
- * Upload a snapshot to IPFS as a folder (image.png + metadata.json)
+ * Upload a snapshot to IPFS as a folder (image.jpg + metadata.json)
  * Returns folder CID and metadata URI for tokenization
  */
 async function uploadSnapshotInternal(
   params: SnapshotUploadParams
 ): Promise<SnapshotUploadResponse> {
   const formData = new FormData();
-  formData.append("image", params.imageBlob, "image.png");
+  formData.append("image", params.imageBlob, "image.jpg");
   formData.append("fid", String(params.fid));
   formData.append("username", params.username);
   formData.append("view", params.view);

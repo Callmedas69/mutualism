@@ -538,7 +538,7 @@ function ConnectionGraph({ connections, centerUser, type }: ConnectionGraphProps
     });
 
     return new Promise<Blob | null>((resolve) => {
-      exportCanvas.toBlob(resolve, "image/png");
+      exportCanvas.toBlob(resolve, "image/jpeg", 0.85);
     });
   }, [centerUser.username, type, graphData]);
 

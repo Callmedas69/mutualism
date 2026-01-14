@@ -45,8 +45,8 @@ export default function ShareGraphButton({
     try {
       const result = await ensureSnapshot();
 
-      // Use folder gateway URL + image.png for Farcaster embed
-      imageUrl = `${result.gatewayUrl}/image.png`;
+      // Use folder gateway URL + image.jpg for Farcaster embed
+      imageUrl = `${result.gatewayUrl}/image.jpg`;
 
       if (!result.gatewayUrl) {
         throw new Error("No gateway URL returned");
