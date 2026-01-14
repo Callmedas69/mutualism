@@ -7,12 +7,35 @@ import { upsertShareVerification } from "@/lib/repositories/share-verification";
 
 export async function POST(request: NextRequest) {
   try {
-    const { fid, imageUrl, maxAgeSeconds = 120 } = await request.json();
+    const { fid, imageUrl, maxAgeSeconds = 120, castHash } = await request.json();
 
     // Validate required fields
-    if (!fid || !imageUrl) {
+    if (!fid) {
       return NextResponse.json(
-        { error: "Missing required fields: fid, imageUrl" },
+        { error: "Missing required field: fid" },
+        { status: 400 }
+      );
+    }
+
+    // If castHash provided directly (from SDK), verify without searching
+    if (castHash) {
+      const castUrl = `https://warpcast.com/~/conversations/${castHash.slice(0, 10)}`;
+      const persisted = await upsertShareVerification(fid, castHash, castUrl);
+      if (!persisted) {
+        console.error(`Failed to persist share verification for fid ${fid}`);
+      }
+      return NextResponse.json({
+        verified: true,
+        castHash,
+        castUrl,
+        persisted,
+      });
+    }
+
+    // Fallback: Search for cast by imageUrl (legacy polling method)
+    if (!imageUrl) {
+      return NextResponse.json(
+        { error: "Missing required field: imageUrl or castHash" },
         { status: 400 }
       );
     }

@@ -53,7 +53,10 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(openssl rand:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(git -C \"D:\\\\Harry\\\\BasedNouns\\\\CodeProject\\\\quotientmutual\" log --oneline -20)",
+      "Bash(git -C \"D:\\\\Harry\\\\BasedNouns\\\\CodeProject\\\\quotientmutual\" show 06e823c --stat)",
+      "Bash(git -C \"D:\\\\Harry\\\\BasedNouns\\\\CodeProject\\\\quotientmutual\" show 06e823c)"
     ]
   },
   "enableAllProjectMcpServers": true,

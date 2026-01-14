@@ -22,7 +22,7 @@ interface MiniAppContextType {
   platform: MiniAppPlatform;
   user: MiniAppUser | null;
   signalReady: () => Promise<void>;
-  composeCast: (text?: string, embeds?: string[]) => Promise<void>;
+  composeCast: (text?: string, embeds?: string[]) => Promise<{ castHash?: string }>;
   closeMiniApp: () => Promise<void>;
   openUrl: (url: string) => Promise<void>;
   viewProfile: (fid: number) => Promise<void>;
@@ -124,18 +124,19 @@ export default function MiniAppProvider({ children }: MiniAppProviderProps) {
   }, [isMiniApp, hasSignaledReady]);
 
   // Action handlers - dual platform support
-  const composeCast = useCallback(async (text?: string, embeds?: string[]) => {
-    if (!isMiniApp) return;
+  const composeCast = useCallback(async (text?: string, embeds?: string[]): Promise<{ castHash?: string }> => {
+    if (!isMiniApp) return {};
 
     // Try Farcaster SDK first if we detected Farcaster platform
     if (platform === "farcaster") {
       try {
         const embedsTuple = embeds?.slice(0, 2) as [] | [string] | [string, string] | undefined;
-        await sdk.actions.composeCast({
+        const result = await sdk.actions.composeCast({
           text,
           embeds: embedsTuple,
         });
-        return;
+        // Return the cast hash from SDK response
+        return { castHash: result.cast?.hash };
       } catch (error) {
         console.error("Farcaster composeCast failed, trying OnchainKit:", error);
         // Fall through to OnchainKit
@@ -152,6 +153,7 @@ export default function MiniAppProvider({ children }: MiniAppProviderProps) {
     } catch (error) {
       console.error("Failed to compose cast:", error);
     }
+    return {};
   }, [isMiniApp, platform, onchainComposeCast]);
 
   const closeMiniApp = useCallback(async () => {

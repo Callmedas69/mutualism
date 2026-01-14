@@ -12,7 +12,7 @@ type ShareState = "idle" | "uploading" | "sharing" | "verifying" | "success" | "
 interface ShareGraphButtonProps {
   graphType: string;
   ensureSnapshot: () => Promise<SnapshotCache>;
-  composeCast: (text?: string, embeds?: string[]) => Promise<void>;
+  composeCast: (text?: string, embeds?: string[]) => Promise<{ castHash?: string }>;
   disabled?: boolean;
   isUploading?: boolean;
   userFid?: number;
@@ -60,6 +60,7 @@ export default function ShareGraphButton({
 
     // Step 2: Open composeCast with image + app URL embeds
     setState("sharing");
+    let castResult: { castHash?: string } = {};
     try {
       // Viral share text: mentions first (triggers notifications), then CTA
       const mentions = topUsernames.slice(0, 5).map(u => `@${u}`).join(' ');
@@ -67,7 +68,7 @@ export default function ShareGraphButton({
         ? `These are my top 5 in the social graph\n\n${mentions}\n\nWho am i missing?`
         : `My social graph. Who's in yours?`;
 
-      await composeCast(shareText, [imageUrl, APP_URL]);
+      castResult = await composeCast(shareText, [imageUrl, APP_URL]);
     } catch (err) {
       console.error("Failed to compose cast:", err);
       setError("Failed to open share");
@@ -75,10 +76,33 @@ export default function ShareGraphButton({
       return;
     }
 
-    // Step 3: Verify cast was published via Neynar (if userFid provided)
+    // Step 3: Verify cast was published
     if (userFid && onShareVerified) {
       setState("verifying");
 
+      // If SDK returned hash directly, use it (skip polling)
+      if (castResult?.castHash) {
+        try {
+          const res = await fetch("/api/farcaster/verify-cast", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              fid: userFid,
+              castHash: castResult.castHash,
+            }),
+          });
+          const data = await res.json();
+          if (data.verified) {
+            setState("success");
+            onShareVerified(castResult.castHash);
+            return;
+          }
+        } catch (err) {
+          console.error("Direct verification failed:", err);
+        }
+      }
+
+      // Fallback: Poll Neynar if no hash returned or direct verification failed
       const maxAttempts = 20; // 20 attempts * 3s = 60s max
 
       for (let attempt = 0; attempt < maxAttempts; attempt++) {
