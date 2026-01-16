@@ -35,6 +35,7 @@ export default function AddAppModal() {
   };
 
   const handleMaybeLater = () => {
+     localStorage.setItem('farcaster-app-modal-dismissed', Date.now().toString());
     setOpen(false);
   };
 
